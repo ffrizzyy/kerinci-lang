@@ -1,0 +1,35 @@
+{
+  "name": "kerincilang",
+  "displayName": "KerinciLang",
+  "description": "Syntax highlighting for KerinciLang (.krc)",
+  "version": "0.5.0",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "kerincilang",
+        "aliases": [
+          "KerinciLang",
+          "krc"
+        ],
+        "extensions": [
+          ".krc"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kerincilang",
+        "scopeName": "source.krc",
+        "path": "./syntaxes/krc.tmLanguage.json"
+      }
+    ]
+  },
+  "publisher": "kerincilang"
+}

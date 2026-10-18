@@ -1,0 +1,36 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.12"
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Language tests
+        run: python tests/test_kerincilang.py
+      - name: Tutorial and glossary tests
+        run: python tests/test_tutorial.py
+      - name: Build the single-file version and run an example
+        run: |
+          python build.py
+          python dist/krc.pyz examples/contoh.krc
+      - name: Install the krc command
+        run: |
+          pip install .
+          krc --version

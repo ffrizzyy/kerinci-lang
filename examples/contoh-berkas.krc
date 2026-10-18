@@ -1,0 +1,34 @@
+# contoh-berkas.krc: membaca dan menulis berkas
+
+tetap nama_berkas = "catatan.txt"
+
+# menulis (mengganti seluruh isi berkas)
+tulis(nama_berkas, "Belajar KerinciLang\n")
+
+# menambah di akhir berkas
+barang f = bukak(nama_berkas, "nambahkah")
+tulis(f, "Hari ini membuat program pertama\n")
+tulis(f, "Besok belajar lagi\n")
+tutup(f)
+
+# membaca seluruh isi
+nyetak baco(nama_berkas)
+
+# membaca baris demi baris
+barang nomor = 1
+untuk baris alem bukak(nama_berkas) {
+    nyetak nomor + ". " + baris
+    nomor = nomor + 1
+}
+
+# berkas yang tidak ada
+cubo {
+    nyetak baco("tidak-ada.txt")
+} tangkap pesan {
+    nyetak "Tidak bisa membaca: " + pesan
+}
+
+# menunggu sebentar, lalu menghapus berkas
+nantik(0.5)
+hapus(nama_berkas)
+nyetak "Selesai"

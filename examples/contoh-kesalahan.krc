@@ -1,0 +1,49 @@
+# contoh-kesalahan.krc: menangani kesalahan dengan cubo, tangkap, dan ngangkat
+
+guno bagi_aman(a, b) {
+    cubo {
+        balik bagi(a, b)
+    } tangkap pesan {
+        nyetak "Kesalahan: " + pesan
+        balik kosong
+    }
+}
+
+nyetak bagi_aman(10, 2)
+nyetak bagi_aman(1, 0)
+
+# memeriksa masukan pengguna
+nyetak "Berapa umurmu?"
+cubo {
+    barang umur = bilangan(tanyo())
+    nyetak "Tahun depan kamu " + (umur + 1) + " tahun"
+} tangkap pesan {
+    nyetak "Masukan harus bilangan bulat. (" + pesan + ")"
+}
+
+# kelihu di dalam perulangan: lewati data yang rusak
+barang data = ["10", "abc", "30", "4.5", "50"]
+barang jumlah = 0
+untuk teks alem data {
+    cubo {
+        jumlah = jumlah + bilangan(teks)
+    } tangkap {
+        nyetak "Dilewati: " + teks
+    }
+}
+nyetak "Jumlah: " + jumlah
+
+# membuat kesalahan sendiri dengan ngangkat
+guno periksa_umur(umur) {
+    kalu umur kurang_daripado 0 { ngangkat "umur tidak boleh negatif" }
+    kalu umur lebih_daripado 150 { ngangkat "umur terlalu besar" }
+    balik umur
+}
+
+untuk u alem [25, 0 - 5, 200] {
+    cubo {
+        nyetak "Umur sah: " + periksa_umur(u)
+    } tangkap pesan {
+        nyetak "Ditolak (" + u + "): " + pesan
+    }
+}

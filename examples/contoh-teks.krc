@@ -1,0 +1,29 @@
+# contoh-teks.krc: pisah, disatu, dan mengolah teks
+
+barang kalimat = "belajar bahasa pemrograman kerinci"
+barang kata_kata = pisah(kalimat)
+nyetak kata_kata
+nyetak "Jumlah kata: " + panjang(kata_kata)
+nyetak "Terurut: " + disatu(milih(kata_kata), ", ")
+nyetak "Terbalik: " + disatu(pulang(kata_kata), " ")
+
+# data yang dipisah koma menjadi peta
+barang baris = "Budi,80,Sari,92,Dewi,65"
+barang bagian = pisah(baris, ",")
+barang nilai = {}
+barang i = 0
+selamo i kurang_daripado panjang(bagian) {
+    nilai[bagian[i]] = bilangan(bagian[i + 1])
+    i = i + 2
+}
+nyetak nilai
+
+# huruf demi huruf
+nyetak pisah("kerinci", "")
+nyetak pulang("kerinci")
+
+# menyimpan daftar ke berkas dan membacanya lagi
+barang buah = ["pisang", "apel", "jeruk"]
+tulis("buah.txt", disatu(buah, "\n"))
+nyetak pisah(baco("buah.txt"), "\n")
+hapus("buah.txt")

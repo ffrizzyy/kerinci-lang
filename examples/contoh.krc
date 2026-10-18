@@ -1,0 +1,39 @@
+# contoh.krc: program contoh KerinciLang
+barang umur = 20
+tetap sapaan = "Halo, "
+
+guno sapa(nama) {
+    kalu umur lebih_daripado 17 {
+        nyetak sapaan + nama
+    } lain {
+        nyetak "Hai"
+    }
+}
+sapa("Budi")
+
+guno fakt(n) {
+    kalu n kurang_samo 1 { balik 1 }
+    balik n * fakt(n - 1)
+}
+nyetak fakt(5)
+
+# perulangan dengan lanjut dan putuh
+barang i = 0
+selamo i kurang_daripado 10 {
+    i = i + 1
+    kalu i == 3 { lanjut }
+    kalu i == 6 { putuh }
+    nyetak i
+}
+
+barang nilai = 70
+kalu nilai >= 80 {
+    nyetak "Bagus"
+} lain kalu nilai >= 60 {
+    nyetak "Cukup"
+} lain {
+    nyetak "Ulang"
+}
+
+nyetak idak (1 > 2) ngan betul
+nyetak kosong

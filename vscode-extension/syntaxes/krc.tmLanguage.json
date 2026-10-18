@@ -1,0 +1,49 @@
+{
+  "scopeName": "source.krc",
+  "name": "KerinciLang",
+  "patterns": [
+    {
+      "name": "comment.line.number-sign.krc",
+      "match": "#.*$"
+    },
+    {
+      "name": "string.quoted.double.krc",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.krc",
+          "match": "\\\\."
+        }
+      ]
+    },
+    {
+      "name": "constant.numeric.krc",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    {
+      "name": "keyword.control.krc",
+      "match": "\\b(kalu|lain|selamo|untuk|alem|pilih|ambik|cubo|tangkap|ngangkat|putuh|lanjut|balik|mulai|habih)\\b"
+    },
+    {
+      "name": "storage.type.krc",
+      "match": "\\b(barang|tetap|guno)\\b"
+    },
+    {
+      "name": "keyword.operator.word.krc",
+      "match": "\\b(ngan|apo|idak|samo|dak_samo|lebih_daripado|kurang_daripado|lebih_samo|kurang_samo)\\b"
+    },
+    {
+      "name": "support.function.krc",
+      "match": "\\b(nyetak|tanyo)\\b"
+    },
+    {
+      "name": "support.function.builtin.krc",
+      "match": "\\b(panjang|daftar|tambah|kurang|kali|bagi|jarak|nambahkah|isi|milih|pulang|bilangan|pecahan|kato|mecem|peta|pisah|disatu|bukak|baco|tulis|tutup|hapus|nantik)(?=\\()"
+    },
+    {
+      "name": "constant.language.krc",
+      "match": "\\b(betul|salah|kosong)\\b"
+    }
+  ]
+}

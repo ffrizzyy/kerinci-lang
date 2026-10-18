@@ -1,0 +1,7 @@
+# contoh-impor.krc: memakai modul perkakas.krc dengan ambik
+ambik "perkakas"
+
+nyetak "Perkakas versi " + versi
+barang nilai = [80, 65, 90, 55, 75]
+nyetak "Rata-rata: " + rata_rata(nilai)
+nyetak "Terbesar: " + terbesar(nilai)

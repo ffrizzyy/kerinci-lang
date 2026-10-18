@@ -1,0 +1,53 @@
+# contoh-daftar.krc: daftar, indeks, dan perulangan untuk
+
+barang nilai = [80, 65, 90, 55, 75]
+nyetak "Jumlah nilai: " + panjang(nilai)
+
+# menjumlah semua nilai
+barang total = 0
+untuk n alem nilai {
+    total = total + n
+}
+nyetak "Total: " + total
+nyetak "Rata-rata: " + bagi(total, panjang(nilai))
+
+# mencari nilai terbesar
+barang terbesar = nilai[0]
+untuk n alem nilai {
+    kalu n lebih_daripado terbesar { terbesar = n }
+}
+nyetak "Terbesar: " + terbesar
+
+# memakai indeks
+untuk i alem jarak(panjang(nilai)) {
+    kalu nilai[i] kurang_daripado 60 {
+        nyetak "Nilai ke-" + i + " tidak lulus: " + nilai[i]
+    }
+}
+
+# membangun daftar baru
+guno ganda(xs) {
+    barang hasil = []
+    untuk x alem xs { hasil = hasil + [kali(x, 2)] }
+    balik hasil
+}
+nyetak ganda([1, 2, 3])
+
+# mengubah elemen
+nilai[3] = 60
+nyetak nilai
+
+# menghitung mundur
+untuk i alem jarak(5) {
+    nyetak 5 - i
+}
+
+# menambah, mengurutkan, membalik, dan mencari
+barang buah = ["pisang", "apel", "jeruk"]
+nambahkah(buah, "mangga")
+nyetak buah
+nyetak milih(buah)        # daftar baru; buah tidak berubah
+nyetak pulang(buah)
+nyetak isi(buah, "apel")
+nyetak isi("halo", "al")
+nyetak jarak(1, 10, 3)

@@ -1,0 +1,16 @@
+# perkakas.krc: modul kecil yang diimpor oleh contoh-impor.krc
+tetap versi = "1.0"
+
+guno rata_rata(xs) {
+    barang total = 0
+    untuk x alem xs { total = total + x }
+    balik bagi(total, panjang(xs))
+}
+
+guno terbesar(xs) {
+    barang hasil = xs[0]
+    untuk x alem xs {
+        kalu x lebih_daripado hasil { hasil = x }
+    }
+    balik hasil
+}

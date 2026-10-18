@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+.venv/
+.DS_Store
+# files the tutorial and tests create while running
+nilai.txt
+catatan.txt

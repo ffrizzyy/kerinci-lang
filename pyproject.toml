@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kerincilang"
+version = "0.5.0"
+description = "A programming language with Siulak-Kerinci keywords"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+keywords = ["programming-language", "kerinci", "siulak", "language-preservation"]
+
+[project.scripts]
+krc = "kerincilang:main"
+
+[tool.setuptools]
+py-modules = ["kerincilang"]
