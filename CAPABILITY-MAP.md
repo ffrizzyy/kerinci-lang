@@ -85,4 +85,6 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
       (`krc migrasi`, `tests/test_migration.py`); examples carry headers.
 - [x] `SPEC-translator.md` approved; `translator` implemented and green
       (`krc terjemah`, `tests/test_translator.py`, 173 checks).
-- [ ] Next: `tutorial-multidialect`.
+- [x] `SPEC-tutorial-multidialect.md` approved; next implement the dialect
+      tutorial generator and the Koto Payang trees.
+- [ ] Next: `docs-release`.
