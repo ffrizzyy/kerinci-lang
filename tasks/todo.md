@@ -1,36 +1,46 @@
-# Todo: core-ids
+# Todo: dialect-model
 
 Each item is done only when the listed check passes.
 
-- [x] T1 `core/ids.json` exists, parses, and covers the full inventory
-      (134 IDs: 26 kw, 6 op, 24 fn, 9 type, 3 mode, 65 msg, 1 reserved).
-      Check: `tests/test_ids.py` catalogue cases.
-- [x] T2 `core/__init__.py` and `dialects/__init__.py` exist (data packages).
-- [x] T3 `Vocabulary` + `LegacySiulak` + `current_vocab`/`use_vocab` in place.
-- [x] T4 `LangError` carries `msg_id`/`msg_args` and renders at construction;
-      `args[0]` stays the rendered text.
-- [x] T5 Lexer emits neutral token kinds; keyword text is the ID; word operators
-      become the neutral symbol.
-- [x] T6 Parser compares IDs only; `display()`/`label()` used for error text.
-- [x] T7 Runtime: `Env.vocab`, `show(v, vocab)`, `new_global(vocab)`,
-      builtins by `fn.*`, modes by `mode.*`, `mecem` by `type.*`.
-- [x] T8 No literal user message left in the engine (AST scan in `test_ids.py`).
-- [x] T9 Compatibility exports generated from `LegacySiulak`, same keys/values.
-- [x] T10 `tests/test_kerincilang.py` 271/271, unchanged.
-- [x] T11 `tests/test_tutorial.py` 550 blocks, unchanged.
-- [x] T12 `tools/buat_glosarium.py` and `make_highlight.py` produce no diff.
-- [x] T13 `build.py` and `pyproject.toml` ship `core/` + `dialects/`.
-- [x] T14 `dist/krc.pyz` runs from a clean temp directory; `pip install . --target`
-      runs from a clean temp directory.
-- [x] T15 `tests/test_ids.py` passes: integrity, matrix, placeholders,
-      synthetic vocabularies, AST scans, packaging.
-- [x] T16 `docs/04-implementation.md` documents the seam and the M1 limit.
-- [x] T17 `python -m compileall -q .` passes.
+- [ ] T1 `OP_SYMBOLS` in `kerincilang.py`, derived from `LEGACY_OPERATORS`.
+- [ ] T2 `dialects/loader.py` exists: `Problem`, `DialectError`, `Report`,
+      `Dialect`, `DialectVocabulary`, `base_dialect`, `validate_dialect`,
+      `load_dialect`, `available_dialects`.
+- [ ] T3 `base_dialect()` resolves every live ID from `core/ids.json` and passes
+      its own validation.
+- [ ] T4 File reading: code pattern, path inside `root`, 1 MiB cap, duplicate
+      keys rejected, UTF-8 only, object root.
+- [ ] T5 Works from a checkout, a wheel, and `dist/krc.pyz` (default root via
+      `importlib.resources`).
+- [ ] T6 Parent chain resolves child -> parent -> base; a parent cycle names all
+      members; a missing parent is `parent-missing`.
+- [ ] T7 Every section 6 rule has a code and a test: `schema`, `code`,
+      `core-version`, `word-empty`, `word-charset`, `word-case`, `unknown-id`,
+      `wrong-namespace`, `message-placeholder`, `parent-missing`,
+      `parent-cycle`, `reviewer-missing`, `source-missing`, `clash`, `path`,
+      `size`, `json`.
+- [ ] T8 Clash matrix: 12 Siulak overlaps accepted; `fn`/`kw` clash rejected
+      with both IDs named.
+- [ ] T9 `newer-core` warns and loads; an unknown ID is a hard error.
+- [ ] T10 `DialectVocabulary` runs a program through
+      `run_source(..., vocab=load_dialect(...).vocab)`.
+- [ ] T11 `tools/cek_dialek.py` supports `--semua`, `--kode`, `--ketat`; exit
+      0/1/2; `main(argv, root)` usable from tests.
+- [ ] T12 `python tools/cek_dialek.py --semua` exits 0 on the empty `dialects/`.
+- [ ] T13 `tests/test_dialects.py` passes; fixtures are temporary, none committed.
+- [ ] T14 `tests/test_kerincilang.py` 271/271, `test_tutorial.py` 550 blocks,
+      `test_ids.py` all pass, all unchanged.
+- [ ] T15 `buat_glosarium.py` and `make_highlight.py` produce no diff;
+      `build.py` and `dist/krc.pyz` still work from a clean temp directory.
+- [ ] T16 `docs/04-implementation.md` documents dialect files; spec marked
+      implemented; `CAPABILITY-MAP.md` points at `runtime-selection`.
+- [ ] T17 `python -m compileall -q .` passes.
 
-## Follow-ups (not part of core-ids)
+## Follow-ups (not part of dialect-model)
 
-- `dialect-model`: load `dialects/*.json`, parent fallback, validation, report.
-- `runtime-selection`: per-module vocabulary, `# dialek:` header, `--ketat`.
+- `dialect-siulak-legacy`: freeze Siulak as `dialects/siulak.json` (`draft`).
+- `dialect-koto-payang`: normalize the worksheet and write the first draft.
+- `runtime-selection`: `# dialek:` header, `--dialek`, `--ketat`, per-module
+  scopes.
 - `cli-migration`: `krc migrasi`, precedence table, import recursion.
-- `type.bool` still returns the placeholder `boolean` in Siulak until a word
-  is supplied; do not change it without a Siulak re-review.
+- `type.bool` still renders `boolean` in Siulak until a speaker review.
