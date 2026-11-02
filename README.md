@@ -62,7 +62,7 @@ program losslessly.
 
 ## Learn
 
-The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included.
+The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included. The same course is generated with Koto Payang code in [English](tutorial/en/koto-payang/README.md) and [Indonesian](tutorial/id/koto-payang/README.md); Koto Payang is still under review.
 
 More example programs are in [`examples/`](examples/). The full language reference is [`docs/03-syntax-design.md`](docs/03-syntax-design.md).
 
@@ -73,6 +73,8 @@ Variables and constants, numbers, text (with `pisah` / `disatu` to split and joi
 ## Status
 
 Version **0.5.0**. The language is complete and tested (271 language tests, plus 550 tutorial code blocks). **The vocabulary has been reviewed and approved by Kerinci speakers.** Two questions remain open: a Kerinci word for "boolean" (the type name that `mecem` returns for `betul` and `salah` is still the temporary English word `boolean`), and what the reserved word `kelihu` ("error") should be used for. The checklist that speakers worked through is in [`docs/02-vocabulary-worksheet.md`](docs/02-vocabulary-worksheet.md).
+
+Koto Payang is the second dialect, committed at `status: review`. It owns 89 of the 137 neutral IDs and falls back to the English base for the other 48, so a second speaker pass is still required before it can be called `approved`. The generated tutorial names the two base words its lessons actually use (`contains` and `boolean`) instead of inventing replacements.
 
 The interpreter's own messages (for example `Kesalahan: Pembagian dengan nol`) are written in Indonesian for now. The [glossary](tutorial/glossary.md#error-messages) explains the common ones, and translating them into Kerinci is a good task for speakers.
 

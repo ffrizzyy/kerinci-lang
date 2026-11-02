@@ -1,0 +1,4 @@
+# Generated tutorial trees are written with LF. Keep them LF on every platform
+# so a fresh build is byte-identical to the committed tree.
+tutorial/en/koto-payang/** text eol=lf
+tutorial/id/koto-payang/** text eol=lf

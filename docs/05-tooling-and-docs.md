@@ -57,6 +57,7 @@ To try it locally, copy the `vscode-extension` folder into your VS Code extensio
 | `README.md` (front page) | English | done |
 | Tutorial: 13 lessons, answers, glossary (`tutorial/`) | English, Kerinci code | done; every sample is tested |
 | The same tutorial in Indonesian (`tutorial/id/`) | Indonesian, Kerinci code | done; every sample is tested |
+| Generated Koto Payang tutorial (`tutorial/en/koto-payang/`, `tutorial/id/koto-payang/`) | English / Indonesian prose, Koto Payang code | done; review status, every block tested |
 | Tutorial prose in Kerinci | Kerinci | **needs speakers** (guide in `tutorial/kerinci/README.md`) |
 | Language reference (`docs/03-syntax-design.md`) | English | done |
 | Keyword glossary (`tutorial/glossary.md`, Indonesian: `tutorial/id/glosarium.md`) | Kerinci, English, Indonesian | done; checked against the language |
@@ -71,7 +72,17 @@ Every code sample in the tutorial is run by `tests/test_tutorial.py`, and the ou
 python3 tools/sinkron_tutorial.py --tulis   # refresh the printed outputs
 python3 tools/buat_glosarium.py             # rewrites both glossaries; fails if a new word is missing
 python3 tests/test_tutorial.py
+python3 tools/sinkron_tutorial.py --bangun koto-payang   # regenerate both generated trees
+python3 tests/test_tutorial_dialects.py
 ```
+
+`--bangun koto-payang` reads the baseline lessons, maps words by neutral ID,
+runs every generated block, and rewrites the committed
+`tutorial/{en,id}/koto-payang/` trees. The generated index names any English
+base fallback the dialect still needs; Koto Payang currently uses `contains`
+(`fn.contains`) and `boolean` (`type.bool`). The build warns once per fallback
+on stderr and still exits 0. A `.krc` helper gets a dialect header; raw-data
+helpers such as `nilai.txt` keep their bytes.
 
 ## The Siulak freeze
 
@@ -101,9 +112,12 @@ python3 tools/cek_dialek.py --kode koto-payang                    # CI gate
 
 `periksa --siap` passes for `review` and prints that `approved` is not ready
 (51 Tier 2 rows unreviewed). Do not promote the file, fill a `todo` with a
-guess, or borrow a Siulak word to make the counts look complete. The second
-speaker pass supplies the 42 messages, 6 words, and 4 draft confirmations; only
-then can the file carry a named reviewer and `status: approved`.
+guess, or borrow a Siulak word to make the counts look complete. The generated
+Koto Payang tutorial is honest about this: it lists `contains` and `boolean`
+as base words in both indexes until speakers supply the dialect's own terms.
+The second speaker pass supplies the 42 messages, 6 words, and 4 draft
+confirmations; only then can the file carry a named reviewer and
+`status: approved`.
 
 ## Migrating old programs
 

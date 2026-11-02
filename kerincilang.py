@@ -1886,6 +1886,24 @@ def _terjemah_write(path, text):
         raise
 
 
+def rewrite_dialect_words(text, source_vocab, target_vocab):
+    """Map code words by neutral ID for a tutorial build.
+
+    Unlike `terjemah`, this never refuses: a target without a word uses its
+    base fallback. Comments, ordinary strings, user names, and formatting are
+    untouched. Returns the new text and the set of IDs that were used.
+    """
+    edits, used, _problems, _lines = _terjemah_scan(
+        text, _terjemah_words(source_vocab), _terjemah_words(target_vocab))
+    return _terjemah_apply(text, edits), used
+
+
+def dialect_declared_names(text, vocab):
+    """The names a snippet declares, parsed with `vocab`; never runs it."""
+    program = Parser(tokenize(text, vocab), vocab).program()
+    return _terjemah_symbols(program)
+
+
 def _terjemah_scan(text, source_words, target_words):
     """Classify every token and return edits, used IDs, and string refusals."""
     source = _terjemah_maps(source_words)

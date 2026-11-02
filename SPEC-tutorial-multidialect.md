@@ -1,6 +1,6 @@
 # Spec: tutorial-multidialect
 
-Status: **approved 2026-11-02.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `tutorial-multidialect`.
 Depends on `runtime-selection`, `dialect-siulak-legacy`, and
 `dialect-koto-payang`, all implemented. Date: 2026-11-02.
@@ -27,8 +27,9 @@ After this module:
 - The generated output is the real output of the real interpreter, not a
   hand edit.
 - Regenerating the tree is deterministic and byte-identical.
-- The existing `tutorial/*.md` and `tutorial/id/*.md` files do not change, and
-  `tests/test_tutorial.py` still checks exactly the same 550 blocks.
+- The existing lesson files, their expected output, and their count do not
+  change; only the two tutorial index pages gain a pointer to the generated
+  trees, and `tests/test_tutorial.py` still checks exactly the same 550 blocks.
 
 ## 2. Scope
 
@@ -142,7 +143,7 @@ without changing the generator contract.
 | Part | Treatment |
 |---|---|
 | `krc` and `krc-error` code fence | word-mapped, given a dialect header, run, and paired with fresh `hasil` |
-| `krc-berkas` helper fence | word-mapped and given a dialect header; written to the temp project before later blocks |
+| `krc-berkas` helper fence | a helper ending in `.krc` is word-mapped and given a dialect header; any other helper is raw data and is copied byte for byte; both are written to the temp project before later blocks |
 | `hasil` fence | replaced with the real output of the block above |
 | inline code span `` `...` `` in prose | word-mapped with the same rules |
 | ordinary prose | copied byte for byte, except dialect-name and link fixes |
@@ -168,9 +169,28 @@ The generator may reuse the translator's scanner through a small public
 function rather than importing a private name. That function returns the
 rewritten text and the set of IDs used. It does not execute the program.
 
+### Inline code spans
+
+A code span `` `...` `` is mapped with the same scanner, with three refinements
+that keep prose readable and avoid inventing a base fallback that the corpus
+does not need:
+
+- A span that looks like an expression (more than one word, or containing
+  `()[]{}.,=<>!+-*/%`) is passed through `rewrite_dialect_words`.
+- A bare identifier span takes the target word for a matching ID only when the
+  target owns that ID; `fn.contains` and `type.bool` may use their base
+  fallbacks. The generator never adds a new fallback such as `list` or `map`
+  merely to translate prose.
+- A cell in a Markdown table column headed `Kind` or `Jenis` is mapped as a
+  `type.*` word, so the type table in lesson 2 names the target dialect's type
+  words rather than a built-in function with the same spelling.
+
+If a span cannot be mapped under these rules, it is left as written. A bare
+prose mention of a word outside backticks is never guessed at.
+
 ### Headers
 
-Every generated `krc`, `krc-error`, and `krc-berkas` block begins with:
+Every generated `krc`, `krc-error`, and `.krc` helper fence begins with:
 
 ```text
 # dialek: <code>
@@ -179,6 +199,10 @@ Every generated `krc`, `krc-error`, and `krc-berkas` block begins with:
 The header is inside the fence, so a reader can copy the block and run it.
 The runner supplies the same header to helper files. A headerless baseline
 block therefore gains exactly one line in the generated tree.
+
+A `krc-berkas` helper whose name does not end in `.krc` is data, not code: its
+bytes are copied unchanged and it gets no header. The tutorial corpus includes
+`nilai.txt`; adding a header there would corrupt the file the lesson reads.
 
 ### Fallbacks
 
@@ -251,11 +275,20 @@ A generated glossary is a stub, not a translated word table. English:
 This tutorial is generated for Koto Payang (status: review). The full glossary
 is still the Siulak one: [glossary](../../glossary.md). A Koto Payang glossary
 follows when the dialect is approved.
+
+## Error messages
+
+The error messages are explained in the [Siulak glossary's error
+messages section](../../glossary.md#error-messages). They will be
+listed here when the dialect is approved.
 ```
 
-The Indonesian tree writes `glosarium.md` with the same notice in Indonesian
-and links to `../../id/glosarium.md`. The stub exists so every link in the
-lessons resolves.
+The Indonesian tree writes `glosarium.md` with the same notice in Indonesian,
+links to `../../id/glosarium.md`, and gives the local section the heading
+`Kesalahan` so a `#kesalahan` fragment resolves. The local `#error-messages` /
+`#kesalahan` headings keep the existing fragment links useful even before a
+full dialect glossary exists. The stub exists so every link in the lessons
+resolves.
 
 ## 7. Tests: `tests/test_tutorial_dialects.py`
 
@@ -274,18 +307,20 @@ on any failure. The suite covers:
 5. **Every generated block runs.** For both prose axes, every `krc` block runs
    without error, every `krc-error` block fails, and every `hasil` matches the
    real output.
-6. **Helper files.** A lesson with `krc-berkas` writes each helper with the
-   target header, and the later blocks import it successfully.
+6. **Helper files.** A lesson with `krc-berkas` writes each `.krc` helper with
+   the target header and leaves a non-`.krc` helper as raw bytes, and the later
+   blocks import the helper successfully.
 7. **Normalized equivalence.** For every baseline block and its generated
    counterpart, stdout matches after normalizing dialect output words and
    message templates to neutral IDs, and errors match by `msg_id` plus
    normalized arguments. This is the parent's equivalence rule.
 8. **Fallbacks.** The generated tree contains exactly the expected fallback
-   surfaces for Koto Payang (`contains`, `boolean`), the index lists them, and
-   the build warning names `fn.contains` and `type.bool`. No other base word
-   appears in a code fence.
-9. **Headers.** Every `krc` / `krc-error` / `krc-berkas` fence in the generated
-   tree starts with `# dialek: koto-payang`; no baseline fence does.
+   surfaces for Koto Payang (`contains` in code, `boolean` in output), the
+   index lists them, and the build warning names `fn.contains` and `type.bool`.
+   No other base word appears in a code fence.
+9. **Headers.** Every `krc` / `krc-error` fence and every `.krc` helper in the
+   generated tree starts with `# dialek: koto-payang`; no baseline fence does.
+   A raw-data helper keeps its bytes.
 10. **Links and index.** Every relative link in the generated tree resolves to
     an existing file (fragments ignored), each generated `README.md` links all
     14 lessons, and the glossary stub exists.
@@ -305,7 +340,8 @@ reported as one PASS per group plus a count.
 
 ### Always
 
-- Keep the baseline tutorial bytes and its 550-block count unchanged.
+- Keep the baseline lesson code and its 550-block count unchanged; the index
+  pages may gain a pointer to the generated trees.
 - Write only under the requested output root; never into the baseline files.
 - Map words by neutral ID; never invent a word.
 - Run every generated block with its dialect header.
@@ -345,8 +381,9 @@ reported as one PASS per group plus a count.
    every lesson has 14 links, and every block runs in Koto Payang.
 5. Normalized output and error identity match the Siulak baseline for every
    block.
-6. No baseline tutorial file, catalogue entry, dialect word, example, or
-   runtime behaviour changes.
+6. No baseline lesson, expected output, catalogue entry, dialect word, example,
+   or runtime behaviour changes; only the two index pages point at the new
+   trees.
 7. `tests/test_tutorial_dialects.py` passes and all earlier suites stay green;
    `cek_dialek --semua`, the generators, `compileall`, and `build.py` pass.
 8. `CAPABILITY-MAP.md`, `docs/03`, `docs/04`, `docs/05`, `README.md`, and
@@ -375,3 +412,41 @@ the baseline discovery, generate and commit both Koto Payang trees, add
 `tests/test_tutorial_dialects.py`, run all eleven suites plus
 `cek_dialek --semua`, the generators, `compileall`, `build.py`, and the zipapp
 smoke test, update the docs and capability map, commit, and push.
+
+## 12. Implementation log
+
+Implemented 2026-11-02 as specified.
+
+- `tools/sinkron_tutorial.py` gained `--bangun`, `--semua-dialek`, `--prosa`,
+  and `--keluaran`. The default check and `tests/test_tutorial.py` use
+  `baseline_paths()`, so the generated trees are not checked twice and the
+  baseline still reports exactly 550 blocks.
+- `kerincilang.py` exposes `rewrite_dialect_words` for code spans and
+  `dialect_declared_names` for the collision check. The build uses the same
+  scanner as `krc terjemah`; it never runs code to map words.
+- Both Koto Payang trees are committed under `tutorial/en/koto-payang/` and
+  `tutorial/id/koto-payang/`: 34 files and 268 runnable blocks. Every generated
+  block was run again after writing and matched its regenerated `hasil`.
+  `.gitattributes` pins those two trees to LF so a Windows checkout is still
+  byte-identical to a fresh build.
+- The only base fallbacks the corpus uses are `fn.contains` (`contains`) and
+  `type.bool` (`boolean`). The index lists both and the build writes one stderr
+  warning per ID; the build still exits 0.
+- A `.krc` helper gets the dialect header and is word-mapped. `nilai.txt` is raw
+  data, so it keeps its bytes and gets no header; the lesson's file code runs
+  unchanged.
+- Inline spans use the policy in section 5. The lesson 2 type table maps
+  kind-column cells as `type.*`, so the table names `bilangan_buluak`,
+  `bilangan_bakoma`, `tulisan`, `daftar`, `kamus`, `boolean`, and `kusao`
+  instead of reading as function calls.
+- The glossary stubs link to the Siulak glossary and add local
+  `## Error messages` / `## Kesalahan` sections, so existing fragments resolve.
+- `tests/test_tutorial_dialects.py` reports 20 checks covering the thirteen
+  groups: determinism, the committed tree, the untouched baseline, the Siulak
+  self-build, every generated block, helper headers, normalized equivalence,
+  fallbacks, headers, links/index/glossary, prose fidelity, usage errors, and
+  transactional failure.
+- All eleven suites, `cek_dialek --semua`, `make_highlight.py`,
+  `buat_glosarium.py`, `compileall`, `build.py`, and a `dist/krc.pyz` run pass.
+  No baseline lesson, expected output, catalogue entry, dialect word, or
+  earlier test expectation changed.

@@ -12,8 +12,8 @@ pyproject.toml             packaging: provides the `krc` command
 build.py                   runs all tests, then builds dist/krc.pyz
 make_highlight.py          generates the VS Code grammar from the line's vocabulary
 examples/                  example programs (.krc)
-tutorial/                  13 lessons, answers, glossary in English; tutorial/id/ is the Indonesian copy (every code sample is tested)
-tests/                     test_kerincilang.py (language), test_tutorial.py (tutorial + glossary), test_ids.py (catalogue + seam + packaging), test_dialects.py (dialect files), test_runtime_selection.py (selection), test_worksheet.py (worksheet pipeline)
+tutorial/                  13 lessons, answers, glossary in English; tutorial/id/ is the Indonesian copy; tutorial/{en,id}/koto-payang/ are generated Koto Payang trees (every code sample is tested)
+tests/                     test_kerincilang.py (language), test_tutorial.py (baseline tutorial + glossary), test_tutorial_dialects.py (generated trees), test_ids.py (catalogue + seam + packaging), test_dialects.py (dialect files), test_runtime_selection.py (selection), test_worksheet.py (worksheet pipeline)
 tools/                     sinkron_tutorial.py, buat_glosarium.py, cek_dialek.py (dialect CI gate), lembar_kerja.py (worksheet pipeline)
 docs/                      design documents (this folder)
 tasks/                     plan.md / todo.md for a working module
@@ -176,6 +176,34 @@ counts, `periksa --siap` readiness (review yes, approved no), header and
 `--dialek` selection, a clean run with no warning, the `type.bool` fallback
 warning, and the `cek_dialek` summaries.
 
+### Dialect-templated tutorial
+
+The tested Siulak lessons are the single written source; there is no second
+prose copy. `tools/sinkron_tutorial.py --bangun koto-payang` maps code fences
+and inline code spans by neutral ID, adds `# dialek: koto-payang`, runs every
+block, and writes `tutorial/en/koto-payang/` and
+`tutorial/id/koto-payang/`. `--semua-dialek` does the same for every dialect
+whose status is `review` or `approved`. The generated trees are committed; the
+baseline lesson code is not touched, and `tests/test_tutorial.py` still checks
+exactly 550 baseline blocks.
+
+A `krc-berkas` helper ending in `.krc` is code: it is word-mapped and gets the
+header. Any other helper is raw data and keeps its bytes, so `nilai.txt` in
+lesson 13 is not corrupted. The generator reuses `rewrite_dialect_words` from
+`kerincilang.py`, the same scanner as `krc terjemah`.
+
+A target that lacks a word may use the English base fallback. Koto Payang's
+tutorial uses two: `fn.contains` (`contains`) and `type.bool` (`boolean`). The
+build lists them in both indexes and warns once per ID on stderr; it never
+invents a word. Inline spans and the `Kind` / `Jenis` table columns have their
+own mapping rules, recorded in `SPEC-tutorial-multidialect.md`.
+
+`tests/test_tutorial_dialects.py` builds into temporary repo copies and checks
+determinism, the committed trees, the untouched baseline, the Siulak
+self-build, every generated block, helper headers, normalized output and error
+identity against Siulak, fallbacks, links/index/glossary, prose fidelity, usage
+errors, and that a failed build leaves the destination alone.
+
 ### `krc migrasi`
 
 `main()` dispatches `migrasi` before the normal run path. `_migrasi_visit()`
@@ -287,7 +315,8 @@ krc contoh.krc                    # after `pip install .`
 python3 krc.pyz contoh.krc        # single-file build
 python3 kerincilang.py contoh.krc # from source
 python3 tests/test_kerincilang.py   # the language
-python3 tests/test_tutorial.py      # every tutorial sample + glossary coverage
+python3 tests/test_tutorial.py      # every baseline tutorial sample + glossary coverage
+python3 tests/test_tutorial_dialects.py  # generated Koto Payang trees + equivalence
 python3 tests/test_ids.py           # catalogue, vocabulary seam, packaging
 python3 tests/test_dialects.py      # dialect files, inheritance, the CLI
 python3 tests/test_runtime_selection.py  # header, precedence, imports, --ketat

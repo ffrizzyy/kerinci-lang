@@ -17,7 +17,7 @@ failed = 0
 # 1. every ```krc sample runs and prints exactly what the lesson says
 problems = []
 total = 0
-for path in sorted(sinkron_tutorial.ROOT.joinpath("tutorial").rglob("*.md")):
+for path in sinkron_tutorial.baseline_paths():
     found, n = sinkron_tutorial.process(path, write=False)
     problems += found
     total += n

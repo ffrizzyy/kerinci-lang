@@ -25,6 +25,8 @@ Also: [answers to the exercises](answers.md) and the [glossary](glossary.md) (ev
 
 **Indonesian version:** the same lessons are available in Indonesian in [id/](id/README.md).
 
+**Koto Payang edition:** the same lessons are generated with Koto Payang code in `tutorial/en/koto-payang/` and `tutorial/id/koto-payang/`. Koto Payang is at `status: review`; each generated index lists the base words its lessons still borrow (`contains` and `boolean`), and a second speaker pass is required before approval.
+
 ## Every example has been tested
 
 Every code example in the tutorial is run automatically, and the output printed under it is compared with the real output. After changing the language, run:

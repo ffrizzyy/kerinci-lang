@@ -16,7 +16,7 @@ This is the index of the initiative. Each module gets its own spec, named by mod
 | `dialect-koto-payang` | Normalized Koto Payang data (`dialects/koto-payang.json`), orthography notes, provenance, Tier 1 and 2 review record. | `worksheet-pipeline`, `runtime-selection` |
 | `dialect-siulak-legacy` | Freeze the v0.5 Siulak vocabulary as `dialects/siulak.json` (draft), preserve `docs/02` as provenance, and define the legacy word mapping. | `core-ids` |
 | `translator` | `krc terjemah`, lossless policy (refuse when impossible), user-symbol handling, mixed-dialect imports. | `runtime-selection`, `dialect-koto-payang`, `dialect-siulak-legacy` |
-| `tutorial-multidialect` | `tutorial/src/` templating, prose-language x code-dialect layout, generated lessons, tutorial tests. | `runtime-selection`, at least one completed dialect |
+| `tutorial-multidialect` | Dialect-templated tutorial builds from the tested Siulak lessons: word-mapped code and inline spans, regenerated `hasil`, committed English/Indonesian trees, tutorial tests. | `runtime-selection`, at least one completed dialect |
 | `docs-release` | Contributor guide, dialect docs, VS Code grammar/README, package data, release notes, version bump. | all |
 
 ## Dependency direction
@@ -85,6 +85,7 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
       (`krc migrasi`, `tests/test_migration.py`); examples carry headers.
 - [x] `SPEC-translator.md` approved; `translator` implemented and green
       (`krc terjemah`, `tests/test_translator.py`, 173 checks).
-- [x] `SPEC-tutorial-multidialect.md` approved; next implement the dialect
-      tutorial generator and the Koto Payang trees.
+- [x] `SPEC-tutorial-multidialect.md` approved; `tutorial-multidialect`
+      implemented and green (`tools/sinkron_tutorial.py --bangun`,
+      `tutorial/{en,id}/koto-payang/`, `tests/test_tutorial_dialects.py`).
 - [ ] Next: `docs-release`.
