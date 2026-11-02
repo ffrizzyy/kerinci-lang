@@ -1,6 +1,6 @@
 # Capability Map: KerinciLang Multi-Dialect
 
-Status: **proposed - awaiting approval.** No module spec is written until this map is approved.
+Status: **approved 2026-11-02.** Module specs are written in dependency order.
 
 This is the index of the initiative. Each module gets its own spec, named by module id (`SPEC-<id>.md`), written in dependency order after approval.
 
@@ -68,6 +68,7 @@ For 0.6, a new dialect is **data only**: one JSON file, one Markdown notes file,
 
 ## Gate
 
-- [ ] Module ids, dependency direction, and build order approved by the human.
-- [ ] First milestone agreed.
-- [ ] Then write `SPEC-core-ids.md`, implement it, and proceed in order.
+- [x] Module ids, dependency direction, and build order approved by the human (2026-11-02).
+- [x] First milestone agreed.
+- [x] `SPEC-core-ids.md` written.
+- [ ] `SPEC-core-ids.md` approved; then plan, implement, and proceed in order.
