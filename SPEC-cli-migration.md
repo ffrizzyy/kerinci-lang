@@ -1,6 +1,6 @@
 # Spec: cli-migration
 
-Status: **approved 2026-11-02.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `cli-migration`.
 Depends on: `runtime-selection` (implemented) and `dialect-koto-payang`
 (implemented). Date: 2026-11-02.
@@ -344,3 +344,30 @@ On approval: archive the current plan/todo, write `tasks/plan.md` and
 `tests/test_migration.py`, migrate `examples/`, then run all nine suites,
 `cek_dialek --semua`, the generators, `compileall`, `build.py`, and
 `dist/krc.pyz` from a temp directory. Update the docs and the capability map.
+
+## 14. Implementation log
+
+Implemented 2026-11-02 as specified.
+
+- `kerincilang.py` now dispatches `migrasi`, parses the subcommand, and adds
+  the header recursively. `migrasi` stays in the engine, so the wheel and
+  `dist/krc.pyz` need no packaging change.
+- `--dialek` defaults to `siulak`; `--semua`, `--kering`, and
+  `migrasi --help` work as specified. `USAGE` documents the subcommand.
+- The CLI now rejects unknown options, extra positional arguments, and a `-c`
+  without a code with exit 2. `-h`, `--help`, `-V`, and `--version` remain
+  valid.
+- Writes are prefix-only and atomic; CRLF and a missing final newline are
+  preserved. BOMs, malformed headers, parse errors, and unknown header
+  dialects are refused without touching the file.
+- Literal `ambik` imports are parsed, not executed, and followed by real path;
+  dynamic and missing imports are reported with exit 1.
+- All eight `examples/*.krc` gained `# dialek: siulak`; their output is
+  unchanged. A second `migrasi --semua examples` reports eight skips.
+- `tests/test_migration.py` has 91 checks covering the thirteen groups,
+  including the zipapp, the examples, and the CLI precedence table.
+- All nine suites are green; `cek_dialek --semua`, both generators,
+  `compileall`, `build.py`, and `dist/krc.pyz migrasi` from a temp directory
+  pass.
+- No catalogue, dialect, loader, or worksheet file changed. No existing test
+  expectation changed.

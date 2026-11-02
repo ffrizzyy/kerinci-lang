@@ -41,6 +41,28 @@ nyetak "halo"
 - A function keeps the dialect it was written in; an imported file uses its own
   header, or the run default when it has none.
 
+## Migrating old programs
+
+A v0.5 program may have no dialect header. Add one, together with headers for
+its literal imports:
+
+```bash
+krc migrasi examples/contoh.krc
+krc migrasi examples --semua
+krc migrasi program.krc --dialek koto-payang
+krc migrasi program.krc --kering
+```
+
+- The default header is `# dialek: siulak`; `--dialek` chooses another code.
+- `migrasi` follows literal `ambik "path"` imports recursively and never runs
+  the program.
+- A file that already has a valid header is never rewritten, so a second run is
+  a no-op.
+- `--kering` reports what would change without writing.
+- It refuses a UTF-8 BOM, a malformed line-1 header, a syntax error, an unknown
+  header dialect, and a computed import. The affected file is left unchanged.
+- Exit 0 is success, 1 is a refused or failed file, and 2 is a usage error.
+
 Only the words change, not the grammar. A dialect may spell the keywords and
 built-ins differently, but braces, operators, values, and the program structure
 are the same.

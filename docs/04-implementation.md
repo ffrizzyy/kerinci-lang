@@ -176,6 +176,28 @@ counts, `periksa --siap` readiness (review yes, approved no), header and
 `--dialek` selection, a clean run with no warning, the `type.bool` fallback
 warning, and the `cek_dialek` summaries.
 
+### `krc migrasi`
+
+`main()` dispatches `migrasi` before the normal run path. `_migrasi_visit()`
+reads a file as bytes, refuses a BOM, checks line 1 with the runtime header
+rules, parses the file with its effective dialect (`tokenize` + `Parser`, never
+`run_source`), walks the AST for literal `ambik` imports, and only then writes
+`# dialek: CODE` before the original bytes. The write goes through a temporary
+file and `os.replace()`, so a failure leaves the original untouched. The visited
+set is keyed by `realpath` + `normcase`, so a shared import is processed once.
+
+Migration follows literal imports only. A computed import is reported as
+`cannot follow` and exits 1; it is never executed or guessed. A missing import,
+a parse error, a malformed header, an unknown header dialect, and a BOM are
+per-file errors: that file is not modified, and other files continue. A file
+that already has a valid header is parsed for imports but never rewritten.
+
+The default code is `siulak`; `--dialek` changes it, `--semua` walks a directory,
+and `--kering` writes nothing. The command is toolchain output (English) and
+does not use the message catalogue. The normal CLI keeps the
+`runtime-selection` precedence: header > `--dialek` > Siulak; `-c` and the REPL
+default to Siulak.
+
 ## Dialect worksheets
 
 `dialects/src/<code>.csv` is the canonical answer file for a new dialect. It is
@@ -332,9 +354,9 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 ## Test suite
 
-`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes. `tests/test_worksheet.py` covers the CSV contract, `buat`/`perbarui`, every worksheet code, normalization, the synthetic validator, DOCX determinism and round trips, export, readiness, and usage errors. `tests/test_siulak_legacy.py` checks the frozen file, every word and message mapping, `DialectVocabulary` against `LegacySiulak`, header and `--dialek` selection, the missing-file shim, and the `cek_dialek` gate.
+`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes. `tests/test_worksheet.py` covers the CSV contract, `buat`/`perbarui`, every worksheet code, normalization, the synthetic validator, DOCX determinism and round trips, export, readiness, and usage errors. `tests/test_siulak_legacy.py` checks the frozen file, every word and message mapping, `DialectVocabulary` against `LegacySiulak`, header and `--dialek` selection, the missing-file shim, and the `cek_dialek` gate. `tests/test_migration.py` covers single-file and recursive import migration, idempotence, `--semua`, `--dialek`, `--kering`, BOM/malformed-header/parse/dynamic-import refusals, CRLF and byte preservation, usage exits, the zipapp, the examples, and the CLI precedence table.
 
-Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. The committed `dialects/` holds `__init__.py`, `loader.py`, and the frozen `siulak.json`; every other test dialect is temporary.
+Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. The committed `dialects/` holds `__init__.py`, `loader.py`, the frozen `siulak.json`, and the review-state `koto-payang.json`; every other test dialect is temporary.
 
 ## Next steps
 

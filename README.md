@@ -40,6 +40,14 @@ python3 dist/krc.pyz -c 'nyetak "Halo"'       # run one line
 
 (On Windows, use `python` or `py` instead of `python3`.) You can also install a `krc` command with `pip install .`, or run `python3 kerincilang.py` straight from the source file.
 
+Old programs without a dialect header still run. To make their dialect explicit
+and migrate their imports:
+
+```bash
+python3 dist/krc.pyz migrasi examples --semua
+python3 dist/krc.pyz migrasi program.krc --kering   # preview only
+```
+
 ## Learn
 
 The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included.

@@ -105,6 +105,30 @@ guess, or borrow a Siulak word to make the counts look complete. The second
 speaker pass supplies the 42 messages, 6 words, and 4 draft confirmations; only
 then can the file carry a named reviewer and `status: approved`.
 
+## Migrating old programs
+
+`krc migrasi` gives a v0.5 source its explicit header and does the same for its
+literal `ambik` imports:
+
+```bash
+python3 kerincilang.py migrasi examples/contoh.krc
+python3 kerincilang.py migrasi --semua examples
+python3 kerincilang.py migrasi program.krc --dialek koto-payang
+python3 kerincilang.py migrasi program.krc --kering   # preview, no writes
+```
+
+The default code is `siulak`. The command parses each file to find imports but
+never runs it. It adds one line and preserves every other byte, including CRLF
+and a missing final newline. A file with a valid header is never rewritten, so
+re-running is a no-op; `migrasi --semua examples` currently reports eight files
+already migrated.
+
+It refuses instead of repairing: a UTF-8 BOM, a malformed line-1 header, a
+syntax error, an unknown header dialect, a computed import, or a missing import
+is reported and the affected file is unchanged. Exit 0 is success, 1 is a
+refused file, and 2 is a usage error (including an unknown `--dialek`, checked
+before any write).
+
 ## Dialect worksheets
 
 The canonical answer file for a new dialect is `dialects/src/<code>.csv`: UTF-8

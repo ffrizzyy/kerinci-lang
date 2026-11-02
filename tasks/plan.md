@@ -1,66 +1,61 @@
-# Plan: dialect-koto-payang
+# Plan: cli-migration
 
-Module: `dialect-koto-payang`. Spec: `SPEC-dialect-koto-payang.md` (approved
-2026-11-02). Depends on `worksheet-pipeline` and `runtime-selection`, both
-implemented.
+Module: `cli-migration`. Spec: `SPEC-cli-migration.md` (approved 2026-11-02).
+Depends on `runtime-selection` and `dialect-koto-payang`, both implemented.
 
-Goal: hand-map the Koto Payang worksheet into a `review` dialect with all 32
-Tier 1 IDs, 53 reviewed Tier 2 IDs, 4 provisional drafts, and 48 documented base
-fallbacks. No invented answers. The second speaker pass is a later step.
+Goal: add `krc migrasi`, recurse into literal imports, keep writes idempotent
+and byte-preserving, tighten CLI usage errors, migrate the examples, and prove
+the whole CLI contract with `tests/test_migration.py`.
 
-The oracle is unchanged: all eight existing suites must stay green.
+The oracle is unchanged: every existing suite, expected output, tutorial block,
+and Siulak word must stay green.
 
 ## Order
 
-1. **Skeleton** - `python tools/lembar_kerja.py buat --kode koto-payang` creates
-   `dialects/src/koto-payang.csv` with 137 `todo` rows.
+1. **CLI dispatch and usage text** - recognize `migrasi` as the first argument,
+   add `MIGRASI_USAGE`, extend `USAGE`, and add `krc migrasi --help`. Keep the
+   normal run path untouched.
 
-2. **Hand mapping** - fill `answer`, `notes`, and `status` from the spec's
-   section 4-6 tables. Tier 1 is all `reviewed`. Tier 2 is 29 reviewed words,
-   2 draft words, 24 reviewed messages, 2 draft messages. Everything else stays
-   `todo` with the worksheet value in `notes`.
+2. **Migration core** - read bytes, refuse a BOM, inspect line 1 with the
+   runtime header rules, detect the newline, and write an atomic header prefix.
 
-3. **Validate the sheet** - `periksa --siap` must pass `review` and fail
-   `approved` with 51 unreviewed Tier 2 rows. Fix only real normalization or
-   placeholder errors; never invent an answer.
+3. **Import scan** - parse without executing with the effective dialect, walk
+   the AST for `("import", expr)`, follow only `("lit", str)`, resolve relative
+   to the importing file (exact path, then `.krc`), and dedupe real paths.
 
-4. **Export** - create the JSON skeleton, set the section 7 metadata
-   (`status: review`, `reviewer: null`, sources, orthography, notes), then run
-   `lembar_kerja.py json`. It must validate and produce 63 words + 26 messages.
+4. **Targets and reporting** - explicit `.krc` files or `--semua DIR`, sorted
+   deterministic order, per-file lines, summary, `--kering`, and exit codes
+   0/1/2 exactly as the spec says.
 
-5. **Provenance note** - `dialects/koto-payang.md` records provenance,
-   orthography, mapping decisions, the review record, the 48 gap IDs, and the
-   change policy.
+5. **CLI cleanup** - unknown flags are usage errors, extra positional arguments
+   are usage errors, `-c` takes one code. Document the precedence table.
 
-6. **Tests** - `tests/test_koto_payang.py` checks the artifacts, metadata, tier
-   counts, exact word/message maps, CSV statuses and readiness, selection,
-   fallback warning, `--ketat`, and the `cek_dialek` gate.
+6. **Examples** - run `migrasi --semua examples`, confirm all eight headers,
+   and confirm `contoh-impor.krc` output is unchanged.
 
-7. **Docs** - mark the spec implemented, check off the todo, update the
-   capability map, and add the Koto Payang workflow to the implementation and
-   tooling docs.
+7. **Tests** - `tests/test_migration.py`, all thirteen groups in spec section 9.
+
+8. **Docs** - mark the spec implemented, check off the todo, update the
+   capability map, `docs/03`, `docs/04`, and `docs/05`.
 
 ## Verification
 
-- `python tests/test_koto_payang.py` -> all pass.
+- `python tests/test_migration.py` -> all pass.
 - The eight earlier suites, unchanged and green.
-- `python tools/cek_dialek.py --kode koto-payang` -> exit 0, exact summary.
 - `python tools/cek_dialek.py --semua` -> exit 0.
 - Both generators produce no diff; `python -m compileall -q .`.
-- `python build.py`, then `dist/krc.pyz` runs Koto Payang from a temp directory.
-- The JSON ships in the wheel/zipapp via the existing `dialects/*.json` package
-  data; the CSV is working data and is not packaged.
+- `python build.py`, then `dist/krc.pyz migrasi` and a normal run from a temp
+  directory.
+- `python kerincilang.py migrasi --semua examples` is a no-op after the commit.
 
 ## Risks
 
-- The worksheet is a first draft: a gloss, alternative, or typo can look like an
-  answer. The spec's status table is the contract; when in doubt, `todo`.
-- Placeholders must be neutral English. A copied `{nama}` or `{pesan}` fails the
-  loader.
-- `kw.import` must be `impor`; `masukka` is `kw.input` and would clash.
-- Multi-word answers use underscores; spaces fail the word regex.
-- `type.float` and `type.null` are draft, not reviewed; do not promote them
-  without a speaker.
-- `status: review` keeps `cek_dialek --ketat` and runtime `--ketat` at exit 0;
-  do not change the gate to make the module look more complete.
-- The old DOCX is never parsed. Its 287 rows are not a data source for a script.
+- A parse error must refuse the file, not add a header above broken code.
+- A BOM would put the header on line 1 but the runtime would not see it; refuse.
+- A malformed header must not be buried by a new valid header.
+- Dynamic imports cannot be followed; report and exit 1, never execute.
+- Do not normalize line endings or add blank lines; only prefix bytes.
+- `--dialek` must be validated before the first write.
+- `--semua` and explicit files are mutually exclusive.
+- Running `migrasi` must never execute user code.
+- Changing `-c`/REPL defaults would break existing usage; keep Siulak.

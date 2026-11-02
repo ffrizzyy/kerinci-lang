@@ -1,3 +1,4 @@
+# dialek: siulak
 # contoh-kesalahan.krc: menangani kesalahan dengan cubo, tangkap, dan ngangkat
 
 guno bagi_aman(a, b) {

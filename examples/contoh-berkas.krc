@@ -1,3 +1,4 @@
+# dialek: siulak
 # contoh-berkas.krc: membaca dan menulis berkas
 
 tetap nama_berkas = "catatan.txt"

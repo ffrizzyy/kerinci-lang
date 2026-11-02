@@ -10,6 +10,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 import time
 
 try:
@@ -1363,12 +1364,33 @@ Pemakaian:
   krc [--dialek KODE] [--ketat] berkas.krc   jalankan program
   krc [--dialek KODE] [--ketat] -c "kode"    jalankan satu potong kode
   krc [--dialek KODE]                        buka REPL interaktif
+  krc migrasi BERKAS...                      tambahkan header dialek
+  krc migrasi DIR --semua                    tambahkan header ke semua .krc
   krc --version                              tampilkan versi
   krc --help                                 tampilkan bantuan ini
 
   --dialek KODE   dialek untuk berkas yang tidak punya header `# dialek:`
   --ketat         gagal (exit 2) bila dialek yang disetujui belum lengkap
+
+  krc migrasi --help   bantuan untuk perintah migrasi
 """
+
+MIGRASI_USAGE = """Pemakaian:
+  krc migrasi BERKAS...
+  krc migrasi DIR --semua
+  krc migrasi BERKAS... --dialek KODE
+  krc migrasi BERKAS... --kering
+
+  --dialek KODE   header yang ditambahkan (default: siulak)
+  --semua         migrasi setiap berkas .krc di dalam DIR
+  --kering        tampilkan rencana, jangan tulis apa pun
+  -h, --help      tampilkan bantuan ini
+
+Menambahkan `# dialek: KODE` sebagai baris pertama, lalu mengikuti impor
+literal (`ambik "berkas"`) secara rekursif. Berkas yang sudah punya header
+tidak ditulis ulang. Perintah ini tidak menjalankan program.
+
+Exit: 0 berhasil, 1 satu berkas ditolak, 2 kesalahan pemakaian."""
 
 OPENERS, CLOSERS = {"(", "{", "["}, {")", "}", "]"}
 
@@ -1440,13 +1462,289 @@ def _parse_argv(argv):
             else:
                 index += 1
             continue
+        if arg.startswith("-") and arg not in ("-h", "--help", "-V", "--version"):
+            raise ValueError("opsi tidak dikenal: %s" % arg)
         rest.append(arg)
         index += 1
     return dialect, strict, rest
 
 
+# ---- krc migrasi ----------------------------------------------------------
+def _migrasi_options(argv):
+    """Parse the migrasi subcommand; the normal-run flags do not apply."""
+    options = {"dialect": None, "dry": False, "semua": False,
+               "help": False, "targets": []}
+    index = 0
+    while index < len(argv):
+        arg = argv[index]
+        if arg in ("-h", "--help"):
+            options["help"] = True
+            return options
+        if arg == "--dialek":
+            if index + 1 >= len(argv):
+                raise ValueError("--dialek butuh kode dialek")
+            options["dialect"] = argv[index + 1]
+            index += 2
+            continue
+        if arg.startswith("--dialek="):
+            code = arg.split("=", 1)[1]
+            if not code:
+                raise ValueError("--dialek butuh kode dialek")
+            options["dialect"] = code
+            index += 1
+            continue
+        if arg == "--semua":
+            options["semua"] = True
+            index += 1
+            continue
+        if arg == "--kering":
+            options["dry"] = True
+            index += 1
+            continue
+        if arg in ("--ketat", "-c", "-V", "--version"):
+            raise ValueError("%s tidak berlaku untuk migrasi" % arg)
+        if arg.startswith("-"):
+            raise ValueError("opsi tidak dikenal: %s" % arg)
+        options["targets"].append(arg)
+        index += 1
+    return options
+
+
+def _migrasi_display(path):
+    try:
+        relative = os.path.relpath(path)
+    except ValueError:                       # different drive on Windows
+        return path
+    return path if relative.startswith("..") else relative
+
+
+def _migrasi_newline(text):
+    index = text.find("\n")
+    if index > 0 and text[index - 1] == "\r":
+        return "\r\n"
+    return "\n"
+
+
+def _migrasi_write(path, raw, header):
+    """Atomically put `header` before the original bytes."""
+    directory = os.path.dirname(path) or "."
+    try:
+        mode = os.stat(path).st_mode
+    except OSError:
+        mode = None
+    handle, temporary = tempfile.mkstemp(prefix=".krc-migrasi-", dir=directory)
+    try:
+        with os.fdopen(handle, "wb") as stream:
+            stream.write(header.encode("utf-8"))
+            stream.write(raw)
+        if mode is not None:
+            os.chmod(temporary, mode)
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
+
+
+def _migrasi_imports(node):
+    """Literal `ambik` names and whether a non-literal import was found."""
+    literals, dynamic = [], []
+
+    def walk(value):
+        if isinstance(value, tuple):
+            if value and value[0] == "import":
+                expression = value[1]
+                if (isinstance(expression, tuple) and len(expression) == 2
+                        and expression[0] == "lit"
+                        and isinstance(expression[1], str)):
+                    literals.append(expression[1])
+                else:
+                    dynamic.append(True)
+                return
+            for item in value[1:]:
+                walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+
+    walk(node)
+    return literals, bool(dynamic)
+
+
+def _migrasi_resolve_import(base, name):
+    path = os.path.join(base, name)
+    candidates = [path] if path.endswith(".krc") else [path, path + ".krc"]
+    for candidate in candidates:
+        if os.path.isfile(candidate):
+            return os.path.abspath(candidate)
+    return None
+
+
+def _migrasi_walk(root):
+    for directory, subdirectories, files in os.walk(root):
+        subdirectories[:] = sorted(
+            name for name in subdirectories if name not in ("__pycache__", ".git"))
+        for name in sorted(files):
+            if name.endswith(".krc"):
+                yield os.path.join(directory, name)
+
+
+def _migrasi_visit(path, context, dry_run, report):
+    real = os.path.realpath(os.path.abspath(path))
+    key = os.path.normcase(real)
+    if key in report["seen"]:
+        return
+    report["seen"].add(key)
+    display = _migrasi_display(real)
+
+    try:
+        with open(real, "rb") as stream:
+            raw = stream.read()
+    except OSError as err:
+        report["errors"].append((display, "tidak bisa dibaca: %s" % err))
+        return
+    if raw.startswith(b"\xef\xbb\xbf"):
+        report["errors"].append(
+            (display, "tidak bisa dimigrasi: berkas memakai BOM UTF-8"))
+        return
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as err:
+        report["errors"].append((display, "bukan teks UTF-8: %s" % err))
+        return
+
+    line = text.split("\n", 1)[0].rstrip("\r")
+    code = None
+    has_header = False
+    if HEADER_HINT_RE.match(line):
+        match = HEADER_RE.match(line)
+        if not match:
+            report["errors"].append(
+                (display, "baris 1 memuat header dialek yang tidak valid"))
+            return
+        code = match.group(1)
+        has_header = True
+
+    try:
+        vocab = (resolve_dialect(code, context) if has_header
+                 else context.default_vocab)
+    except LangError as err:
+        report["errors"].append(
+            (display, "dialek header tidak bisa dimuat: %s" % err))
+        return
+
+    try:
+        program = Parser(tokenize(text, vocab), vocab).program()
+    except LangError as err:
+        report["errors"].append((display, "tidak bisa diurai: %s" % err))
+        return
+
+    literals, dynamic = _migrasi_imports(program)
+    if dynamic:
+        report["errors"].append(
+            (display, "impor non-literal tidak bisa diikuti"))
+
+    if has_header:
+        report["skipped"].append(display)
+    else:
+        header = "# dialek: %s%s" % (context.default_vocab.code,
+                                     _migrasi_newline(text))
+        if dry_run:
+            report["migrated"].append(display)
+        else:
+            try:
+                _migrasi_write(real, raw, header)
+            except OSError as err:
+                report["errors"].append((display, "tidak bisa ditulis: %s" % err))
+                return
+            report["migrated"].append(display)
+
+    base = os.path.dirname(real)
+    for name in literals:
+        target = _migrasi_resolve_import(base, name)
+        if target is None:
+            report["errors"].append(
+                (display, "impor tidak ditemukan: %s" % name))
+            continue
+        _migrasi_visit(target, context, dry_run, report)
+
+
+def migrasi_main(argv=None, dialect_root=None):
+    argv = sys.argv[1:] if argv is None else argv
+    try:
+        options = _migrasi_options(argv)
+    except ValueError as err:
+        print("migrasi: %s" % err, file=sys.stderr)
+        return 2
+    if options["help"]:
+        print(MIGRASI_USAGE)
+        return 0
+
+    targets = options["targets"]
+    if options["semua"]:
+        if len(targets) != 1:
+            print("migrasi: --semua butuh tepat satu direktori", file=sys.stderr)
+            return 2
+        if not os.path.isdir(targets[0]):
+            print("migrasi: bukan direktori: %s" % targets[0], file=sys.stderr)
+            return 2
+    else:
+        if not targets:
+            print("migrasi: butuh berkas .krc", file=sys.stderr)
+            return 2
+        for target in targets:
+            if not os.path.isfile(target):
+                print("migrasi: berkas tidak ditemukan: %s" % target,
+                      file=sys.stderr)
+                return 2
+            if not target.endswith(".krc"):
+                print("migrasi: bukan berkas .krc: %s" % target,
+                      file=sys.stderr)
+                return 2
+
+    context = RunContext(LEGACY, dialect_root, False)
+    try:
+        context.default_vocab = resolve_dialect(options["dialect"] or "siulak",
+                                               context)
+    except LangError as err:
+        print("migrasi: %s" % err, file=sys.stderr)
+        return 2
+
+    report = {"migrated": [], "skipped": [], "errors": [], "seen": set()}
+    try:
+        with use_context(context):
+            if options["semua"]:
+                for path in _migrasi_walk(targets[0]):
+                    _migrasi_visit(path, context, options["dry"], report)
+            else:
+                for path in targets:
+                    _migrasi_visit(path, context, options["dry"], report)
+    finally:
+        close_all_files()
+
+    for path in report["migrated"]:
+        if options["dry"]:
+            print("migrasi: would add header to %s" % path)
+        else:
+            print("migrasi: added header to %s" % path)
+    for path in report["skipped"]:
+        print("migrasi: already has a header: %s" % path)
+    for path, message in report["errors"]:
+        print("migrasi: error: %s: %s" % (path, message), file=sys.stderr)
+    suffix = "" if len(report["errors"]) == 1 else "s"
+    print("migrasi: %d %s, %d already had a header, %d error%s"
+          % (len(report["migrated"]),
+             "would migrate" if options["dry"] else "migrated",
+             len(report["skipped"]), len(report["errors"]), suffix))
+    return 1 if report["errors"] else 0
+
+
 def main(argv=None, dialect_root=None):
     argv = sys.argv[1:] if argv is None else argv
+    if argv and argv[0] == "migrasi":
+        return migrasi_main(argv[1:], dialect_root)
     try:
         dialect_code, strict, rest = _parse_argv(argv)
     except ValueError as err:
@@ -1458,6 +1756,13 @@ def main(argv=None, dialect_root=None):
     if rest and rest[0] in ("-V", "--version"):
         print(f"KerinciLang {__version__}")
         return 0
+    if rest and rest[0] == "-c":
+        if len(rest) != 2:
+            print("Kesalahan: -c butuh satu potong kode", file=sys.stderr)
+            return 2
+    elif len(rest) > 1:
+        print("Kesalahan: argumen terlalu banyak", file=sys.stderr)
+        return 2
 
     context = RunContext(LEGACY, dialect_root, strict)
     try:
