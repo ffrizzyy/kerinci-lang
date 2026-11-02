@@ -121,6 +121,10 @@ LEGACY_OPERATORS = {
     "op.le": ("kurang_samo", "<="),
 }
 
+# The symbols are neutral (`==`, `<`, ...); only the words belong to a dialect.
+# A dialect file supplies `op.*` words, and the loader pairs them with these.
+OP_SYMBOLS = {id: symbol for id, (word, symbol) in LEGACY_OPERATORS.items()}
+
 FILE_MODE_CHARS = {"mode.read": "r", "mode.write": "w", "mode.append": "a"}
 
 
