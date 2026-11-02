@@ -1,76 +1,72 @@
-# Plan: runtime-selection
+# Plan: worksheet-pipeline
 
-Module: `runtime-selection`. Spec: `SPEC-runtime-selection.md` (approved 2026-11-02).
-Depends on `dialect-model` (commit `60f9335`).
+Module: `worksheet-pipeline`. Spec: `SPEC-worksheet-pipeline.md` (approved
+2026-11-02).
+Depends on `core-ids` and `dialect-model`; `dialect-model` is implemented.
 
-Goal: a program chooses its dialect per file. `# dialek: koto-payang` on line 1,
-`--dialek` as the default, Siulak when nothing is declared. A function keeps the
-dialect it was written in.
+Goal: one canonical CSV per dialect, one validator, one reviewable DOCX, and an
+export that fills an existing dialect skeleton. `core/ids.json` stays read-only.
 
-The oracle is unchanged: `tests/test_kerincilang.py` (271),
-`tests/test_tutorial.py` (550), `tests/test_ids.py`, `tests/test_dialects.py`.
-None may be edited.
+The oracle is unchanged: all five existing suites must stay green.
 
 ## Order
 
-1. **Catalogue** - add three Tier 2 messages to `core/ids.json`:
-   `msg.dialect.header`, `msg.dialect.unknown`, `msg.dialect.invalid`, with
-   neutral placeholders. `test_ids.py` keeps the catalogue honest.
+1. **CSV contract** - `dialects/src/<code>.csv` with the eight columns, one row
+   per catalogue ID, tier/id order, atomic writes. `buat` creates a blank sheet;
+   `perbarui` restores missing rows and refreshes the read-only columns.
 
-2. **Header** - `dialect_header(src)` reads line 1 only. A matching line returns
-   the code; a `#` line containing `dialek` that does not match raises
-   `msg.dialect.header`; everything else is `None`. The lexer stays untouched
-   because the header is already a comment.
+2. **Reader** - strict header, width, BOM, encoding, duplicate, unknown and
+   missing ID checks. Problems carry a 1-based data row, the ID, a code, and a
+   message. No traceback for a bad file.
 
-3. **Run context** - `RunContext` (default vocab, `dialect_root`, strict flag,
-   dialect cache, warned set, strict failure). Pushed by `run_file`/`main`,
-   created on demand by a bare `run_source`, so the public API keeps working.
+3. **Normalizer** - words: NFC, trim, lowercase, whitespace to `_`, one trailing
+   `()` removed, then the loader's `^[a-z][a-z0-9_]*$`. Messages: NFC and trim
+   only, placeholders untouched. Alternatives are errors, never guesses.
 
-4. **Resolver** - `resolve_source_vocab(src, context)`: header wins, else the
-   context default. The loader is imported lazily inside the resolver (no
-   circular import). `missing` -> `msg.dialect.unknown`; any other
-   `DialectError` -> `msg.dialect.invalid` with the first problem.
+4. **Validator** - build a synthetic draft dialect from accepted answers and
+   call `validate_dialect`, so words, messages, and clashes have one source of
+   truth. Add status, answer, catalogue-value, and readiness checks.
 
-5. **Per-call vocabulary** - `ev()`'s call branch wraps the body in
-   `use_vocab(closure_env.vocab)`. Nested cross-dialect calls push and pop, so
-   output, `mecem`, file modes, and errors follow the executing module.
+5. **DOCX writer** - standard library only, six columns, grey read-only columns,
+   repeating header, A4 landscape, fixed ZIP timestamps. Same CSV -> same bytes.
 
-6. **Imports** - `do_import` resolves the imported file's header before running
-   it and builds that module's globals with its own vocabulary. A module is
-   cached by path per run, as today.
+6. **DOCX reader** - map by header, require the six columns, compare with the
+   current CSV, change only `answer`/`notes`, downgrade a changed answer to
+   `draft`, never set `reviewed`.
 
-7. **CLI** - `--dialek CODE` and `--ketat`. `--dialek` loads once, before the
-   run; a failure exits 2. `--ketat` checks the selected dialect before the
-   program starts, and later-loaded dialects as they load; any failure exits 2.
-   `USAGE` gains both flags.
+7. **Export** - `json` copies metadata unchanged, merges `draft`/`reviewed`
+   answers into `words`/`messages`, validates, writes atomically. The readiness
+   gate applies when the skeleton is `review` or `approved`.
 
-8. **Warnings** - `warn_fallback(code, id, kind, word)` prints to stderr once per
-   `(dialect, id)` per run. English, never fatal, no catalogue ID.
+8. **Reports** - `laporan` prints tier counts, missing tier-1 IDs, errors, and
+   readiness; `periksa --siap` reuses the same calculation.
 
-9. **Tests** - `tests/test_runtime_selection.py`: every positive and negative in
-   spec section 12, with temp dialect JSONs and `dialect_root`.
+9. **CLI** - the seven subcommands, `--kode`, `--csv`, `--docx`, `--json`,
+   `--paksa`, `--tulis`, `--siap`; exit 0/1/2; `--help`.
 
-10. **Docs** - `docs/04-implementation.md` and `docs/03-syntax-design.md` record
-    the header and precedence; the spec is marked implemented.
+10. **Tests** - `tests/test_worksheet.py` covers spec section 10, with temp
+    directories and explicit paths.
+
+11. **Docs** - `docs/05-tooling-and-docs.md` gains the worksheet workflow;
+    `docs/04-implementation.md` records the tool at `dialects/src/`; the spec is
+    marked implemented.
 
 ## Verification
 
-- `python tests/test_runtime_selection.py` -> all pass.
-- The other four suites, unchanged and green.
+- `python tests/test_worksheet.py` -> all pass.
+- The five existing suites, unchanged and green.
 - `python tools/cek_dialek.py --semua` -> exit 0.
-- `python tools/buat_glosarium.py`, `python make_highlight.py` -> no diff.
+- Both generators produce no diff; `python -m compileall -q .`.
 - `python build.py`, then `dist/krc.pyz` from a temp directory.
-- `python -m compileall -q .`.
+- No third-party package is imported by the tool.
 
 ## Risks
 
-- Per-call vocabulary changes the engine's call path; every existing test must
-  stay byte-identical. `use_vocab` is a stack, so push/pop must be paired even
-  when a call raises (`finally`).
-- `LOADED` must stay keyed by path: the run default is constant, so a file's
-  dialect is fixed for the run.
-- A malformed header must be an error, not a silent comment, or a typo would run
-  Siulak without telling anyone.
-- `--ketat` must never weaken to a warning, and must not change output of the
-  program itself.
-- Warning text is not a language message; it must not enter `core/ids.json`.
+- The old docx cannot be ingested: no ID column, 287 rows for 137 IDs. The
+  reader accepts only sheets this tool generated; Koto Payang is mapped by hand.
+- A `baca` write must not invent `reviewed`; only a human changes that status.
+- `periksa` must never mutate `core/ids.json` or a skeleton's metadata.
+- DOCX is a ZIP: cap uncompressed size and entry count, read only
+  `word/document.xml`, and never follow relationships.
+- Deterministic DOCX bytes need fixed ZIP timestamps and a fixed entry order.
+- `json` must fail before writing when the merged file would not validate.
