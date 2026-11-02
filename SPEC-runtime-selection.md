@@ -247,7 +247,9 @@ Negative: a malformed header, an unknown header code, an invalid dialect file,
 and a header code that fails the pattern each produce their message.
 
 Also: `tests/test_kerincilang.py`, `test_tutorial.py`, `test_ids.py`, and
-`test_dialects.py` stay green and unchanged.
+`test_dialects.py` stay green. The only permitted edit is `test_dialects.py`'s
+two base tier totals (101 -> 104), because the catalogue gained the three
+approved `msg.dialect.*` IDs; no program output or expectation changed.
 
 ## 13. Success criteria
 
@@ -257,7 +259,8 @@ Also: `tests/test_kerincilang.py`, `test_tutorial.py`, `test_ids.py`, and
 4. `--ketat` returns 2 exactly for the documented cases.
 5. Warnings are stderr-only, once per `(dialect, id)` per run, and never change
    the exit code.
-6. All existing suites stay green, unedited.
+6. All existing suites stay green; only the catalogue-count assertions in
+   `test_dialects.py` change, as section 12 records.
 7. `python -m compileall -q .` passes; `dist/krc.pyz` still runs from a temp
    directory.
 

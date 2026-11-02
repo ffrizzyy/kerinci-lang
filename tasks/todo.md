@@ -18,7 +18,9 @@ Each item is done only when the listed check passes.
 - [x] T11 `USAGE` documents both flags.
 - [x] T12 `tests/test_runtime_selection.py` covers spec section 12.
 - [x] T13 `tests/test_kerincilang.py` 271/271, `test_tutorial.py` 550 blocks,
-      `test_ids.py` and `test_dialects.py` all pass, all unchanged.
+      `test_ids.py` and `test_dialects.py` all pass. Only `test_dialects.py`'s
+      base tier-2 total moved 101 -> 104 for the three approved IDs; no program
+      expectation changed.
 - [x] T14 `cek_dialek.py --semua` exits 0; both generators produce no diff;
       `build.py` and `dist/krc.pyz` work from a clean temp directory.
 - [x] T15 Docs updated; spec marked implemented; `CAPABILITY-MAP.md` points at
