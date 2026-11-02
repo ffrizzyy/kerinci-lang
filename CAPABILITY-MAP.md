@@ -74,4 +74,5 @@ For 0.6, a new dialect is **data only**: one JSON file, one Markdown notes file,
 - [x] `SPEC-core-ids.md` approved; `core-ids` implemented and green (`2cb1c55`).
 - [x] `SPEC-dialect-model.md` approved; `dialect-model` implemented and green.
 - [x] `SPEC-runtime-selection.md` approved; `runtime-selection` implemented and green.
-- [ ] Next: `SPEC-worksheet-pipeline.md` (then `dialect-siulak-legacy`).
+- [x] `SPEC-worksheet-pipeline.md` written.
+- [ ] Next: approve `SPEC-worksheet-pipeline.md`.
