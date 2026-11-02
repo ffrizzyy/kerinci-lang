@@ -1,76 +1,88 @@
-# Plan: tutorial-multidialect
+# Plan: docs-release
 
-Module: `tutorial-multidialect`. Spec: `SPEC-tutorial-multidialect.md`
-(approved 2026-11-02). Depends on `runtime-selection`,
-`dialect-siulak-legacy`, and `dialect-koto-payang`, all implemented.
+Module: `docs-release`. Spec: `SPEC-docs-release.md` (approved 2026-11-02).
+Depends on `core-ids`, `dialect-model`, `runtime-selection`,
+`worksheet-pipeline`, `dialect-siulak-legacy`, `dialect-koto-payang`,
+`cli-migration`, `translator`, and `tutorial-multidialect`, all implemented.
 
-Goal: generate the English and Indonesian Koto Payang tutorial trees from the
-tested Siulak lessons, run every block in its dialect, and prove normalized
-equivalence while the baseline stays at 550 blocks.
+Goal: make the 0.6 multi-dialect work teachable and shippable. A contributor
+adds a dialect from one guide without touching Python; every current document,
+editor file, package, and command tells the truth; 0.6.0 can be reproduced and
+verified from a clean checkout.
 
-The oracle is unchanged: the existing lessons, their expected output, the 271
-language cases, and every dialect word stay green.
+The oracle is unchanged: the 271 language checks, 550 baseline tutorial blocks,
+every dialect word, every expected output, and Koto Payang's `review` status.
 
 ## Order
 
-1. **Word-rewrite seam** - expose a small `rewrite_dialect_words` function that
-   the generator and translator share. It maps code words and direct `bukak`
-   mode strings by ID and never touches comments, strings, or user names.
+1. **Scaffold command** - add `lembar_kerja.py rangka --kode CODE --nama NAME`
+   that writes a validated `draft` JSON skeleton and a notes stub. Generic, no
+   dialect and no word added. Exit codes match the existing tool.
 
-2. **Baseline discovery** - add `baseline_paths()` and make the default check
-   and `tests/test_tutorial.py` use it. They must still report 550 blocks and
-   must not see `tutorial/en/` or a generated dialect folder.
+2. **Contributor guide** - write `docs/09-adding-a-dialect.md` from an empty
+   worksheet to a runnable dialect, using the exact section 3.2 commands and
+   the placeholder `dialek-baru`. It names only commands and paths that exist.
 
-3. **Renderer** - parse the baseline, map code fences and inline code spans,
-   add the dialect header, run each block, and replace its `hasil`. Keep the
-   block order, fence kinds, and `info` strings.
+3. **Truth audit** - fix every current reader-facing file named in spec
+   section 4: `README.md`, `GETTING-STARTED.md`, `CONTRIBUTING.md`, `docs/01`
+   through `docs/07`, and `docs/README.md`. History (`SPEC-*`, `docs/08`,
+   `CHANGELOG.md`) keeps its dated statements.
 
-4. **Prose and links** - replace the dialect noun, re-resolve relative links,
-   add the review footer, build the index, and write the glossary stub.
+4. **Union grammar** - rework `make_highlight.py` to load every dialect through
+   `available_dialects()` and `load_dialect()` and emit one deterministic
+   union grammar. Add `vscode-extension/README.md`; bump the extension to
+   0.6.0.
 
-5. **Transactional build** - collect the whole tree in memory, write it through
-   a temporary directory, and only replace the destination after every block
-   succeeds. Make two builds byte-identical.
+5. **Release notes and checklist** - add the `CHANGELOG.md` 0.6.0 entry with
+   the real dialect table and the "not in this release" sentence; add
+   `RELEASING.md`; bump every version location to 0.6.0.
 
-6. **Fallbacks** - collect the base-fallback IDs the corpus actually uses,
-   report them once on stderr, and list the surface words in the index.
+6. **Packaging** - update `pyproject.toml` description and keywords, keep the
+   package data rules, and prove a fresh wheel contains both dialect JSON/MD
+   files and `core/ids.json`, no CSV, and no bytecode.
 
-7. **Commit the trees** - generate `tutorial/en/koto-payang/` and
-   `tutorial/id/koto-payang/`; commit them with the generator.
+7. **Tests** - add offline `tests/test_docs_release.py` for all twelve groups
+   in spec section 9.1; add `tests/test_release.py` for the network-dependent
+   wheel smoke in 9.2. Update `build.py` to discover the offline suite and
+   skip the release smoke with one clear line.
 
-8. **Tests** - `tests/test_tutorial_dialects.py`, all thirteen groups in spec
-   section 7, including determinism, committed freshness, equivalence, links,
-   headers, fallbacks, and usage errors.
+8. **CI** - keep the version matrix; add the full offline suite, `compileall`,
+   `cek_dialek --semua`, freshness diffs, the wheel smoke, and an installed
+   `krc --version` plus Koto Payang run on Ubuntu 3.12.
 
-9. **Docs** - update `CAPABILITY-MAP.md`, `docs/03`, `docs/04`, `docs/05`,
-   `README.md`, and `tutorial/README.md`; mark the spec implemented.
+9. **Close** - run every offline suite, the generators, `compileall`,
+   `cek_dialek --semua`, `build.py`, the wheel smoke, and the zipapp smoke;
+   update `CAPABILITY-MAP.md` and mark the spec implemented.
 
 ## Verification
 
-- `python tools/sinkron_tutorial.py` -> 550 blocks, 0 problems.
-- `python tests/test_tutorial.py` -> unchanged counts and glossary check.
-- `python tests/test_tutorial_dialects.py` -> all pass.
-- All eleven suites, unchanged and green.
+- `python tools/lembar_kerja.py rangka` in a temporary repo produces a valid
+  `draft` JSON and a notes stub; `cek_dialek --kode` exits 0.
+- The walkthrough in `tests/test_docs_release.py` runs the guide commands in
+  order with `dialek-baru`, fills 32 Tier 1 rows, and runs a program.
+- `python make_highlight.py` -> committed grammar unchanged; a fresh generation
+  is byte-identical.
+- `python tests/test_docs_release.py` -> all twelve groups pass.
+- All earlier suites unchanged and green; `build.py` runs every offline suite.
 - `python tools/cek_dialek.py --semua` -> exit 0.
-- `python make_highlight.py`, `python tools/buat_glosarium.py` -> no diff.
-- `python -m compileall -q .`, `python build.py`, and a `dist/krc.pyz` smoke
-  test from a temporary directory.
-- Two builds of `koto-payang` produce identical bytes.
-- No baseline lesson, expected output, example, catalogue, dialect, or runtime
-  change; only the two tutorial index pages gain a pointer to the generated
-  trees.
+- `python -m compileall -q .` and the zipapp smoke pass.
+- `python tests/test_release.py` builds a wheel from a clean copy, finds both
+  dialects, installs, and runs both from outside the checkout.
+- `krc --version` prints `KerinciLang 0.6.0`; all eight version locations agree.
+- No baseline lesson, expected output, example, catalogue, dialect status, CLI
+  text, `--ketat` behavior, or dialect word changes.
 
 ## Risks
 
-- A generated block that uses a fallback still has to run; capture the warning
-  and report it once.
-- A literal string can look like a type word; the generator must not rewrite
-  ordinary strings.
-- Input blocks need their `masukan=` arguments preserved.
-- Relative links gain a directory level; resolve them instead of prefixing.
-- A failed build must not leave a half-written tree.
-- The baseline test must not double-count the generated trees.
-- `krc-berkas` helper files ending in `.krc` need the target header; raw-data
-  helpers such as `nilai.txt` keep their bytes.
-- Inline spans must not introduce a new `list` / `map` fallback; kind-table
-  cells are mapped as `type.*` words.
+- The guide must be executable: every command and path it names is checked by
+  a test.
+- A union grammar must not color ordinary text; `type.*` and `mode.*` stay out.
+- Regenerating the grammar must not silently drop a Siulak word.
+- A stale local `build/` can hide a packaging bug; the wheel smoke copies the
+  tree without build artifacts.
+- Version strings appear in eight places; missing one breaks the consistency
+  test.
+- `test_release.py` needs the network for an isolated build, so it must not run
+  inside `build.py` or the everyday offline path.
+- The stale-string audit must exempt history without letting a real stale
+  instruction survive in a current file.
