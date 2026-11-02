@@ -1,6 +1,7 @@
 # Spec: dialect-model
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map: `dialect-model`.
+Status: **approved 2026-11-02; implemented 2026-11-02.** Parent: `SPEC.md`.
+Capability map: `dialect-model`.
 Depends on: `core-ids` (implemented, commit `2cb1c55`). Date: 2026-11-02.
 
 ## 1. Objective

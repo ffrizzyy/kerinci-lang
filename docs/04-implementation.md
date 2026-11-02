@@ -7,14 +7,14 @@ README.md                  front page (English)
 GETTING-STARTED.md         step-by-step guide for a newly unzipped copy
 kerincilang.py             the whole interpreter (one file, no dependencies)
 core/ids.json              neutral ID catalogue: the language's contract (data)
-dialects/                  dialect data packages (data-only; no Python per dialect)
+dialects/                  dialect JSON files (data) + loader.py (validation only)
 pyproject.toml             packaging: provides the `krc` command
 build.py                   runs all tests, then builds dist/krc.pyz
 make_highlight.py          generates the VS Code grammar from the line's vocabulary
 examples/                  example programs (.krc)
 tutorial/                  13 lessons, answers, glossary in English; tutorial/id/ is the Indonesian copy (every code sample is tested)
-tests/                     test_kerincilang.py (language), test_tutorial.py (tutorial + glossary), test_ids.py (catalogue + seam + packaging)
-tools/                     sinkron_tutorial.py (check/refresh tutorial output), buat_glosarium.py
+tests/                     test_kerincilang.py (language), test_tutorial.py (tutorial + glossary), test_ids.py (catalogue + seam + packaging), test_dialects.py (dialect files)
+tools/                     sinkron_tutorial.py, buat_glosarium.py, cek_dialek.py (dialect CI gate)
 docs/                      design documents (this folder)
 tasks/                     plan.md / todo.md for a working module
 vscode-extension/          syntax highlighting for .krc files
@@ -73,6 +73,74 @@ it with `use_vocab`, and `Env` carries it, but `do_import` still uses the same
 vocabulary as its importer. `runtime-selection` will push the callee's vocabulary
 around a call and per module; the seam above is what makes that a small change.
 
+## Dialect files (0.6)
+
+A dialect is data, not code: `dialects/<code>.json`. `dialects/loader.py` reads,
+validates, and resolves it. There is no Python file per dialect, and nothing in a
+dialect is ever executed.
+
+```json
+{
+  "code": "koto-payang",
+  "name": "Koto Payang",
+  "status": "draft",
+  "core": "0.6",
+  "revision": 1,
+  "parent": null,
+  "license": "CC BY-SA 4.0",
+  "maintainer": "Nama Pengurus <email>",
+  "reviewer": null,
+  "sources": ["Translation Worksheet (Koto Payang), 2026"],
+  "orthography": "Final -u (kalu, selamu); nga for and.",
+  "words": {"kw.if": "kalu", "op.eq": "samo"},
+  "messages": {"msg.value.div_zero": "Pembagian dengan nol"}
+}
+```
+
+`words` and `messages` may be partial. One ID resolves in this order: this file,
+then its `parent` chain, then the neutral English base. The base is synthesized
+from `core/ids.json` (`greater than` -> `greater_than`), so there is no
+`base.json` that could drift from the catalogue.
+
+| Rule | Detail |
+|---|---|
+| Identity | `code` is `^[a-z0-9-]+$` and must match the filename |
+| Base fallback | a word ID's base word is its `en` normalized to an identifier; a message's base template is its `en` |
+| Inheritance | one `parent`, no cycles; `base` is the implicit terminal parent |
+| Disjoint words | `kw`, `op`, `reserved`, `fn` may not share a word; `type` and `mode` may share with anything |
+| Version | `core` is a minimum: a newer file warns (`newer-core`), an unknown ID is a hard error |
+| Safety | 1 MiB cap, UTF-8 only, duplicate JSON keys rejected, no path outside `dialects/` |
+
+```python
+from dialects.loader import load_dialect
+from kerincilang import run_source
+
+d = load_dialect("koto-payang")
+run_source('kalu 1 samo 1 { nyetak "samo" }', vocab=d.vocab)
+d.report.tiers()      # {1: (own, 32), 2: (own, 101), 3: (own, 1)}
+d.report.missing()    # [(id, tier)] still coming from the base
+```
+
+`present` in `tiers()` counts only the words and messages the file writes itself,
+so a parent never inflates it. That is the number a speaker review cares about.
+
+Validation codes are one per rule: `schema`, `code`, `core-version`, `word-empty`,
+`word-charset`, `word-case`, `unknown-id`, `wrong-namespace`,
+`message-placeholder`, `parent-missing`, `parent-cycle`, `reviewer-missing`,
+`source-missing`, `clash`, `path`, `size`, `json`, plus `missing` for a file that
+does not exist. `validate_dialect` returns every problem and never prints;
+`load_dialect` raises `DialectError` with all of them in `.problems`.
+
+`python3 tools/cek_dialek.py --semua` is the CI gate. Exit 0 is clean, exit 1 is a
+validation error, exit 2 is a strict failure (`--ketat`: an approved dialect still
+falling back to the base for a Tier 1 word, or a newer `core`). The checker reads
+JSON only; it never imports a dialect.
+
+The default root works from a checkout, a wheel, and `dist/krc.pyz`, because it
+uses `importlib.resources.files("dialects")` instead of a source path.
+`tests/test_dialects.py` builds a zipapp containing a dialect and loads it from a
+directory with no checkout.
+
 ## Running
 
 ```bash
@@ -81,6 +149,9 @@ python3 krc.pyz contoh.krc        # single-file build
 python3 kerincilang.py contoh.krc # from source
 python3 tests/test_kerincilang.py   # the language
 python3 tests/test_tutorial.py      # every tutorial sample + glossary coverage
+python3 tests/test_ids.py           # catalogue, vocabulary seam, packaging
+python3 tests/test_dialects.py      # dialect files, inheritance, the CLI
+python3 tools/cek_dialek.py --semua # dialect CI gate (exit 0 / 1 / 2)
 ```
 
 Python 3.9 or newer (3.11 or newer recommended: it allows function calls to nest 400 deep instead of 80); no packages needed.
@@ -140,7 +211,9 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 ## Test suite
 
-`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data.
+`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp.
+
+Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. No fake dialect is committed: `dialects/` holds only `__init__.py` and `loader.py` until `dialect-siulak-legacy` adds `siulak.json`.
 
 ## Next steps
 
