@@ -1,6 +1,6 @@
 # Spec: dialect-koto-payang
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `dialect-koto-payang`.
 Depends on: `worksheet-pipeline` (implemented) and `runtime-selection`
 (implemented). Date: 2026-11-02.
@@ -398,3 +398,28 @@ On approval: archive the current plan/todo, write `tasks/plan.md` and
 JSON with `lembar_kerja.py json`, write the MD and tests, then run all eight
 suites, `cek_dialek`, the generators, `compileall`, `build.py`, and
 `dist/krc.pyz` from a temp directory.
+
+## 14. Implementation log
+
+Implemented 2026-11-02 as specified.
+
+- `dialects/src/koto-payang.csv`: 137 rows, 89 answers, 85 `reviewed`,
+  4 `draft`, 48 `todo`. `periksa --siap` passes `review`; `laporan` reports
+  `approved` not ready with 51 unreviewed Tier 2 rows.
+- `dialects/koto-payang.json`: 63 words + 26 messages, `status: review`,
+  `reviewer: null`, revision 1, core `0.6`. Loader report:
+  `{1: (32, 32), 2: (57, 104), 3: (0, 1)}`, 48 base fallbacks, no problems.
+- `dialects/koto-payang.md`: provenance, orthography, mapping decisions, review
+  record, and the 48-ID gap list.
+- `tests/test_koto_payang.py`: artifact, metadata, completeness, exact word and
+  message maps, CSV contract, selection, fallback warning, `--ketat`, and
+  `cek_dialek` checks. All pass.
+- Runtime, loader, catalogue, worksheet tool, and Siulak were not changed.
+- One inventory assertion pair in `tests/test_dialects.py` changed from
+  `['siulak']` to `['koto-payang', 'siulak']` (and the zipapp list likewise)
+  because a second dialect file now exists. This is a count, not an oracle; no
+  program output or language expectation changed.
+- All eight suites are green; `cek_dialek --semua`, both generators,
+  `compileall`, `build.py`, and `dist/krc.pyz` from a temp directory pass.
+- The second speaker pass (42 messages, 6 words, 4 drafts) is still pending and
+  remains the only path to `approved`.

@@ -1,29 +1,32 @@
-# Todo: dialect-siulak-legacy
+# Todo: dialect-koto-payang
 
 Each item is done only when the listed check passes.
 
-- [x] T1 `dialects/siulak.json` has the spec metadata, `status: draft`,
-      `revision: 1`, `reviewer: null`, `parent: null`.
-- [x] T2 All 69 word IDs match `LEGACY_WORDS` and `LEGACY_OPERATORS`; no extra
-      or missing word ID.
-- [x] T3 All 68 `msg.*` templates equal `id_gloss`; placeholders match.
-- [x] T4 `load_dialect("siulak")` has no problems, `fallbacks == []`,
-      `missing() == []`, and tiers `32/32`, `104/104`, `1/1`.
-- [x] T5 `dialects/siulak.md` records provenance, the 69-word table, the
-      message rule, the change policy, and the `type.bool` placeholder.
-- [x] T6 `tests/test_siulak_legacy.py` proves `DialectVocabulary` equals
-      `LegacySiulak` for every word and message.
-- [x] T7 A `# dialek: siulak` file and `--dialek siulak` run with v0.5 output
-      and no fallback warning.
-- [x] T8 `cek_dialek --kode siulak` and `--ketat` exit 0; `--semua` exits 0.
-- [x] T9 All six earlier suites stay green, unchanged.
-- [x] T10 `python -m compileall -q .`, `build.py`, and `dist/krc.pyz` from a temp
-      directory pass; both generators produce no diff.
-- [x] T11 Docs updated; the spec is marked implemented.
+- [x] T1 `dialects/src/koto-payang.csv` has 137 rows and the exact header.
+- [x] T2 Tier 1 is 32/32 `reviewed`; the 32 answers equal the spec's section 4.
+- [x] T3 Tier 2 has 53 reviewed, 4 draft, 47 todo; the answers equal sections
+      5-6 and every todo keeps the worksheet value in `notes`.
+- [x] T4 `periksa --siap` passes `review` and fails `approved` with 51
+      unreviewed Tier 2 rows.
+- [x] T5 `dialects/koto-payang.json` has the section 7 metadata and owns exactly
+      63 words + 26 messages.
+- [x] T6 `load_dialect("koto-payang")` has no problems, tiers
+      `32/32, 57/104, 0/1`, and exactly the 48 expected fallbacks.
+- [x] T7 `dialects/koto-payang.md` records provenance, orthography, mapping
+      decisions, the review record, and the 48 gaps.
+- [x] T8 `tests/test_koto_payang.py` proves the word and message maps, the CSV
+      counts, selection with no warning, and a missing-ID warning.
+- [x] T9 `cek_dialek --kode koto-payang`, `--ketat`, and `--semua` exit 0; the
+      summary is exact.
+- [x] T10 All eight earlier suites stay green, unchanged except no further test
+      edits.
+- [x] T11 `compileall`, `build.py`, and `dist/krc.pyz` from a temp directory
+      pass; both generators produce no diff.
+- [x] T12 Docs updated; the spec is marked implemented.
 
-## Follow-ups (not part of dialect-siulak-legacy)
+## Follow-ups (not part of dialect-koto-payang)
 
-- `dialect-koto-payang`: map the old worksheet by hand, fill the CSV, run the
-  second speaker pass, export `dialects/koto-payang.json`.
-- A real Siulak re-review changes this file in a new revision and may change
-  `type.bool`.
+- Second speaker pass: fill the 42 todo messages and 6 todo words, confirm the
+  4 drafts, then re-run `periksa --siap` and promote to `approved` with a named
+  reviewer.
+- The translator and tutorial modules depend on this reviewed dialect.

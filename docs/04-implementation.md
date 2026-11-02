@@ -155,6 +155,27 @@ while `docs/02-vocabulary-worksheet.md` remains the decision log.
 `LegacySiulak` format every message identically. A bare `run_source()` still
 defaults to `LegacySiulak`, and a missing `siulak.json` still resolves to it.
 
+### The Koto Payang review
+
+`dialects/koto-payang.json` is the first non-Siulak dialect, at `status: review`.
+It is hand-mapped from the old worksheet, never ingested: the DOCX has no ID
+column and 287 rows for 137 IDs. The canonical answer file is
+`dialects/src/koto-payang.csv`; `dialects/koto-payang.md` records provenance,
+orthography, the mapping decisions, and the review record.
+
+The file owns 89 IDs (63 words + 26 messages) and falls back to the English base
+for 48 (`{1: (32, 32), 2: (57, 104), 3: (0, 1)}`). All 32 Tier 1 IDs are
+reviewed, so `--ketat` and `cek_dialek --ketat` still exit 0; the gaps are Tier 2
+and warn once per `(dialect, id)`. Four rows are provisional `draft`s
+(`type.float`, `type.null`, `msg.name.constant`, `msg.value.convert`) and 48
+are `todo`. A second speaker pass fills those and is the only path to
+`approved`; nothing is guessed to close a gap.
+
+`tests/test_koto_payang.py` pins the exact word and message maps, the CSV status
+counts, `periksa --siap` readiness (review yes, approved no), header and
+`--dialek` selection, a clean run with no warning, the `type.bool` fallback
+warning, and the `cek_dialek` summaries.
+
 ## Dialect worksheets
 
 `dialects/src/<code>.csv` is the canonical answer file for a new dialect. It is

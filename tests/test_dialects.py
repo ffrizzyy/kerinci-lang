@@ -226,8 +226,8 @@ def test_available_dialects():
         check(available_dialects(root=tmp) == ["a", "b"],
               "available_dialects lists usable codes only",
               available_dialects(root=tmp))
-    check(available_dialects() == ["siulak"],
-          "the committed dialects/ contains only siulak",
+    check(available_dialects() == ["koto-payang", "siulak"],
+          "the committed dialects/ contains siulak and koto-payang",
           available_dialects())
 
 
@@ -565,7 +565,7 @@ def test_zipapp_default_root():
         result = subprocess.run([sys.executable, str(pyz)], cwd=str(work),
                                 capture_output=True, text=True)
         check(result.returncode == 0
-              and result.stdout == "uji cetak ['siulak', 'uji']\n",
+              and result.stdout == "uji cetak ['koto-payang', 'siulak', 'uji']\n",
               "load_dialect works from a zipapp with no checkout",
               (result.returncode, result.stdout, result.stderr))
 

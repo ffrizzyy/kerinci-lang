@@ -86,6 +86,25 @@ placeholder `boolean`, and `tests/test_siulak_legacy.py` locks every word and
 message to `LEGACY_WORDS`, `LEGACY_OPERATORS`, and `id_gloss`. A real change
 needs a Siulak speaker review and a new revision.
 
+## The Koto Payang review
+
+Koto Payang is the worked example of the worksheet cycle, committed at
+`status: review`. `dialects/src/koto-payang.csv` holds 137 rows: 85 `reviewed`,
+4 `draft`, and 48 `todo`. The JSON owns the 89 accepted answers and lets the
+other 48 fall back to the base.
+
+```bash
+python3 tools/lembar_kerja.py periksa --kode koto-payang --siap   # review gate
+python3 tools/lembar_kerja.py laporan --kode koto-payang          # tier counts
+python3 tools/cek_dialek.py --kode koto-payang                    # CI gate
+```
+
+`periksa --siap` passes for `review` and prints that `approved` is not ready
+(51 Tier 2 rows unreviewed). Do not promote the file, fill a `todo` with a
+guess, or borrow a Siulak word to make the counts look complete. The second
+speaker pass supplies the 42 messages, 6 words, and 4 draft confirmations; only
+then can the file carry a named reviewer and `status: approved`.
+
 ## Dialect worksheets
 
 The canonical answer file for a new dialect is `dialects/src/<code>.csv`: UTF-8
@@ -122,8 +141,9 @@ into an existing `dialects/<code>.json`, preserves metadata and `revision`, and
 writes nothing unless the merged file validates.
 
 The old `Translation Worksheet (Koto Payang).docx` cannot be read by `baca`: it
-has no ID column and 287 rows for 137 IDs. Map it by hand during the
-`dialect-koto-payang` second speaker pass.
+has no ID column and 287 rows for 137 IDs. It was mapped by hand into
+`dialects/src/koto-payang.csv`; the remaining gaps are part of the second
+speaker pass, not a script.
 
 ## Teaching materials
 
