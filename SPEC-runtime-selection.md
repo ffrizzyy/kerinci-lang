@@ -1,6 +1,6 @@
 # Spec: runtime-selection
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map:
+Status: **implemented** (2026-11-02). Parent: `SPEC.md`. Capability map:
 `runtime-selection`.
 Depends on: `dialect-model` (implemented, commit `60f9335`). Date: 2026-11-02.
 

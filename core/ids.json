@@ -590,6 +590,44 @@
       "placeholders": [],
       "tier": 2
     },
+    "msg.dialect.header": {
+      "arity": null,
+      "description": "The first line looks like a dialect header but does not name a valid code.",
+      "en": "Line {line}: invalid dialect header: {text}",
+      "example": "Baris 1: header dialek tidak valid: # dialek: ../x",
+      "id_gloss": "Baris {line}: header dialek tidak valid: {text}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.dialect.invalid": {
+      "arity": null,
+      "description": "A dialect file exists but does not pass validation.",
+      "en": "Dialect {code} is not valid: {detail}",
+      "example": "Dialek uji tidak valid: the word is empty",
+      "id_gloss": "Dialek {code} tidak valid: {detail}",
+      "namespace": "msg",
+      "placeholders": [
+        "code",
+        "detail"
+      ],
+      "tier": 2
+    },
+    "msg.dialect.unknown": {
+      "arity": null,
+      "description": "A dialect code names no file in dialects/.",
+      "en": "Unknown dialect: {code}",
+      "example": "Dialek tidak dikenal: hantu",
+      "id_gloss": "Dialek tidak dikenal: {code}",
+      "namespace": "msg",
+      "placeholders": [
+        "code"
+      ],
+      "tier": 2
+    },
     "msg.file.closed": {
       "arity": null,
       "description": "An operation used a file that is already closed.",

@@ -19,6 +19,12 @@ except ImportError:                                   # pragma: no cover - Pytho
 
 __version__ = "0.5.0"
 
+# `python kerincilang.py` runs this file as __main__. Registering the alias means
+# a lazy `import kerincilang` (dialects.loader) reuses this module instead of
+# loading a second copy of the engine.
+if __name__ == "__main__":
+    sys.modules.setdefault("kerincilang", sys.modules[__name__])
+
 # Function calls nest deeply in this interpreter. Python 3.11+ can safely go deeper
 # than its default limit; older versions stay conservative.
 if sys.version_info >= (3, 11):
@@ -208,7 +214,7 @@ def current_vocab():
 
 
 class use_vocab:
-    """Push a vocabulary for the duration of a run (M1: one per program)."""
+    """Push a vocabulary for the duration of a run or one function call."""
 
     def __init__(self, vocab):
         self.vocab = vocab
@@ -220,6 +226,119 @@ class use_vocab:
     def __exit__(self, *exc):
         _VOCAB_STACK.pop()
         return False
+
+
+# ---- run context (dialect selection) --------------------------------------
+HEADER_HINT_RE = re.compile(r"^\s*#.*\bdialek\b", re.IGNORECASE)
+HEADER_RE = re.compile(r"^\s*#\s*dialek\s*:\s*([a-z0-9-]+)\s*$")
+
+
+class RunContext:
+    """State shared by every file in one invocation."""
+
+    def __init__(self, default_vocab=None, dialect_root=None, strict=False):
+        self.default_vocab = default_vocab or LEGACY
+        self.dialect_root = dialect_root
+        self.strict = strict
+        self.cache = {}          # dialect code -> Vocabulary
+        self.warned = set()      # {(dialect code, ID)}
+        self.strict_failed = False
+        self.started = False
+
+
+_CONTEXT_STACK = []
+
+
+def current_context():
+    return _CONTEXT_STACK[-1] if _CONTEXT_STACK else None
+
+
+class use_context:
+    def __init__(self, context):
+        self.context = context
+
+    def __enter__(self):
+        _CONTEXT_STACK.append(self.context)
+        return self.context
+
+    def __exit__(self, *exc):
+        _CONTEXT_STACK.pop()
+        return False
+
+
+def dialect_header(src):
+    """The code on line 1, or None. A malformed header is an error, not a comment."""
+    line = src.split("\n", 1)[0].rstrip("\r")
+    if not HEADER_HINT_RE.match(line):
+        return None
+    match = HEADER_RE.match(line)
+    if not match:
+        raise LangError(msg("msg.dialect.header", line=1, text=line.strip()))
+    return match.group(1)
+
+
+def _gaps(dialect):
+    """Tier 1 IDs an approved dialect still takes from the base."""
+    if dialect.status != "approved":
+        return []
+    return [id for id, source in dialect.report.fallbacks
+            if source == "base" and CATALOG["ids"][id]["tier"] == 1]
+
+
+def _warn_fallback(context, code, id, word):
+    key = (code, id)
+    if key in context.warned:
+        return
+    context.warned.add(key)
+    if id.startswith("msg."):
+        print(f"warning: dialect {code}: {id} falls back to the base message",
+              file=sys.stderr)
+    else:
+        print(f"warning: dialect {code}: {id} falls back to the base word {word!r}",
+              file=sys.stderr)
+
+
+def resolve_dialect(code, context=None):
+    """Load one dialect for this run, or Siulak while it has no file yet."""
+    context = context or current_context() or RunContext()
+    if code in context.cache:
+        return context.cache[code]
+
+    from dialects.loader import DialectError, load_dialect
+
+    try:
+        dialect = load_dialect(code, root=context.dialect_root)
+    except DialectError as err:
+        if err.code == "missing" and code == "siulak":
+            context.cache[code] = LEGACY
+            return LEGACY
+        if err.code == "missing":
+            raise LangError(msg("msg.dialect.unknown", code=code))
+        raise LangError(msg("msg.dialect.invalid", code=code,
+                            detail=err.problems[0].message))
+
+    vocab = dialect.vocab
+    watch = getattr(vocab, "watch", None)
+    if watch is not None:
+        watch(lambda id, word: _warn_fallback(context, code, id, word))
+    context.cache[code] = vocab
+
+    if context.strict:
+        gaps = _gaps(dialect)
+        if gaps:
+            context.strict_failed = True
+            print(f"warning: strict: dialect {code} has {len(gaps)} tier-1 "
+                  f"word(s) from the base: {', '.join(gaps)}", file=sys.stderr)
+    return vocab
+
+
+def resolve_source_vocab(src, context=None):
+    """The header wins; otherwise the run default (Siulak when nothing is set)."""
+    context = context or current_context() or RunContext()
+    code = dialect_header(src)
+    if code is None:
+        return context.default_vocab
+    return resolve_dialect(code, context)
 
 
 # ---- lexer ----------------------------------------------------------------
@@ -977,12 +1096,21 @@ BUILTIN_IDS = {
 }
 
 
+def _register_builtins(base, vocab):
+    for fn_id, (arity, fn) in BUILTIN_IDS.items():
+        base.vars[vocab.word(fn_id)] = ("builtin", fn_id, arity, fn)
+
+
 def new_global(vocab=None):
     """Built-ins live in a parent scope, so programs can freely reuse their names."""
     vocab = vocab or current_vocab()
     base = Env(vocab=vocab)
-    for fn_id, (arity, fn) in BUILTIN_IDS.items():
-        base.vars[vocab.word(fn_id)] = ("builtin", fn_id, arity, fn)
+    suspend = getattr(vocab, "suspend", None)
+    if suspend is None:                 # a plain Vocabulary has nothing to silence
+        _register_builtins(base, vocab)
+    else:
+        with suspend():                 # registering every built-in is not a "use"
+            _register_builtins(base, vocab)
     return Env(base, vocab=vocab)
 
 
@@ -1008,12 +1136,15 @@ def do_import(name, env):
     if found not in LOADED:
         with open(found, encoding="utf-8") as f:
             src = f.read()
-        module = new_global(vocab)
+        context = current_context() or RunContext()
+        module_vocab = resolve_source_vocab(src, context)
+        module = new_global(module_vocab)
         LOADING.append(found)
         IMPORT_STACK.append(os.path.dirname(found))
         try:
-            with use_vocab(vocab):
-                run_block(Parser(tokenize(src, vocab), vocab).program(), module)
+            with use_vocab(module_vocab):
+                run_block(Parser(tokenize(src, module_vocab), module_vocab).program(),
+                          module)
         except LangError as err:
             raise LangError(msg("msg.import.in_module", name=name, message=str(err)))
         finally:
@@ -1147,7 +1278,8 @@ def ev(e, env):
             raise LangError(msg("msg.call.depth", max=MAX_CALL_DEPTH))
         CALL_DEPTH[0] += 1
         try:
-            run_block(body, local)
+            with use_vocab(local.vocab):     # the callee's dialect, not the caller's
+                run_block(body, local)
         except ReturnSignal as r:
             return r.value
         except RecursionError:
@@ -1158,25 +1290,46 @@ def ev(e, env):
     raise LangError(msg("msg.runtime.unknown_expr", op=op))
 
 
-def run_source(src, env=None, vocab=None):
+def run_source(src, env=None, vocab=None, *, dialect_root=None):
     if not LOADING:
         LOADED.clear()                      # a fresh run re-reads imported files
-    if env is None:
-        env = new_global(vocab)
-    elif vocab is not None:
-        env.vocab = vocab
-    with use_vocab(env.vocab):
-        run_block(Parser(tokenize(src, env.vocab), env.vocab).program(), env)
-    return env
+
+    context = current_context()
+    own_context = context is None
+    if own_context:
+        context = RunContext(vocab or (env.vocab if env is not None else LEGACY),
+                             dialect_root)
+    else:
+        if vocab is not None:
+            context.default_vocab = vocab
+        if dialect_root is not None:
+            context.dialect_root = dialect_root
+    if own_context:
+        _CONTEXT_STACK.append(context)
+    try:
+        src_vocab = resolve_source_vocab(src, context)
+        if context.strict_failed and not context.started:
+            return env                        # strict: don't run a failing file
+        if env is None:
+            env = new_global(src_vocab)
+        else:
+            env.vocab = src_vocab
+        context.started = True
+        with use_vocab(src_vocab):
+            run_block(Parser(tokenize(src, src_vocab), src_vocab).program(), env)
+        return env
+    finally:
+        if own_context:
+            _CONTEXT_STACK.pop()
 
 
-def run_file(path, env=None, vocab=None):
+def run_file(path, env=None, vocab=None, *, dialect_root=None):
     """Run a .krc file; `ambik` paths are relative to that file."""
     with open(path, encoding="utf-8") as f:
         src = f.read()
     IMPORT_STACK.append(os.path.dirname(os.path.abspath(path)))
     try:
-        return run_source(src, env, vocab)
+        return run_source(src, env, vocab, dialect_root=dialect_root)
     finally:
         IMPORT_STACK.pop()
         close_all_files()
@@ -1207,11 +1360,14 @@ BUILTINS = {LEGACY_WORDS[id]: spec for id, spec in BUILTIN_IDS.items()}
 USAGE = f"""KerinciLang {__version__}
 
 Pemakaian:
-  krc                  buka REPL interaktif
-  krc berkas.krc       jalankan program
-  krc -c "kode"        jalankan satu potong kode
-  krc --version        tampilkan versi
-  krc --help           tampilkan bantuan ini
+  krc [--dialek KODE] [--ketat] berkas.krc   jalankan program
+  krc [--dialek KODE] [--ketat] -c "kode"    jalankan satu potong kode
+  krc [--dialek KODE]                        buka REPL interaktif
+  krc --version                              tampilkan versi
+  krc --help                                 tampilkan bantuan ini
+
+  --dialek KODE   dialek untuk berkas yang tidak punya header `# dialek:`
+  --ketat         gagal (exit 2) bila dialek yang disetujui belum lengkap
 """
 
 OPENERS, CLOSERS = {"(", "{", "["}, {")", "}", "]"}
@@ -1227,8 +1383,11 @@ def is_incomplete(src, vocab=None):
     return depth > 0
 
 
-def repl():
-    env = new_global()
+def repl(vocab=None):
+    env = new_global(vocab)
+    context = current_context()
+    if context is not None:
+        context.started = True          # a strict failure must not swallow input
     print(f"KerinciLang {__version__}. Ctrl+D untuk keluar.")
     buffer = ""
     while True:
@@ -1251,41 +1410,94 @@ def repl():
         buffer = ""
 
 
-def main(argv=None):
+def _parse_argv(argv):
+    """Split flags from the file/code arguments; `-c` keeps its code intact."""
+    dialect, strict, rest = None, False, []
+    index = 0
+    while index < len(argv):
+        arg = argv[index]
+        if arg == "--dialek":
+            if index + 1 >= len(argv):
+                raise ValueError("--dialek butuh kode dialek")
+            dialect = argv[index + 1]
+            index += 2
+            continue
+        if arg.startswith("--dialek="):
+            dialect = arg.split("=", 1)[1]
+            if not dialect:
+                raise ValueError("--dialek butuh kode dialek")
+            index += 1
+            continue
+        if arg == "--ketat":
+            strict = True
+            index += 1
+            continue
+        if arg == "-c":
+            rest.append(arg)
+            if index + 1 < len(argv):
+                rest.append(argv[index + 1])
+                index += 2
+            else:
+                index += 1
+            continue
+        rest.append(arg)
+        index += 1
+    return dialect, strict, rest
+
+
+def main(argv=None, dialect_root=None):
     argv = sys.argv[1:] if argv is None else argv
-    if argv and argv[0] in ("-h", "--help"):
+    try:
+        dialect_code, strict, rest = _parse_argv(argv)
+    except ValueError as err:
+        print(f"Kesalahan: {err}", file=sys.stderr)
+        return 2
+    if rest and rest[0] in ("-h", "--help"):
         print(USAGE)
         return 0
-    if argv and argv[0] in ("-V", "--version"):
+    if rest and rest[0] in ("-V", "--version"):
         print(f"KerinciLang {__version__}")
         return 0
+
+    context = RunContext(LEGACY, dialect_root, strict)
     try:
-        if not argv:
-            return repl()
-        if argv[0] == "-c":
-            if len(argv) < 2:
-                print("Kesalahan: -c butuh kode", file=sys.stderr)
+        with use_context(context):
+            if dialect_code is not None:
+                try:
+                    context.default_vocab = resolve_dialect(dialect_code, context)
+                except LangError as err:
+                    print(f"Kesalahan: {err}", file=sys.stderr)
+                    return 2
+            try:
+                if not rest:
+                    code = repl(context.default_vocab)
+                    return 2 if context.strict_failed else code
+                if rest[0] == "-c":
+                    if len(rest) < 2:
+                        print("Kesalahan: -c butuh kode", file=sys.stderr)
+                        return 2
+                    run_source(rest[1], vocab=context.default_vocab)
+                else:
+                    run_file(rest[0], vocab=context.default_vocab)
+            except LangError as err:
+                print(f"Kesalahan: {err}", file=sys.stderr)
+                return 1
+            except FileNotFoundError:
+                print(f"Kesalahan: berkas tidak ditemukan: {rest[0]}", file=sys.stderr)
                 return 2
-            run_source(argv[1])
-        else:
-            run_file(argv[0])
-    except LangError as err:
-        print(f"Kesalahan: {err}", file=sys.stderr)
-        return 1
-    except FileNotFoundError:
-        print(f"Kesalahan: berkas tidak ditemukan: {argv[0]}", file=sys.stderr)
-        return 2
-    except UnicodeDecodeError:
-        print("Kesalahan: berkas harus berupa teks UTF-8", file=sys.stderr)
-        return 2
-    except KeyboardInterrupt:
-        print("\nDihentikan.", file=sys.stderr)
-        return 130
-    except BrokenPipeError:                  # e.g. `krc program.krc | head`
-        sys.stderr.close()
-        return 0
+            except UnicodeDecodeError:
+                print("Kesalahan: berkas harus berupa teks UTF-8", file=sys.stderr)
+                return 2
+            except KeyboardInterrupt:
+                print("\nDihentikan.", file=sys.stderr)
+                return 130
+            except BrokenPipeError:          # e.g. `krc program.krc | head`
+                sys.stderr.close()
+                return 0
     finally:
         close_all_files()
+    if context.strict_failed:
+        return 2
     return 0
 
 

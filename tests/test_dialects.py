@@ -118,7 +118,7 @@ def test_base():
     check(base.vocab.message("msg.value.div_zero", {}) == "Division by zero",
           "base messages are English", base.vocab.message("msg.value.div_zero", {}))
 
-    check(base.report.tiers() == {1: (32, 32), 2: (101, 101), 3: (1, 1)},
+    check(base.report.tiers() == {1: (32, 32), 2: (104, 104), 3: (1, 1)},
           "base tier totals match the catalogue", base.report.tiers())
     check(base.report.missing() == [], "the base has no fallbacks", base.report.missing())
 

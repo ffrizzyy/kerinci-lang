@@ -22,6 +22,29 @@ Reserved for later: `kelihu` (error)
 Built-in functions: `daftar` `peta` `panjang` `bilangan` `pecahan` `kato` `mecem` `jarak` `nambahkah` `isi` `milih` `pulang` `pisah` `disatu` `bukak` `baco` `tulis` `tutup` `hapus` `nantik` `tambah` `kurang` `kali` `bagi`
 
 
+## Choosing a dialect
+
+Siulak is the default. A file may choose another dialect on line 1:
+
+```
+# dialek: koto-payang
+nyetak "halo"
+```
+
+- The header must be the first line; a `# dialek:` line anywhere else is an
+  ordinary comment.
+- A malformed header on line 1 is an error, not a silent comment.
+- `krc --dialek CODE file.krc` sets the default for files without a header.
+  The header wins over `--dialek`, and Siulak is used when neither is present.
+- `krc --ketat` fails (exit 2) when an approved dialect still borrows Tier 1
+  words from the base.
+- A function keeps the dialect it was written in; an imported file uses its own
+  header, or the run default when it has none.
+
+Only the words change, not the grammar. A dialect may spell the keywords and
+built-ins differently, but braces, operators, values, and the program structure
+are the same.
+
 ## Values
 
 | Type | Example | Notes |

@@ -128,6 +128,23 @@ class Report:
 
 
 # ---- the vocabulary seam --------------------------------------------------
+class _Suspend:
+    """Context manager: quiet a DialectVocabulary's fallback notifications."""
+
+    def __init__(self, vocab):
+        self.vocab = vocab
+        self.saved = None
+
+    def __enter__(self):
+        self.saved = self.vocab._notify
+        self.vocab._notify = None
+        return self.vocab
+
+    def __exit__(self, *exc):
+        self.vocab._notify = self.saved
+        return False
+
+
 class DialectVocabulary(Vocabulary):
     """A resolved dialect, ready for `run_source(..., vocab=...)`."""
 
@@ -137,6 +154,8 @@ class DialectVocabulary(Vocabulary):
         self.core = dialect.core
         self._words = dialect.words
         self._messages = dialect.messages
+        self._base_ids = dialect.base_ids
+        self._notify = None
         self._surface = {word: id for id, word in self._words.items()
                          if id.startswith("kw.")}
         self._modes = {word: id for id, word in self._words.items()
@@ -144,10 +163,22 @@ class DialectVocabulary(Vocabulary):
         self._reserved = {word for id, word in self._words.items()
                           if id.startswith("reserved.")}
 
+    def watch(self, notify):
+        """Called as notify(id, word) the first time a base fallback is used."""
+        self._notify = notify
+
+    def suspend(self):
+        """Silence fallback notifications (eager built-in registration)."""
+        return _Suspend(self)
+
     def word(self, id):
+        if self._notify is not None and id in self._base_ids:
+            self._notify(id, self._words[id])
         return self._words[id]
 
     def message(self, id, args=None):
+        if self._notify is not None and id in self._base_ids:
+            self._notify(id, None)
         return self._messages[id].format(**(args or {}))
 
     def mode_id(self, word):
@@ -175,6 +206,7 @@ class Dialect:
         self.revision = data["revision"]
         self.words = words
         self.messages = messages
+        self.base_ids = {id for id, source in sources.items() if source == "base"}
         own = {id for id, source in sources.items() if source == self.code}
         self.report = Report(self.code, own, sources, problems)
         self.vocab = DialectVocabulary(self)

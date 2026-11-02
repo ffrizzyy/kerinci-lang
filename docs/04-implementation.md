@@ -68,10 +68,10 @@ Rules:
   `RESERVED` are compatibility views generated from `LegacySiulak`. Do not
   hand-maintain a second table.
 
-**M1 limitation.** There is one vocabulary per run. `run_source`/`run_file` push
-it with `use_vocab`, and `Env` carries it, but `do_import` still uses the same
-vocabulary as its importer. `runtime-selection` will push the callee's vocabulary
-around a call and per module; the seam above is what makes that a small change.
+**Selection is now per file (0.6).** Line 1 may declare `# dialek: <code>`;
+without it the file uses `--dialek`, and with neither, Siulak. A call pushes the
+callee's vocabulary for the body, and an import gives the imported file its own
+vocabulary. See *Dialect selection* below.
 
 ## Dialect files (0.6)
 
@@ -117,7 +117,7 @@ from kerincilang import run_source
 
 d = load_dialect("koto-payang")
 run_source('kalu 1 samo 1 { nyetak "samo" }', vocab=d.vocab)
-d.report.tiers()      # {1: (own, 32), 2: (own, 101), 3: (own, 1)}
+d.report.tiers()      # {1: (own, 32), 2: (own, 104), 3: (own, 1)}
 d.report.missing()    # [(id, tier)] still coming from the base
 ```
 
@@ -141,6 +141,47 @@ uses `importlib.resources.files("dialects")` instead of a source path.
 `tests/test_dialects.py` builds a zipapp containing a dialect and loads it from a
 directory with no checkout.
 
+## Dialect selection
+
+One `RunContext` per invocation holds the default vocabulary, the dialect cache,
+the warned set, and the `--ketat` flag. It is pushed by `main`/`run_file` and
+restored afterwards; a bare `run_source()` creates a one-shot context so the
+public API keeps working.
+
+Precedence:
+
+```
+line 1 `# dialek: <code>`   >   --dialek   >   Siulak
+```
+
+- The header is line 1 only. Any later `# dialek:` line is an ordinary comment.
+  A line 1 that starts with `#` and contains `dialek` but does not match
+  `^\s*#\s*dialek\s*:\s*([a-z0-9-]+)\s*$` is an error (`msg.dialect.header`),
+  never a silent comment.
+- `--dialek` is the default for files that declare nothing, including the REPL
+  and `-c`.
+- A headerless import uses the run default, not the importer's dialect. A file's
+  dialect is a property of the file, so `LOADED` stays keyed by path.
+- A call pushes the vocabulary of the function's defining module; nested calls
+  restore correctly, even when the callee raises. Output, `mecem`, file modes,
+  and error text therefore follow the executing module.
+- A header naming a missing file is `msg.dialect.unknown`; one naming a file that
+  fails validation is `msg.dialect.invalid`. Both are program errors (exit 1).
+
+`--ketat` checks the selected dialect before the program starts, and any dialect
+loaded later from an import. An approved dialect with a Tier 1 base fallback
+exits 2; a program that was already running finishes first.
+
+A base fallback prints one English line to stderr per `(dialect, id)` per run,
+for example `warning: dialect koto-payang: kw.in falls back to the base word
+"in"`. Registering every built-in is silent; only a real use warns. Warnings
+never change the exit code.
+
+```krc
+# dialek: koto-payang
+kalu 1 samo 1 { nyetak "samo" }
+```
+
 ## Running
 
 ```bash
@@ -151,6 +192,7 @@ python3 tests/test_kerincilang.py   # the language
 python3 tests/test_tutorial.py      # every tutorial sample + glossary coverage
 python3 tests/test_ids.py           # catalogue, vocabulary seam, packaging
 python3 tests/test_dialects.py      # dialect files, inheritance, the CLI
+python3 tests/test_runtime_selection.py  # header, precedence, imports, --ketat
 python3 tools/cek_dialek.py --semua # dialect CI gate (exit 0 / 1 / 2)
 ```
 
@@ -163,8 +205,11 @@ Python 3.9 or newer (3.11 or newer recommended: it allows function calls to nest
 | `krc` | REPL; keeps reading while `{`, `(`, `[` (or `mulai`) are still open | 0 |
 | `krc file.krc` | Runs the program | 0, or 1 on a program error |
 | `krc -c "code"` | Runs one piece of code | 0 / 1 |
+| `krc --dialek CODE ...` | Default dialect for files without a `# dialek:` header | 0 / 1 / 2 |
+| `krc --ketat ...` | Fails (exit 2) when an approved dialect still takes Tier 1 words from the base | 0 / 1 / 2 |
 | `krc --version`, `krc --help` | Information | 0 |
 | missing file or bad encoding | Message in Indonesian | 2 |
+| bad `--dialek` (missing value, unknown code, invalid file) | Message before the program starts | 2 |
 
 Closed pipes (`krc program.krc | head`) and Ctrl+C are handled without a traceback. `tanyo()` returns an empty text when input ends.
 
@@ -211,7 +256,7 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 ## Test suite
 
-`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp.
+`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes.
 
 Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. No fake dialect is committed: `dialects/` holds only `__init__.py` and `loader.py` until `dialect-siulak-legacy` adds `siulak.json`.
 
