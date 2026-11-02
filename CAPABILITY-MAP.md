@@ -58,13 +58,13 @@ Recommended first milestone (M1): 1-5. Translation and tutorial generation are M
 |---|---|
 | `core-ids` -> dialect files | `core/ids.json`: `id`, `namespace`, `tier`, `en`, `id_gloss`, `arity`, `placeholders`. IDs are immutable after release. |
 | `dialect-model` -> runtime | `dialects/<code>.json`: `code`, `name`, `parent`, `status`, `core`, `revision`, `orthography`, `maintainer`, `reviewer`, `sources`, `words`, `messages`. |
-| `worksheet-pipeline` -> dialect data | Canonical CSV: `id`, `tier`, `namespace`, `kind`, `en`, `id_gloss`, `answer`, `notes`, `status`. |
+| `worksheet-pipeline` -> dialect data | Canonical CSV: `id`, `tier`, `namespace`, `en`, `id_gloss`, `answer`, `notes`, `status`. The first five columns mirror `core/ids.json` and are read-only. |
 | `runtime-selection` -> translator | Resolved word table for a dialect plus the neutral token stream; user symbols are resolved before any rewrite. |
 | `tutorial-multidialect` -> runtime | Generated `.krc` files with a valid header for every block and helper file. |
 
 ## What "adding a dialect" means
 
-For 0.6, a new dialect is **data only**: one JSON file, one Markdown notes file, and a review record. It may only use IDs already in `core/ids.json`. New IDs (Tier 3 / future features) are a code change to the catalogue and follow the `Ask first` boundary.
+For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, one Markdown notes file, and a review record. It may only use IDs already in `core/ids.json`. New IDs (Tier 3 / future features) are a code change to the catalogue and follow the `Ask first` boundary.
 
 ## Gate
 
@@ -75,4 +75,5 @@ For 0.6, a new dialect is **data only**: one JSON file, one Markdown notes file,
 - [x] `SPEC-dialect-model.md` approved; `dialect-model` implemented and green.
 - [x] `SPEC-runtime-selection.md` approved; `runtime-selection` implemented and green.
 - [x] `SPEC-worksheet-pipeline.md` written.
-- [ ] Next: approve `SPEC-worksheet-pipeline.md`.
+- [x] `SPEC-worksheet-pipeline.md` approved; `worksheet-pipeline` implemented and green (`tools/lembar_kerja.py`, `tests/test_worksheet.py`).
+- [ ] Next: `dialect-siulak-legacy` (spec), then `dialect-koto-payang`.

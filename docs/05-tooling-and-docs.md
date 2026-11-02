@@ -73,6 +73,45 @@ python3 tools/buat_glosarium.py             # rewrites both glossaries; fails if
 python3 tests/test_tutorial.py
 ```
 
+## Dialect worksheets
+
+The canonical answer file for a dialect is `dialects/src/<code>.csv`: UTF-8
+without a BOM, LF line endings, with the exact header
+`id,tier,namespace,en,id_gloss,answer,notes,status`. The first five columns come
+from `core/ids.json` and are read-only. The speaker fills `answer` and `notes`;
+`status` is one of `todo`, `draft`, `reviewed`, or `rejected`.
+
+The cycle is one tool:
+
+```bash
+python3 tools/lembar_kerja.py buat     --kode koto-payang   # create the sheet
+python3 tools/lembar_kerja.py perbarui --kode koto-payang   # add new catalogue IDs
+python3 tools/lembar_kerja.py periksa  --kode koto-payang --tulis
+python3 tools/lembar_kerja.py docx     --kode koto-payang   # reviewable table
+python3 tools/lembar_kerja.py baca     --kode koto-payang --tulis
+python3 tools/lembar_kerja.py laporan  --kode koto-payang
+python3 tools/lembar_kerja.py json     --kode koto-payang
+```
+
+`periksa` reports every problem by CSV row and catalogue ID. It normalizes word
+answers (NFC, trim, lowercase, whitespace to `_`, one trailing `()` removed) and
+message answers (NFC and trim only), then calls the dialect loader so word,
+message, and clash rules cannot drift. Alternatives such as `kalu/lamun` are
+errors for a human to resolve. `--tulis` writes only when there are no errors;
+`--siap` applies the target skeleton's readiness gate. `laporan` prints tier
+counts, missing Tier 1 IDs, and readiness.
+
+`docx` writes an A4 landscape table with grey read-only columns and repeating
+headers; the same CSV gives byte-identical bytes. `baca` updates only `answer`
+and `notes`, turns a changed answer into `draft`, clears an empty answer to
+`todo`, and never sets `reviewed` itself. `json` merges only accepted answers
+into an existing `dialects/<code>.json`, preserves metadata and `revision`, and
+writes nothing unless the merged file validates.
+
+The old `Translation Worksheet (Koto Payang).docx` cannot be read by `baca`: it
+has no ID column and 287 rows for 137 IDs. Map it by hand during the
+`dialect-koto-payang` second speaker pass.
+
 ## Teaching materials
 
 - Printable keyword poster (Siulak word, Indonesian meaning, example)

@@ -1,6 +1,6 @@
 # Spec: worksheet-pipeline
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `worksheet-pipeline`.
 Depends on: `core-ids` (implemented, commit `2cb1c55`) and `dialect-model`
 (implemented, commit `60f9335`). Date: 2026-11-02.
@@ -204,7 +204,7 @@ Normalization is deterministic and never guesses between alternatives.
 2. Strip leading and trailing whitespace.
 3. Lowercase.
 4. Collapse each run of internal whitespace to one `_`.
-5. Remove one trailing `()` pair (`Nytak()` -> `nyetak`).
+5. Remove one trailing `()` pair (`Nyetak()` -> `nyetak`).
 6. Leave every other character alone for validation.
 
 The result must match `^[a-z][a-z0-9_]*$`, the loader's `WORD_RE`. A hyphen,
@@ -354,7 +354,7 @@ Fixtures use `tempfile.TemporaryDirectory()` and pass `--csv`, `--docx`, and
    `csv-header`, `csv-width`, `csv-bom`, `unknown-id`, `missing-id`,
    `duplicate-id`, `catalogue-value`, `status`, `answer-empty`, `answer-choice`;
    `csv-formula` is a warning with exit 0.
-6. Word normalization: `"  Kalu   Laen "` -> `kalu_laen`; `"Nytak()"` ->
+6. Word normalization: `"  Kalu   Laen "` -> `kalu_laen`; `"Nyetak()"` ->
    `nyetak`; `"ka-lu"` stays and fails `word-charset`; `"impor/masukka"` fails
    `answer-choice`; `"1kalu"` fails `word-charset`; `"BETUL"` -> `betul`.
 7. Message normalization preserves spaces and case; a renamed placeholder fails
