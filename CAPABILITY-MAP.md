@@ -81,4 +81,5 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
 - [x] `SPEC-dialect-koto-payang.md` approved; `dialect-koto-payang`
       implemented and green (`dialects/koto-payang.json`,
       `tests/test_koto_payang.py`), status `review`.
-- [ ] Next: write `SPEC-cli-migration.md`.
+- [x] `SPEC-cli-migration.md` approved; next implement `krc migrasi` and the
+      CLI contract (`tests/test_migration.py`).
