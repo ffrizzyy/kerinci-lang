@@ -1,6 +1,6 @@
 # Spec: dialect-siulak-legacy
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `dialect-siulak-legacy`.
 Depends on: `core-ids` (implemented, commit `2cb1c55`) and `dialect-model`
 (implemented, commit `60f9335`). Date: 2026-11-02.
@@ -251,3 +251,24 @@ On approval: write `tasks/plan.md` and `tasks/todo.md` for this module, add
 `tests/test_siulak_legacy.py`, then run all six existing suites plus this one,
 `cek_dialek`, the generators, `compileall`, `build.py`, and `dist/krc.pyz` from a
 temp directory.
+
+## 11. Implementation log
+
+Implemented 2026-11-02.
+
+- `dialects/siulak.json`: 69 words + 68 messages, 137 IDs, `draft`, revision 1.
+- `dialects/siulak.md`: provenance, freeze policy, grouped word table, message
+  rule, change policy.
+- `tests/test_siulak_legacy.py`: 65 checks covering load, completeness, exact
+  word/message mapping, `DialectVocabulary` vs `LegacySiulak`, selection, the
+  missing-file shim, and the `cek_dialek` gate.
+- No loader, runtime, `LegacySiulak`, or catalogue change was needed.
+
+One approved-boundary exception: `tests/test_dialects.py` had two inventory
+assertions that encoded "no dialect files yet" — `available_dialects() == []`
+and the zipapp list `['uji']`. Adding the first committed dialect makes both
+false. They were updated to `['siulak']` and `['siulak', 'uji']` with the human's
+explicit approval. No program-output, tutorial, or language expectation was
+changed. The approval is recorded here because section 7 says "never edit an
+existing test"; this is the sole edit and it is an inventory count, not an
+oracle.

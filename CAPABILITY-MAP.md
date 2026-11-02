@@ -76,5 +76,6 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
 - [x] `SPEC-runtime-selection.md` approved; `runtime-selection` implemented and green.
 - [x] `SPEC-worksheet-pipeline.md` written.
 - [x] `SPEC-worksheet-pipeline.md` approved; `worksheet-pipeline` implemented and green (`tools/lembar_kerja.py`, `tests/test_worksheet.py`).
-- [x] `SPEC-dialect-siulak-legacy.md` written.
-- [ ] Next: approve `SPEC-dialect-siulak-legacy.md`.
+- [x] `SPEC-dialect-siulak-legacy.md` approved; `dialect-siulak-legacy`
+      implemented and green (`dialects/siulak.json`, `tests/test_siulak_legacy.py`).
+- [ ] Next: write `SPEC-dialect-koto-payang.md`.

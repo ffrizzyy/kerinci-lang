@@ -73,9 +73,22 @@ python3 tools/buat_glosarium.py             # rewrites both glossaries; fails if
 python3 tests/test_tutorial.py
 ```
 
+## The Siulak freeze
+
+Siulak v0.5 is committed as `dialects/siulak.json`, not as a CSV worksheet. It
+is the complete legacy snapshot (69 words, 68 messages, 137 IDs), marked
+`draft` so it is not mistaken for a 0.6 speaker review. `dialects/siulak.md`
+holds the provenance, the grouped word table, and the change policy; `docs/02`
+stays the decision history.
+
+Do not edit the file to "fix" a v0.5 quirk. `type.bool` is the known English
+placeholder `boolean`, and `tests/test_siulak_legacy.py` locks every word and
+message to `LEGACY_WORDS`, `LEGACY_OPERATORS`, and `id_gloss`. A real change
+needs a Siulak speaker review and a new revision.
+
 ## Dialect worksheets
 
-The canonical answer file for a dialect is `dialects/src/<code>.csv`: UTF-8
+The canonical answer file for a new dialect is `dialects/src/<code>.csv`: UTF-8
 without a BOM, LF line endings, with the exact header
 `id,tier,namespace,en,id_gloss,answer,notes,status`. The first five columns come
 from `core/ids.json` and are read-only. The speaker fills `answer` and `notes`;

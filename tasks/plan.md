@@ -1,72 +1,57 @@
-# Plan: worksheet-pipeline
+# Plan: dialect-siulak-legacy
 
-Module: `worksheet-pipeline`. Spec: `SPEC-worksheet-pipeline.md` (approved
-2026-11-02).
-Depends on `core-ids` and `dialect-model`; `dialect-model` is implemented.
+Module: `dialect-siulak-legacy`. Spec: `SPEC-dialect-siulak-legacy.md`
+(approved 2026-11-02). Depends on `core-ids` and `dialect-model`, both
+implemented.
 
-Goal: one canonical CSV per dialect, one validator, one reviewable DOCX, and an
-export that fills an existing dialect skeleton. `core/ids.json` stays read-only.
+Goal: freeze the v0.5 Siulak vocabulary as a complete `draft` dialect, without
+changing the runtime or any existing test expectation.
 
-The oracle is unchanged: all five existing suites must stay green.
+The oracle is unchanged: all six existing suites must stay green.
 
 ## Order
 
-1. **CSV contract** - `dialects/src/<code>.csv` with the eight columns, one row
-   per catalogue ID, tier/id order, atomic writes. `buat` creates a blank sheet;
-   `perbarui` restores missing rows and refreshes the read-only columns.
+1. **Freeze data** - generate `dialects/siulak.json` from `LEGACY_WORDS`,
+   `LEGACY_OPERATORS`, and the `msg.*` `id_gloss` values in `core/ids.json`.
+   Use the exact metadata from the spec; 137 IDs; sorted keys; 2-space indent;
+   final newline.
 
-2. **Reader** - strict header, width, BOM, encoding, duplicate, unknown and
-   missing ID checks. Problems carry a 1-based data row, the ID, a code, and a
-   message. No traceback for a bad file.
+2. **Provenance note** - `dialects/siulak.md` records the freeze, the source
+   files, the 69-word table, the message rule, the change policy, and the
+   `type.bool` placeholder.
 
-3. **Normalizer** - words: NFC, trim, lowercase, whitespace to `_`, one trailing
-   `()` removed, then the loader's `^[a-z][a-z0-9_]*$`. Messages: NFC and trim
-   only, placeholders untouched. Alternatives are errors, never guesses.
+3. **Loader check** - `load_dialect("siulak")` must own every ID, report no
+   fallbacks, and pass `validate_dialect`. No code change is expected.
 
-4. **Validator** - build a synthetic draft dialect from accepted answers and
-   call `validate_dialect`, so words, messages, and clashes have one source of
-   truth. Add status, answer, catalogue-value, and readiness checks.
+4. **Equivalence test** - `tests/test_siulak_legacy.py` compares the file to the
+   v0.5 tables and `DialectVocabulary` to `LegacySiulak` for all words,
+   operators, modes, types, reserved word, and messages.
 
-5. **DOCX writer** - standard library only, six columns, grey read-only columns,
-   repeating header, A4 landscape, fixed ZIP timestamps. Same CSV -> same bytes.
+5. **Selection and gate** - the test runs a `# dialek: siulak` file, a
+   `--dialek siulak` one-liner, checks that stderr has no fallback warning, and
+   runs `cek_dialek --kode siulak` with and without `--ketat`.
 
-6. **DOCX reader** - map by header, require the six columns, compare with the
-   current CSV, change only `answer`/`notes`, downgrade a changed answer to
-   `draft`, never set `reviewed`.
-
-7. **Export** - `json` copies metadata unchanged, merges `draft`/`reviewed`
-   answers into `words`/`messages`, validates, writes atomically. The readiness
-   gate applies when the skeleton is `review` or `approved`.
-
-8. **Reports** - `laporan` prints tier counts, missing tier-1 IDs, errors, and
-   readiness; `periksa --siap` reuses the same calculation.
-
-9. **CLI** - the seven subcommands, `--kode`, `--csv`, `--docx`, `--json`,
-   `--paksa`, `--tulis`, `--siap`; exit 0/1/2; `--help`.
-
-10. **Tests** - `tests/test_worksheet.py` covers spec section 10, with temp
-    directories and explicit paths.
-
-11. **Docs** - `docs/05-tooling-and-docs.md` gains the worksheet workflow;
-    `docs/04-implementation.md` records the tool at `dialects/src/`; the spec is
-    marked implemented.
+6. **Docs** - mark the spec implemented, check off the todo, update the
+   capability map, and add the freeze to the implementation/tooling docs.
 
 ## Verification
 
-- `python tests/test_worksheet.py` -> all pass.
-- The five existing suites, unchanged and green.
-- `python tools/cek_dialek.py --semua` -> exit 0.
+- `python tests/test_siulak_legacy.py` -> all pass.
+- The six earlier suites, unchanged and green.
+- `python tools/cek_dialek.py --semua` -> exit 0; `--kode siulak --ketat` -> 0.
 - Both generators produce no diff; `python -m compileall -q .`.
 - `python build.py`, then `dist/krc.pyz` from a temp directory.
-- No third-party package is imported by the tool.
+- The new file is in the wheel/zipapp data because `dialects/*.json` is already
+  packaged.
 
 ## Risks
 
-- The old docx cannot be ingested: no ID column, 287 rows for 137 IDs. The
-  reader accepts only sheets this tool generated; Koto Payang is mapped by hand.
-- A `baca` write must not invent `reviewed`; only a human changes that status.
-- `periksa` must never mutate `core/ids.json` or a skeleton's metadata.
-- DOCX is a ZIP: cap uncompressed size and entry count, read only
-  `word/document.xml`, and never follow relationships.
-- Deterministic DOCX bytes need fixed ZIP timestamps and a fixed entry order.
-- `json` must fail before writing when the merged file would not validate.
+- A typo in one word silently changes v0.5 output. The test compares every ID,
+  so a typo fails.
+- `type.bool` must stay `"boolean"`; "fixing" it is a later re-review.
+- Messages must use `id_gloss` unchanged; placeholders are validated by the
+  loader and the test.
+- `LEGACY_WORDS` order is not file order; write sorted keys.
+- `DialectVocabulary.operators()` is word -> symbol, like `LegacySiulak`; do not
+  compare symbols only.
+- Do not change `resolve_dialect` or the default `run_source()` vocabulary.
