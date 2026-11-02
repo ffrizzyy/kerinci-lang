@@ -63,6 +63,33 @@ krc migrasi program.krc --kering
   header dialect, and a computed import. The affected file is left unchanged.
 - Exit 0 is success, 1 is a refused or failed file, and 2 is a usage error.
 
+## Translating between dialects
+
+`krc terjemah` rewrites one file's dialect words without running it:
+
+```bash
+krc terjemah program.krc --ke koto-payang --out program.kot
+krc terjemah program.krc --ke koto-payang              # stdout
+krc terjemah old.krc --dari siulak --ke koto-payang    # headerless input
+krc terjemah program.krc --ke koto-payang --out out.krc --kering
+```
+
+- The source is the file's line-1 header, then `--dari`, then Siulak. `--ke`
+  is always required and must name a valid dialect.
+- Only keywords, word operators, built-in names, the header, and the direct
+  second argument of `bukak` change. User names, comments, strings, numbers,
+  spacing, and line endings are preserved byte for byte.
+- The command refuses rather than guesses: a used ID the target does not own,
+  a user name that collides with a target keyword/operator/built-in/reserved
+  word, a user name that shadows a source built-in, or a mode/type string that
+  cannot be translated losslessly. A refusal writes nothing.
+- Same-dialect translation is a validated copy. A headerless file gains one
+  header; a file translated A -> B -> A keeps its original bytes.
+- Imports are not followed. Each imported file keeps its own header, so a
+  translated main file can still import a module in another dialect.
+- `--out` is atomic and may not equal the input; `--kering` previews without
+  writing. Exit 0 is success, 1 is a refused file, and 2 is a usage error.
+
 Only the words change, not the grammar. A dialect may spell the keywords and
 built-ins differently, but braces, operators, values, and the program structure
 are the same.

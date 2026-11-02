@@ -1,6 +1,6 @@
 # Spec: translator
 
-Status: **approved 2026-11-02.** Parent: `SPEC.md`. Capability map:
+Status: **implemented 2026-11-02.** Parent: `SPEC.md`. Capability map:
 `translator`.
 Depends on `runtime-selection`, `dialect-koto-payang`, and
 `dialect-siulak-legacy`, all implemented. Date: 2026-11-02.
@@ -377,7 +377,7 @@ this module.
 ## 10. Tests: `tests/test_translator.py`
 
 Plain-Python style, all work in `tempfile.TemporaryDirectory()`. The suite
-covers the thirteen groups below and should land near 100 checks.
+covers the thirteen groups below (173 checks as implemented).
 
 1. **Basic translation.** A Siulak program with every keyword, word operator,
    and built-in round-trips to Koto Payang with the expected exact text. Braces,
@@ -385,8 +385,9 @@ covers the thirteen groups below and should land near 100 checks.
    are preserved; the header becomes `# dialek: koto-payang`.
 2. **User names.** Declared variables, constants, functions, parameters, loop
    variables, catch names, and assignment targets are unchanged. A user name
-   that looks like a dialect word in another namespace (`kato`, `tulis`) is
-   unchanged when it is not a guarded word.
+   that looks like a dialect word in a non-guarded namespace (`berkas`,
+   `boolean`) is unchanged; `kato` and `tulis` are built-in words and therefore
+   belong to the shadowing/collision refusals.
 3. **Strings and comments.** A string containing `barang`, `nyetak`, `samo`, or
    a mode/type word as ordinary text is unchanged; a comment containing any
    word is unchanged; numbers and punctuation are unchanged.
@@ -519,3 +520,42 @@ On approval: archive the `cli-migration` plan/todo, write
 all ten suites, `cek_dialek --semua`, both generators, `compileall`, `build.py`,
 and `dist/krc.pyz terjemah` from a temporary directory. Update the docs and
 `CAPABILITY-MAP.md`, commit, and push.
+
+## 15. Implementation log
+
+Implemented 2026-11-02 as specified.
+
+- `kerincilang.py` dispatches `terjemah` as the first argument and keeps the
+  normal run, `migrasi`, `-c`, and REPL paths unchanged. `USAGE` gained the
+  subcommand and `terjemah --help` prints `TERJEMAH_USAGE`.
+- Source resolution is header > `--dari` > Siulak. A malformed line-1 header or
+  an unknown header code is exit 1; `--ke` and `--dari` are validated before
+  the input is read and exit 2 when invalid.
+- The rewriter scans with `MASTER`, classifies identifiers with the source
+  word maps, and applies non-overlapping span edits. Comments, strings,
+  numbers, symbols, spacing, line endings, and a missing final newline are
+  preserved byte for byte. `mulai` / `habih` translate as words while literal
+  braces stay braces.
+- Declared names come from the AST (`var`, `assign`, `func` plus parameters,
+  `for`, `try` catch names). Source built-in shadowing, target guarded-word
+  collisions, and used IDs the target does not own are refused with exit 1 and
+  no write. A target base fallback is never emitted.
+- Only the direct second argument of a source `bukak` call is rewritten as a
+  mode string; other differing mode/type literals are refused. Ordinary string
+  data is untouched.
+- Same-dialect translation is a validated copy: it parses, adds or replaces the
+  header, and skips the symbol refusals so legal built-in shadowing survives.
+- stdout mode writes only the translated source through a bytes path that
+  avoids Windows' `\r\r\n` translation. `--out` uses a same-directory temporary
+  file and `os.replace`, may not equal the input, and prints one summary line.
+  `--kering` requires `--out` and writes nothing.
+- Literal imports are not followed. A moved `--out` warns when a literal import
+  would no longer resolve but still exits 0. The runtime keeps each imported
+  file's own dialect, so mixed imports still run.
+- `tests/test_translator.py` has 173 checks covering the thirteen groups,
+  including all committed examples, the refusals, CRLF and byte preservation,
+  the CLI table, mixed imports, and the zipapp.
+- All ten suites are green; `cek_dialek --semua`, both generators,
+  `compileall`, `build.py`, and `dist/krc.pyz terjemah` from a temporary
+  directory pass. No catalogue, dialect, loader, worksheet, example, tutorial,
+  or earlier test expectation changed.

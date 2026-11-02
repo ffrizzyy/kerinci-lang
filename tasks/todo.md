@@ -1,31 +1,35 @@
-# Todo: cli-migration
+# Todo: translator
 
 Each item is done only when the listed check passes.
 
-- [x] T1 `krc migrasi` is dispatched only as the first argument; normal runs are
-      unchanged.
-- [x] T2 A headerless file gains exactly `# dialek: CODE` as line 1, with every
-      original byte preserved and the file's newline style.
-- [x] T3 A valid header makes the file a no-op on every later run.
-- [x] T4 Literal `ambik` imports are followed recursively and deduped by real
-      path; a dynamic or missing import is reported and exits 1.
-- [x] T5 A BOM, malformed header, parse error, and unknown header dialect are
-      refused: file unchanged, exit 1.
-- [x] T6 `--semua DIR`, `--dialek CODE`, and `--kering` behave exactly as the
-      spec says; `--dialek` is validated before any write.
-- [x] T7 Usage errors exit 2: no target, both modes, non-`.krc`, unknown flag,
-      bad `-c`, extra arguments.
-- [x] T8 `krc migrasi --help` exits 0 and documents every flag.
-- [x] T9 `tests/test_migration.py` proves all thirteen groups in spec section 9,
-      including the zipapp.
-- [x] T10 `examples/*.krc` all carry `# dialek: siulak` and their output is
-      unchanged.
-- [x] T11 All nine suites, `cek_dialek --semua`, both generators, `compileall`,
-      `build.py`, and `dist/krc.pyz` pass.
-- [x] T12 Docs updated; the spec is marked implemented.
+- [x] T1 `krc terjemah` is dispatched only as the first argument; normal runs,
+      `migrasi`, the REPL, and `-c` are unchanged.
+- [x] T2 Source resolution follows header > `--dari` > Siulak; `--ke` is
+      required and validated before the input is read.
+- [x] T3 Keywords, word operators, built-in names, and the header are
+      translated; braces, symbols, comments, strings, numbers, spacing, and
+      line endings are byte-identical.
+- [x] T4 User-declared names are never rewritten; target guarded-word
+      collisions and source built-in shadowing are refused.
+- [x] T5 A used ID the target does not own is refused with the ID named; no
+      base fallback is written.
+- [x] T6 Only the direct second argument of `bukak` is translated; other
+      mode/type string literals that differ are refused.
+- [x] T7 Same-dialect translation is a validated copy and allows legal
+      built-in shadowing.
+- [x] T8 stdout mode, atomic `--out`, `--kering`, and the import-location
+      warning behave exactly as the spec says; `--out` may not equal the input.
+- [x] T9 BOM, non-UTF-8, malformed header, unknown source header dialect, and
+      parse error are refused with exit 1 and no write.
+- [x] T10 Usage and target errors exit 2; `terjemah --help` exits 0 and
+      documents every option.
+- [x] T11 `tests/test_translator.py` proves all thirteen groups in spec section
+      10, including the examples, mixed imports, and the zipapp.
+- [x] T12 All ten suites, `cek_dialek --semua`, both generators, `compileall`,
+      `build.py`, and `dist/krc.pyz terjemah` pass.
+- [x] T13 Docs updated; the spec is marked implemented.
 
-## Follow-ups (not part of cli-migration)
+## Follow-ups (not part of translator)
 
-- `translator`: `krc terjemah`.
 - `tutorial-multidialect`: dialect-templated lessons.
 - `docs-release`: contributor guide, VS Code grammar, release notes.

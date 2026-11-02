@@ -48,6 +48,18 @@ python3 dist/krc.pyz migrasi examples --semua
 python3 dist/krc.pyz migrasi program.krc --kering   # preview only
 ```
 
+To rewrite a program in another dialect without running it:
+
+```bash
+python3 dist/krc.pyz terjemah program.krc --ke koto-payang --out program.kot
+python3 dist/krc.pyz terjemah program.krc --ke koto-payang   # print to stdout
+```
+
+The translator changes only dialect words, the header, and the direct mode
+argument of `bukak`; it preserves names, comments, strings, and formatting, and
+it refuses rather than guesses when the target dialect cannot express the
+program losslessly.
+
 ## Learn
 
 The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included.

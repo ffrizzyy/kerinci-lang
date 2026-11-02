@@ -129,6 +129,40 @@ is reported and the affected file is unchanged. Exit 0 is success, 1 is a
 refused file, and 2 is a usage error (including an unknown `--dialek`, checked
 before any write).
 
+## Translating between dialects
+
+`krc terjemah` moves one file from its own dialect to another without executing
+it or reformatting it:
+
+```bash
+python3 kerincilang.py terjemah contoh.krc --ke koto-payang --out contoh.kot
+python3 kerincilang.py terjemah contoh.krc --ke koto-payang   # stdout
+python3 kerincilang.py terjemah old.krc --dari siulak --ke koto-payang
+python3 kerincilang.py terjemah contoh.krc --ke koto-payang \
+    --out contoh.kot --kering                                  # preview
+```
+
+The policy is deliberately conservative. Only keywords, word operators,
+built-in names, the line-1 header, and the direct second argument of a `bukak`
+call are rewritten. User-declared names, comments, ordinary strings, numbers,
+spacing, line endings, and a missing final newline are byte-identical. The
+translator parses the file but never runs it.
+
+It refuses with exit 1, and writes nothing, when the target does not own an ID
+the file uses (for example Koto Payang has no `fn.wait`, `fn.list`, `fn.map`, or
+`fn.contains` yet), when a user name collides with a target keyword, operator,
+built-in, or reserved word, when a user name shadows a source built-in, or when
+a mode/type string cannot be translated without changing the meaning. A
+refusal is intentional: emitting an English base fallback would break the
+round-trip promise.
+
+For a headered file that uses only target-owned IDs, `A -> B -> A` is
+byte-identical. Same-dialect translation is a validated copy, and a headerless
+file gains exactly one header. Imports are not followed; every imported file
+keeps its own header, so mixed-dialect programs still run. `--out` is atomic,
+may not equal the input, and `--kering` writes nothing. Exit 0 is success, 1 is
+a refused file, and 2 is a usage error.
+
 ## Dialect worksheets
 
 The canonical answer file for a new dialect is `dialects/src/<code>.csv`: UTF-8

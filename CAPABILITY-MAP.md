@@ -83,6 +83,6 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
       `tests/test_koto_payang.py`), status `review`.
 - [x] `SPEC-cli-migration.md` approved; `cli-migration` implemented and green
       (`krc migrasi`, `tests/test_migration.py`); examples carry headers.
-- [x] `SPEC-translator.md` approved; next implement `krc terjemah` and the
-      lossless policy (`tests/test_translator.py`).
+- [x] `SPEC-translator.md` approved; `translator` implemented and green
+      (`krc terjemah`, `tests/test_translator.py`, 173 checks).
 - [ ] Next: `tutorial-multidialect`.

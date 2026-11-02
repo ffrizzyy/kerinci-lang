@@ -1366,13 +1366,15 @@ Pemakaian:
   krc [--dialek KODE]                        buka REPL interaktif
   krc migrasi BERKAS...                      tambahkan header dialek
   krc migrasi DIR --semua                    tambahkan header ke semua .krc
+  krc terjemah BERKAS --ke KODE              terjemahkan ke dialek lain
   krc --version                              tampilkan versi
   krc --help                                 tampilkan bantuan ini
 
   --dialek KODE   dialek untuk berkas yang tidak punya header `# dialek:`
   --ketat         gagal (exit 2) bila dialek yang disetujui belum lengkap
 
-  krc migrasi --help   bantuan untuk perintah migrasi
+  krc migrasi --help    bantuan untuk perintah migrasi
+  krc terjemah --help   bantuan untuk perintah terjemah
 """
 
 MIGRASI_USAGE = """Pemakaian:
@@ -1391,6 +1393,27 @@ literal (`ambik "berkas"`) secara rekursif. Berkas yang sudah punya header
 tidak ditulis ulang. Perintah ini tidak menjalankan program.
 
 Exit: 0 berhasil, 1 satu berkas ditolak, 2 kesalahan pemakaian."""
+
+TERJEMAH_USAGE = """Pemakaian:
+  krc terjemah BERKAS --ke KODE
+  krc terjemah BERKAS --ke KODE --out BERKAS-BARU
+  krc terjemah BERKAS --ke KODE --out BERKAS-BARU --kering
+  krc terjemah BERKAS --ke KODE --dari KODE
+
+  --ke KODE       dialek tujuan (wajib)
+  --dari KODE     dialek sumber bila berkas tidak punya header (default: siulak)
+  --out BERKAS    tulis hasil ke berkas ini; tanpa --out, hasil ke stdout
+  --kering        dengan --out, periksa saja dan jangan tulis apa pun
+  -h, --help      tampilkan bantuan ini
+
+Menerjemahkan kata kunci, operator kata, nama bawaan, dan argumen mode `bukak`
+langsung. Nama buatan pengguna, komentar, teks, angka, dan tata letak tidak
+diubah. Perintah menolak terjemahan bila dialek tujuan tidak memiliki ID yang
+dipakai, bila nama pengguna bentrok dengan kata tujuan, atau bila string mode/
+tipe tidak bisa diterjemahkan tanpa mengubah arti. Perintah ini tidak
+menjalankan program.
+
+Exit: 0 berhasil, 1 berkas ditolak, 2 kesalahan pemakaian."""
 
 OPENERS, CLOSERS = {"(", "{", "["}, {")", "}", "]"}
 
@@ -1741,10 +1764,422 @@ def migrasi_main(argv=None, dialect_root=None):
     return 1 if report["errors"] else 0
 
 
+# ---- krc terjemah ---------------------------------------------------------
+class _TerjemahRefusal(Exception):
+    """A translation that would not be lossless."""
+
+
+def _terjemah_words(vocab):
+    """Every non-message word of one vocabulary, without fallback notifications."""
+    dialect = getattr(vocab, "dialect", None)
+    if dialect is not None:
+        return dict(dialect.words)
+    return {id: vocab.word(id) for id in CATALOG["ids"]
+            if not id.startswith("msg.")}
+
+
+def _terjemah_maps(words):
+    maps = {}
+    for prefix in ("kw.", "op.", "fn.", "reserved.", "mode.", "type."):
+        maps[prefix] = {word: id for id, word in words.items()
+                        if id.startswith(prefix)}
+    return maps
+
+
+def _terjemah_owns(vocab, id):
+    """True when the target chain supplies the ID itself, not the English base."""
+    dialect = getattr(vocab, "dialect", None)
+    if dialect is None or dialect.code == "base":
+        return True
+    return id not in dialect.base_ids
+
+
+def _terjemah_symbols(program):
+    """Every name the file declares, from the AST."""
+    names = set()
+
+    def walk(value):
+        if isinstance(value, tuple) and value:
+            tag = value[0]
+            if tag in ("var", "assign") and len(value) > 1 and isinstance(value[1], str):
+                names.add(value[1])
+            elif tag == "func" and len(value) > 2:
+                names.add(value[1])
+                names.update(name for name in value[2] if isinstance(name, str))
+            elif tag == "for" and len(value) > 1 and isinstance(value[1], str):
+                names.add(value[1])
+            elif tag == "try" and len(value) > 2 and isinstance(value[2], str):
+                names.add(value[2])
+            for item in value[1:]:
+                walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item)
+
+    walk(program)
+    return names
+
+
+def _terjemah_header_parts(text):
+    """(code, match) for a valid line-1 header, or (None, None)."""
+    line = text.split("\n", 1)[0].rstrip("\r")
+    if not HEADER_HINT_RE.match(line):
+        return None, None
+    match = HEADER_RE.match(line)
+    if not match:
+        raise _TerjemahRefusal("baris 1 memuat header dialek yang tidak valid")
+    return match.group(1), match
+
+
+def _terjemah_header_text(text, match, code):
+    """Replace the header code in place, or prepend a new header."""
+    if match is None:
+        return "# dialek: %s%s%s" % (code, _migrasi_newline(text), text)
+    return text[:match.start(1)] + code + text[match.end(1):]
+
+
+def _terjemah_apply(text, edits):
+    if not edits:
+        return text
+    pieces, last = [], 0
+    for start, end, replacement in sorted(edits):
+        if start < last:
+            raise _TerjemahRefusal("internal: tumpang tindih hasil terjemahan")
+        pieces.append(text[last:start])
+        pieces.append(replacement)
+        last = end
+    pieces.append(text[last:])
+    return "".join(pieces)
+
+
+def _terjemah_stdout(text):
+    """Write exact bytes, avoiding Windows' newline translation on stdout."""
+    data = text.encode("utf-8")
+    stream = getattr(sys.stdout, "buffer", None)
+    if stream is None:
+        sys.stdout.write(text)
+        return
+    sys.stdout.flush()
+    stream.write(data)
+    stream.flush()
+
+
+def _terjemah_write(path, text):
+    """Atomically write UTF-8 text, preserving the destination's mode."""
+    directory = os.path.dirname(os.path.abspath(path)) or "."
+    try:
+        mode = os.stat(path).st_mode
+    except OSError:
+        mode = None
+    handle, temporary = tempfile.mkstemp(prefix=".krc-terjemah-", dir=directory)
+    try:
+        with os.fdopen(handle, "wb") as stream:
+            stream.write(text.encode("utf-8"))
+        if mode is not None:
+            os.chmod(temporary, mode)
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
+
+
+def _terjemah_scan(text, source_words, target_words):
+    """Classify every token and return edits, used IDs, and string refusals."""
+    source = _terjemah_maps(source_words)
+    target = _terjemah_maps(target_words)
+    edits, used, problems = [], set(), []
+    lines = {}
+    stack = []                      # {"call": bool, "open": bool, "arg": int}
+    previous = None
+    line = 1
+
+    for match in MASTER.finditer(text):
+        kind, piece = match.lastgroup, match.group()
+        if kind in ("SKIP", "COMMENT"):
+            line += piece.count("\n")
+            continue
+        if kind == "BAD":
+            continue                       # tokenize() already rejected the file
+        start, end = match.start(), match.end()
+
+        if kind == "IDENT":
+            lines.setdefault(piece, line)
+            keyword = source["kw."].get(piece)
+            operator = source["op."].get(piece)
+            reserved = source["reserved."].get(piece)
+            builtin = source["fn."].get(piece)
+            if keyword is not None:
+                token_id = keyword
+            elif operator is not None:
+                token_id = operator
+            elif reserved is not None:
+                token_id = None            # unreachable: tokenize() refuses it
+            elif builtin is not None:
+                token_id = builtin
+            else:
+                token_id = None
+            if token_id is not None:
+                used.add(token_id)
+                replacement = target_words[token_id]
+                if replacement != piece:
+                    edits.append((start, end, replacement))
+        elif kind == "STRING":
+            value = unescape(piece[1:-1], line)
+            mode_id = source["mode."].get(value)
+            type_id = source["type."].get(value)
+            top = stack[-1] if stack else None
+            if mode_id is not None:
+                if top is not None and top["open"] and top["arg"] == 1:
+                    used.add(mode_id)
+                    replacement = target_words[mode_id]
+                    if replacement != value:
+                        edits.append((start, end, '"%s"' % replacement))
+                elif target_words[mode_id] != value:
+                    problems.append(
+                        "baris %d: string mode %r tidak bisa diterjemahkan "
+                        "di posisi ini" % (line, value))
+            elif type_id is not None and target_words[type_id] != value:
+                problems.append(
+                    "baris %d: string tipe %r tidak bisa diterjemahkan "
+                    "di posisi ini" % (line, value))
+        elif kind == "OP":
+            if piece in ("(", "[", "{"):
+                is_call = (piece == "(" and previous is not None
+                           and previous[0] == "IDENT")
+                is_open = (is_call and source["fn."].get(previous[1]) == "fn.open")
+                stack.append({"call": is_call, "open": is_open, "arg": 0})
+            elif piece in (")", "]", "}"):
+                if stack:
+                    stack.pop()
+            elif piece == "," and stack and stack[-1]["call"]:
+                stack[-1]["arg"] += 1
+
+        previous = (kind, piece, line)
+    return edits, used, problems, lines
+
+
+def _terjemah_translate(text, program, source_vocab, target_vocab,
+                        header_match):
+    """Return (new_text, warnings) or raise `_TerjemahRefusal`."""
+    source_words = _terjemah_words(source_vocab)
+    target_words = _terjemah_words(target_vocab)
+
+    if source_vocab.code == target_vocab.code:
+        return _terjemah_header_text(text, header_match, target_vocab.code), []
+
+    edits, used, problems, lines = _terjemah_scan(text, source_words, target_words)
+    symbols = _terjemah_symbols(program)
+    source = _terjemah_maps(source_words)
+    target = _terjemah_maps(target_words)
+
+    for token_id in sorted(used):
+        if not _terjemah_owns(target_vocab, token_id):
+            problems.append("dialek tujuan %s tidak memiliki %s"
+                            % (target_vocab.code, token_id))
+
+    for name in sorted(symbols):
+        if name in source["fn."]:
+            problems.append(
+                "nama pengguna %r menutupi bawaan %s; terjemahkan manual"
+                % (name, source["fn."][name]))
+
+    guarded = {}
+    for prefix, label in (("kw.", "kata kunci"), ("op.", "operator"),
+                          ("fn.", "bawaan"), ("reserved.", "kata simpanan")):
+        for word, token_id in target[prefix].items():
+            guarded.setdefault(word, (label, token_id))
+    for name in sorted(symbols):
+        if name in source["fn."]:
+            continue
+        if name in guarded:
+            label, token_id = guarded[name]
+            problems.append(
+                "baris %d: nama pengguna %r bentrok dengan %s %s di dialek %s"
+                % (lines.get(name, 1), name, label, token_id, target_vocab.code))
+
+    if problems:
+        raise _TerjemahRefusal("\n".join(problems))
+
+    translated = _terjemah_apply(text, edits)
+    return _terjemah_header_text(translated, header_match,
+                                 target_vocab.code), []
+
+
+def _terjemah_import_warnings(program, output):
+    """Warn when a moved output would no longer find a literal import."""
+    literals, _dynamic = _migrasi_imports(program)
+    base = os.path.dirname(os.path.abspath(output))
+    warnings = []
+    for name in literals:
+        if _migrasi_resolve_import(base, name) is None:
+            warnings.append("impor %r tidak ditemukan dari direktori hasil"
+                            % name)
+    return warnings
+
+
+def _terjemah_options(argv):
+    options = {"ke": None, "dari": None, "out": None, "dry": False,
+               "help": False, "targets": []}
+    index = 0
+    while index < len(argv):
+        arg = argv[index]
+        if arg in ("-h", "--help"):
+            options["help"] = True
+            return options
+        matched = False
+        for flag, key in (("--ke", "ke"), ("--dari", "dari"), ("--out", "out")):
+            if arg == flag:
+                if index + 1 >= len(argv):
+                    raise ValueError("%s butuh nilai" % flag)
+                options[key] = argv[index + 1]
+                index += 2
+                matched = True
+                break
+            if arg.startswith(flag + "="):
+                value = arg.split("=", 1)[1]
+                if not value:
+                    raise ValueError("%s butuh nilai" % flag)
+                options[key] = value
+                index += 1
+                matched = True
+                break
+        if matched:
+            continue
+        if arg == "--kering":
+            options["dry"] = True
+            index += 1
+            continue
+        if arg in ("--ketat", "--dialek", "--semua", "-c", "-V", "--version"):
+            raise ValueError("%s tidak berlaku untuk terjemah" % arg)
+        if arg.startswith("-"):
+            raise ValueError("opsi tidak dikenal: %s" % arg)
+        options["targets"].append(arg)
+        index += 1
+    return options
+
+
+def terjemah_main(argv=None, dialect_root=None):
+    argv = sys.argv[1:] if argv is None else argv
+    try:
+        options = _terjemah_options(argv)
+    except ValueError as err:
+        print("terjemah: %s" % err, file=sys.stderr)
+        return 2
+    if options["help"]:
+        print(TERJEMAH_USAGE)
+        return 0
+    if not options["ke"]:
+        print("terjemah: --ke KODE wajib diisi", file=sys.stderr)
+        return 2
+    targets = options["targets"]
+    if len(targets) != 1:
+        print("terjemah: butuh tepat satu berkas .krc", file=sys.stderr)
+        return 2
+    path = targets[0]
+    if not os.path.isfile(path):
+        print("terjemah: berkas tidak ditemukan: %s" % path, file=sys.stderr)
+        return 2
+    if not path.endswith(".krc"):
+        print("terjemah: bukan berkas .krc: %s" % path, file=sys.stderr)
+        return 2
+    if options["dry"] and not options["out"]:
+        print("terjemah: --kering butuh --out", file=sys.stderr)
+        return 2
+    if options["out"]:
+        try:
+            same = (os.path.normcase(os.path.realpath(path))
+                    == os.path.normcase(os.path.realpath(options["out"])))
+        except OSError:
+            same = False
+        if same:
+            print("terjemah: --out tidak boleh sama dengan berkas masukan",
+                  file=sys.stderr)
+            return 2
+
+    context = RunContext(LEGACY, dialect_root, False)
+    with use_context(context):
+        try:
+            target_vocab = resolve_dialect(options["ke"], context)
+        except LangError as err:
+            print("terjemah: %s" % err, file=sys.stderr)
+            return 2
+        if options["dari"]:
+            try:
+                context.default_vocab = resolve_dialect(options["dari"], context)
+            except LangError as err:
+                print("terjemah: %s" % err, file=sys.stderr)
+                return 2
+
+        try:
+            with open(path, "rb") as stream:
+                raw = stream.read()
+        except OSError as err:
+            print("terjemah: error: %s: %s" % (path, err), file=sys.stderr)
+            return 1
+        if raw.startswith(b"\xef\xbb\xbf"):
+            print("terjemah: error: %s: berkas memakai BOM UTF-8" % path,
+                  file=sys.stderr)
+            return 1
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError as err:
+            print("terjemah: error: %s: bukan teks UTF-8: %s" % (path, err),
+                  file=sys.stderr)
+            return 1
+
+        try:
+            header_code, header_match = _terjemah_header_parts(text)
+            if header_code is None:
+                source_vocab = context.default_vocab
+            else:
+                source_vocab = resolve_dialect(header_code, context)
+            program = Parser(tokenize(text, source_vocab), source_vocab).program()
+            result, warnings = _terjemah_translate(
+                text, program, source_vocab, target_vocab, header_match)
+            if options["out"]:
+                warnings.extend(_terjemah_import_warnings(program, options["out"]))
+        except _TerjemahRefusal as err:
+            for line in str(err).splitlines():
+                print("terjemah: error: %s: %s" % (path, line), file=sys.stderr)
+            return 1
+        except LangError as err:
+            print("terjemah: error: %s: %s" % (path, err), file=sys.stderr)
+            return 1
+
+        for warning in warnings:
+            print("terjemah: warning: %s: %s" % (path, warning),
+                  file=sys.stderr)
+
+        if not options["out"]:
+            try:
+                _terjemah_stdout(result)
+            except BrokenPipeError:
+                return 0
+            return 0
+        if options["dry"]:
+            print("terjemah: would write %s (%s -> %s)"
+                  % (options["out"], source_vocab.code, target_vocab.code))
+            return 0
+        try:
+            _terjemah_write(options["out"], result)
+        except OSError as err:
+            print("terjemah: error: %s: %s" % (options["out"], err),
+                  file=sys.stderr)
+            return 1
+        print("terjemah: wrote %s (%s -> %s)"
+              % (options["out"], source_vocab.code, target_vocab.code))
+        return 0
+
+
 def main(argv=None, dialect_root=None):
     argv = sys.argv[1:] if argv is None else argv
     if argv and argv[0] == "migrasi":
         return migrasi_main(argv[1:], dialect_root)
+    if argv and argv[0] == "terjemah":
+        return terjemah_main(argv[1:], dialect_root)
     try:
         dialect_code, strict, rest = _parse_argv(argv)
     except ValueError as err:
