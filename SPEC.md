@@ -4,7 +4,7 @@ Status: **approved 2026-11-02.** Date: 2026-11-02.
 Source plan: `KerinciLang-Multi-Dialect-Plan.md` (external, project root).
 Review: `docs/08-multi-dialect-plan-review.md`.
 Capability map: `CAPABILITY-MAP.md` (approved).
-First module spec: `SPEC-core-ids.md` (draft for approval).
+First module spec: `SPEC-core-ids.md` (approved; implemented).
 
 Module specs are written in dependency order; no later module starts until the current one is approved.
 

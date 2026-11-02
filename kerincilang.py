@@ -1,12 +1,21 @@
-"""KerinciLang: interpreter with Siulak-Kerinci keywords.
+"""KerinciLang: interpreter with neutral IDs and dialect vocabularies.
+
+The engine never contains a dialect word. Words come from a Vocabulary; today
+there is one, LegacySiulak, which is the frozen Siulak 0.5 vocabulary.
 
 Run a file:  krc contoh.krc        (or: python3 kerincilang.py contoh.krc)
 Start REPL:  krc
 """
+import json
 import os
 import re
 import sys
 import time
+
+try:
+    from importlib.resources import files as _resource_files
+except ImportError:                                   # pragma: no cover - Python < 3.9
+    _resource_files = None
 
 __version__ = "0.5.0"
 
@@ -19,64 +28,197 @@ else:
     MAX_CALL_DEPTH = 80
 CALL_DEPTH = [0]
 
-# internal name -> Kerinci word (Siulak dialect). Edit only the right-hand side.
-KEYWORDS = {
-    "VAR": "barang",       # variable
-    "CONST": "tetap",      # constant
-    "FUNC": "guno",        # function
-    "RETURN": "balik",
-    "IF": "kalu",
-    "ELSE": "lain",        # "lain kalu" = else if
-    "WHILE": "selamo",
-    "FOR": "untuk",
-    "IN": "alem",          # untuk x alem xs { ... }
-    "SWITCH": "pilih",     # pilih x { kalu 1 { } lain { } }
-    "IMPORT": "ambik",     # ambik "berkas"
-    "TRY": "cubo",         # cubo { ... } tangkap pesan { ... }
-    "CATCH": "tangkap",
-    "RAISE": "ngangkat",   # ngangkat "pesan"
-    "BREAK": "putuh",
-    "CONTINUE": "lanjut",
-    "PRINT": "nyetak",
-    "INPUT": "tanyo",
-    "TRUE": "betul",
-    "FALSE": "salah",
-    "NULL": "kosong",
-    "AND": "ngan",
-    "OR": "apo",
-    "NOT": "idak",
-    "BEGIN": "mulai",      # same as {
-    "END": "habih",        # same as }
+
+# ---- the neutral catalogue ------------------------------------------------
+def load_catalog():
+    """Read core/ids.json from a checkout, a wheel, or dist/krc.pyz."""
+    try:
+        if _resource_files is not None:
+            return json.loads(_resource_files("core").joinpath("ids.json")
+                              .read_text(encoding="utf-8"))
+    except (ImportError, ModuleNotFoundError, FileNotFoundError, OSError):
+        pass
+    here = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(here, "core", "ids.json"), encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+CATALOG = load_catalog()
+CORE_VERSION = CATALOG["core"]
+
+
+# ---- messages and errors --------------------------------------------------
+class Message:
+    """A catalogue message plus the values for its placeholders."""
+    __slots__ = ("id", "args")
+
+    def __init__(self, id, args):
+        self.id, self.args = id, dict(args)
+
+
+def msg(id, **args):
+    return Message(id, args)
+
+
+class LangError(Exception):
+    """A user-facing error.
+
+    `Exception.args` stays `(text,)` because tests and tools read `e.args[0]`.
+    The neutral identity lives in `msg_id` and `msg_args`.
+    """
+
+    def __init__(self, message, vocab=None):
+        if isinstance(message, Message):
+            self.msg_id = message.id
+            self.msg_args = message.args
+            vocabulary = vocab or current_vocab()
+            try:
+                self.text = vocabulary.message(message.id, message.args)
+            except (KeyError, IndexError, ValueError):
+                self.text = "[" + message.id + "] " + repr(message.args)
+        else:
+            self.msg_id = None
+            self.msg_args = {}
+            self.text = str(message)
+        super().__init__(self.text)
+
+
+# ---- the Siulak 0.5 vocabulary (frozen) -----------------------------------
+# Word IDs in the order the original KEYWORDS table used, then the rest.
+LEGACY_WORDS = {
+    "kw.var": "barang", "kw.const": "tetap", "kw.func": "guno", "kw.return": "balik",
+    "kw.if": "kalu", "kw.else": "lain", "kw.while": "selamo", "kw.for": "untuk",
+    "kw.in": "alem", "kw.switch": "pilih", "kw.import": "ambik", "kw.try": "cubo",
+    "kw.catch": "tangkap", "kw.raise": "ngangkat", "kw.break": "putuh",
+    "kw.continue": "lanjut", "kw.print": "nyetak", "kw.input": "tanyo",
+    "kw.true": "betul", "kw.false": "salah", "kw.null": "kosong", "kw.and": "ngan",
+    "kw.or": "apo", "kw.not": "idak", "kw.begin": "mulai", "kw.end": "habih",
+    # built-in function names
+    "fn.length": "panjang", "fn.list": "daftar", "fn.add": "tambah", "fn.sub": "kurang",
+    "fn.mul": "kali", "fn.div": "bagi", "fn.range": "jarak", "fn.append": "nambahkah",
+    "fn.contains": "isi", "fn.sort": "milih", "fn.reverse": "pulang", "fn.int": "bilangan",
+    "fn.float": "pecahan", "fn.text": "kato", "fn.type": "mecem", "fn.map": "peta",
+    "fn.split": "pisah", "fn.join": "disatu", "fn.open": "bukak", "fn.read": "baco",
+    "fn.write": "tulis", "fn.close": "tutup", "fn.delete": "hapus", "fn.wait": "nantik",
+    # type names returned by mecem()
+    "type.int": "bilangan", "type.float": "pecahan", "type.str": "kato",
+    "type.list": "daftar", "type.map": "peta", "type.func": "guno", "type.null": "kosong",
+    "type.bool": "boolean",                       # placeholder: no Kerinci word yet
+    "type.file": "berkas",
+    # file modes (string values, not lexed words)
+    "mode.read": "baco", "mode.write": "tulis", "mode.append": "nambahkah",
+    # reserved for a future feature: using it as a name is an error today
+    "reserved.error": "kelihu",
 }
-SURFACE = {word: name for name, word in KEYWORDS.items()}
-assert len(SURFACE) == len(KEYWORDS), "Two keywords share the same word"
 
-# Word forms of the comparison operators. They mean exactly the same as the symbols.
-# Arithmetic words (tambah, kurang, kali, bagi) are NOT operators: they are built-in
-# functions, so they stay usable as ordinary names too.
-# Set ENABLE_WORD_OPERATORS = False to free these words for names as well.
-ENABLE_WORD_OPERATORS = True
-WORD_OPERATORS = {
-    "samo": "==",
-    "dak_samo": "!=",
-    "lebih_daripado": ">",
-    "kurang_daripado": "<",
-    "lebih_samo": ">=",
-    "kurang_samo": "<=",
-}
-assert not set(WORD_OPERATORS) & set(SURFACE), "A word is both a keyword and an operator"
-
-# reserved for later versions: using these as names is an error today
-RESERVED = {"kelihu"}     # "error": held back for a future feature (error values)
-
-# names returned by mecem(x). The table has no Kerinci word for "boolean" yet:
-# "boolean" below is a PLACEHOLDER: replace it when speakers supply a word.
-TYPE_NAMES = {
-    "int": "bilangan", "float": "pecahan", "str": "kato", "list": "daftar",
-    "map": "peta", "func": KEYWORDS["FUNC"], "null": KEYWORDS["NULL"],
-    "bool": "boolean", "file": "berkas",
+# Word forms of the comparison operators, with the neutral symbol they mean.
+LEGACY_OPERATORS = {
+    "op.eq": ("samo", "=="),
+    "op.ne": ("dak_samo", "!="),
+    "op.gt": ("lebih_daripado", ">"),
+    "op.lt": ("kurang_daripado", "<"),
+    "op.ge": ("lebih_samo", ">="),
+    "op.le": ("kurang_samo", "<="),
 }
 
+FILE_MODE_CHARS = {"mode.read": "r", "mode.write": "w", "mode.append": "a"}
+
+
+class Vocabulary:
+    """The seam between neutral IDs and one dialect's words."""
+
+    code = "base"
+    core = CORE_VERSION
+
+    def word(self, id):
+        raise NotImplementedError
+
+    def message(self, id, args=None):
+        raise NotImplementedError
+
+    def mode_id(self, word):
+        raise NotImplementedError
+
+    def surface(self):
+        raise NotImplementedError
+
+    def operators(self):
+        raise NotImplementedError
+
+    def reserved(self):
+        raise NotImplementedError
+
+
+class LegacySiulak(Vocabulary):
+    """The frozen Siulak 0.5 vocabulary. Output must match v0.5 byte for byte."""
+
+    code = "siulak"
+    core = CORE_VERSION
+
+    def __init__(self, catalog=None):
+        self.catalog = catalog or CATALOG
+        self._words = dict(LEGACY_WORDS)
+        self._operators = dict(LEGACY_OPERATORS)
+        self._surface = {word: id for id, word in self._words.items()
+                         if id.startswith("kw.")}
+        self._operator_words = {id: pair[0] for id, pair in self._operators.items()}
+        self._operator_symbols = {pair[0]: pair[1] for pair in self._operators.values()}
+        self._modes = {word: id for id, word in self._words.items()
+                       if id.startswith("mode.")}
+        self._reserved = {word for id, word in self._words.items()
+                          if id.startswith("reserved.")}
+        self._templates = {id: entry["id_gloss"]
+                           for id, entry in self.catalog["ids"].items()
+                           if id.startswith("msg.")}
+
+    def word(self, id):
+        if id in self._words:
+            return self._words[id]
+        if id in self._operator_words:
+            return self._operator_words[id]
+        raise KeyError(id)
+
+    def message(self, id, args=None):
+        return self._templates[id].format(**(args or {}))
+
+    def mode_id(self, word):
+        return self._modes.get(word)
+
+    def surface(self):
+        return dict(self._surface)
+
+    def operators(self):
+        return dict(self._operator_symbols)
+
+    def reserved(self):
+        return set(self._reserved)
+
+
+LEGACY = LegacySiulak()
+_VOCAB_STACK = [LEGACY]
+
+
+def current_vocab():
+    """The vocabulary used for output and messages right now."""
+    return _VOCAB_STACK[-1] if _VOCAB_STACK else LEGACY
+
+
+class use_vocab:
+    """Push a vocabulary for the duration of a run (M1: one per program)."""
+
+    def __init__(self, vocab):
+        self.vocab = vocab
+
+    def __enter__(self):
+        _VOCAB_STACK.append(self.vocab)
+        return self.vocab
+
+    def __exit__(self, *exc):
+        _VOCAB_STACK.pop()
+        return False
+
+
+# ---- lexer ----------------------------------------------------------------
 TOKEN_SPEC = [
     ("COMMENT", r"#[^\n]*"),
     ("NUMBER",  r"\d+(\.\d+)?"),
@@ -89,12 +231,9 @@ TOKEN_SPEC = [
 MASTER = re.compile("|".join(f"(?P<{n}>{p})" for n, p in TOKEN_SPEC))
 
 # tokens that begin a statement; used to decide whether `return` has a value
-STATEMENT_STARTS = {"VAR", "CONST", "FUNC", "IF", "ELSE", "WHILE", "FOR", "SWITCH", "TRY", "RAISE",
-                    "IMPORT", "BREAK", "CONTINUE", "RETURN", "PRINT"}
-
-
-class LangError(Exception):
-    pass
+STATEMENT_STARTS = {"kw.var", "kw.const", "kw.func", "kw.if", "kw.else", "kw.while",
+                    "kw.for", "kw.switch", "kw.try", "kw.raise", "kw.import",
+                    "kw.break", "kw.continue", "kw.return", "kw.print"}
 
 
 ESCAPES = {"n": "\n", "t": "\t", '"': '"', "\\": "\\"}
@@ -105,12 +244,16 @@ def unescape(raw, line):
     def replace(m):
         c = m.group(1)
         if c not in ESCAPES:
-            raise LangError(f"Baris {line}: urutan escape tidak dikenal: \\{c}")
+            raise LangError(msg("msg.syntax.escape", line=line, c=c))
         return ESCAPES[c]
     return re.sub(r"\\(.)", replace, raw)
 
 
-def tokenize(src):
+def tokenize(src, vocab=None):
+    vocab = vocab or current_vocab()
+    surface = vocab.surface()
+    operators = vocab.operators()
+    reserved = vocab.reserved()
     tokens, line = [], 1
     for m in MASTER.finditer(src):
         kind, text = m.lastgroup, m.group()
@@ -118,25 +261,28 @@ def tokenize(src):
             line += text.count("\n")
             continue
         if kind == "BAD":
-            raise LangError(f"Baris {line}: karakter tidak dikenal {text!r}")
-        if kind == "IDENT" and ENABLE_WORD_OPERATORS and text in WORD_OPERATORS:
-            kind, text = "OP", WORD_OPERATORS[text]
-        elif kind == "IDENT" and text in RESERVED:
-            raise LangError(f"Baris {line}: '{text}' adalah kata cadangan untuk fitur berikutnya")
-        elif kind == "IDENT" and text in SURFACE:
-            kind = SURFACE[text]
-            if kind == "BEGIN":              # mulai ... habih are braces in Kerinci
+            raise LangError(msg("msg.syntax.bad_char", line=line, text=repr(text)))
+        if kind == "IDENT" and ENABLE_WORD_OPERATORS and text in operators:
+            kind, text = "OP", operators[text]
+        elif kind == "IDENT" and text in reserved:
+            raise LangError(msg("msg.syntax.reserved", line=line, text=text))
+        elif kind == "IDENT" and text in surface:
+            token_id = surface[text]
+            if token_id == "kw.begin":           # mulai ... habih are braces in Kerinci
                 kind, text = "OP", "{"
-            elif kind == "END":
+            elif token_id == "kw.end":
                 kind, text = "OP", "}"
+            else:
+                kind, text = token_id, token_id
         tokens.append((kind, text, line))
     tokens.append(("EOF", "", line))
     return tokens
 
 
 class Parser:
-    def __init__(self, tokens):
+    def __init__(self, tokens, vocab=None):
         self.t, self.i, self.loop_depth, self.func_depth = tokens, 0, 0, 0
+        self.vocab = vocab or current_vocab()
 
     def kind(self): return self.t[self.i][0]
     def text(self): return self.t[self.i][1]
@@ -152,10 +298,25 @@ class Parser:
             return self.advance()
         return None
 
+    def label(self, what):
+        """The user-facing name of an expected token."""
+        if isinstance(what, str) and (what.startswith("kw.") or what.startswith("op.")):
+            return self.vocab.word(what)
+        return what
+
+    def display(self, kind, text):
+        """The user-facing spelling of a token that was found."""
+        if kind.startswith("kw.") or kind.startswith("op."):
+            return self.vocab.word(kind)
+        return text
+
     def expect(self, what):
         tok = self.match(what)
         if not tok:
-            raise LangError(f"Baris {self.line()}: diharapkan {what!r}, ditemukan {self.text()!r}")
+            raise LangError(msg("msg.syntax.expected",
+                                line=self.line(),
+                                what=repr(self.label(what)),
+                                text=repr(self.display(self.kind(), self.text()))))
         return tok
 
     def program(self):
@@ -179,20 +340,20 @@ class Parser:
         return body
 
     def if_stmt(self):
-        self.advance()                       # IF
+        self.advance()                       # if
         cond, then, other = self.expression(), self.block(), []
-        if self.match("ELSE"):               # "lain kalu ..." chains, plain "lain { }" ends
-            other = [self.if_stmt()] if self.kind() == "IF" else self.block()
+        if self.match("kw.else"):            # "else if ..." chains, plain "else { }" ends
+            other = [self.if_stmt()] if self.kind() == "kw.if" else self.block()
         return ("if", cond, then, other)
 
     def statement(self):
         k = self.kind()
-        if k in ("VAR", "CONST"):
+        if k in ("kw.var", "kw.const"):
             self.advance()
             name = self.expect("IDENT")[1]
             self.expect("=")
-            return ("var", name, self.expression(), k == "CONST")
-        if k == "FUNC":
+            return ("var", name, self.expression(), k == "kw.const")
+        if k == "kw.func":
             self.advance()
             name = self.expect("IDENT")[1]
             self.expect("(")
@@ -208,62 +369,68 @@ class Parser:
             self.func_depth -= 1
             self.loop_depth = saved
             return ("func", name, params, body)
-        if k == "IF":
+        if k == "kw.if":
             return self.if_stmt()
-        if k == "WHILE":
+        if k == "kw.while":
             self.advance()
             cond = self.expression()
             return ("while", cond, self.loop_body())
-        if k == "FOR":                       # untuk <name> alem <list | text> { ... }
+        if k == "kw.for":                    # for <name> in <list | text> { ... }
             self.advance()
             var = self.expect("IDENT")[1]
-            if not self.match("IN"):
-                raise LangError(f"Baris {self.line()}: diharapkan '{KEYWORDS['IN']}' setelah nama, "
-                                f"ditemukan {self.text()!r}")
+            if not self.match("kw.in"):
+                raise LangError(msg("msg.syntax.expected_after_name",
+                                    line=self.line(),
+                                    word=self.vocab.word("kw.in"),
+                                    text=repr(self.display(self.kind(), self.text()))))
             source = self.expression()
             return ("for", var, source, self.loop_body())
-        if k == "TRY":                       # cubo { ... } tangkap pesan { ... }
+        if k == "kw.try":                    # try { ... } catch name { ... }
             line = self.advance()[2]
             body = self.block()
-            if not self.match("CATCH"):
-                raise LangError(f"Baris {line}: blok '{KEYWORDS['TRY']}' harus diikuti "
-                                f"'{KEYWORDS['CATCH']}' dan blok penanganan")
+            if not self.match("kw.catch"):
+                raise LangError(msg("msg.syntax.try_requires_catch",
+                                    line=line,
+                                    try_word=self.vocab.word("kw.try"),
+                                    catch_word=self.vocab.word("kw.catch")))
             name = self.advance()[1] if self.kind() == "IDENT" else None
             return ("try", body, name, self.block())
-        if k == "RAISE":                     # ngangkat "pesan"
+        if k == "kw.raise":                  # raise "message"
             self.advance()
             return ("raise", self.expression())
-        if k == "SWITCH":                    # pilih x { kalu 1, 2 { } lain { } }
+        if k == "kw.switch":                 # switch x { if 1, 2 { } else { } }
             self.advance()
             subject = self.expression()
             self.expect("{")
             clauses, default = [], None
-            while self.kind() == "IF":
+            while self.kind() == "kw.if":
                 self.advance()
                 values = [self.expression()]
                 while self.match(","):
                     values.append(self.expression())
                 clauses.append((values, self.block()))
-            if self.match("ELSE"):
+            if self.match("kw.else"):
                 default = self.block()
             self.expect("}")
             return ("switch", subject, clauses, default)
-        if k == "IMPORT":                    # ambik "berkas"
+        if k == "kw.import":                 # import "file"
             self.advance()
             return ("import", self.expression())
-        if k in ("BREAK", "CONTINUE"):
+        if k in ("kw.break", "kw.continue"):
             line = self.advance()[2]
             if self.loop_depth == 0:
-                raise LangError(f"Baris {line}: '{KEYWORDS[k]}' hanya boleh di dalam perulangan")
-            return (k.lower(),)
-        if k == "RETURN":
+                raise LangError(msg("msg.loop.break_outside", line=line,
+                                    word=self.vocab.word(k)))
+            return (k.split(".", 1)[1],)
+        if k == "kw.return":
             line = self.advance()[2]
             if self.func_depth == 0:
-                raise LangError(f"Baris {line}: '{KEYWORDS['RETURN']}' hanya boleh di dalam fungsi")
+                raise LangError(msg("msg.func.return_outside", line=line,
+                                    word=self.vocab.word("kw.return")))
             if self.text() == "}" or self.kind() in STATEMENT_STARTS or self.kind() == "EOF":
                 return ("return", None)
             return ("return", self.expression())
-        if k == "PRINT":
+        if k == "kw.print":
             self.advance()
             return ("print", self.expression())
         if k == "IDENT" and self.t[self.i + 1][:2] == ("OP", "="):
@@ -274,7 +441,7 @@ class Parser:
         expr = self.expression()
         if self.kind() == "OP" and self.text() == "=":       # xs[0] = value
             if expr[0] != "index":
-                raise LangError(f"Baris {line}: sisi kiri '=' harus nama atau elemen daftar")
+                raise LangError(msg("msg.syntax.assign_target", line=line))
             self.advance()
             return ("setindex", expr[1], expr[2], self.expression())
         return ("expr", expr)
@@ -286,15 +453,17 @@ class Parser:
             left = ("bin", op, left, sub())
         return left
 
-    def expression(self): return self.binary(self.and_, ("OR",))
-    def and_(self):       return self.binary(self.equality, ("AND",))
+    def expression(self): return self.binary(self.and_, ("kw.or",))
+    def and_(self):       return self.binary(self.equality, ("kw.and",))
+    # Comparison tokens carry the neutral symbol, whether written as a word or a
+    # symbol, so the parser works on symbols the same way it always has.
     def equality(self):   return self.binary(self.comparison, ("==", "!="))
     def comparison(self): return self.binary(self.term, ("<", ">", "<=", ">="))
     def term(self):       return self.binary(self.factor, ("+", "-"))
     def factor(self):     return self.binary(self.unary, ("*", "/", "%"))
 
     def unary(self):
-        if self.match("NOT"):
+        if self.match("kw.not"):
             return ("not", self.unary())
         if self.match("-"):
             return ("neg", self.unary())
@@ -322,10 +491,10 @@ class Parser:
         kind, text, line = self.advance()
         if kind == "NUMBER": return ("lit", float(text) if "." in text else int(text))
         if kind == "STRING": return ("lit", unescape(text[1:-1], line))
-        if kind == "TRUE":   return ("lit", True)
-        if kind == "FALSE":  return ("lit", False)
-        if kind == "NULL":   return ("lit", None)
-        if kind == "INPUT":
+        if kind == "kw.true":  return ("lit", True)
+        if kind == "kw.false": return ("lit", False)
+        if kind == "kw.null":  return ("lit", None)
+        if kind == "kw.input":
             self.expect("(")
             self.expect(")")
             return ("input",)
@@ -342,7 +511,7 @@ class Parser:
                     break
             self.expect("]")
             return ("list", items)
-        if kind == "OP" and text == "{":     # peta literal: { "kunci": nilai, ... }
+        if kind == "OP" and text == "{":     # map literal: { "key": value, ... }
             pairs = []
             while not (self.kind() == "OP" and self.text() == "}") and self.kind() != "EOF":
                 key = self.expression()
@@ -352,7 +521,8 @@ class Parser:
                     break
             self.expect("}")
             return ("map", pairs)
-        raise LangError(f"Baris {line}: tidak terduga {text!r}")
+        raise LangError(msg("msg.syntax.unexpected", line=line,
+                            text=repr(self.display(kind, text))))
 
 
 class ReturnSignal(Exception):
@@ -362,8 +532,9 @@ class ContinueSignal(Exception): pass
 
 
 class Env:
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, vocab=None):
         self.vars, self.consts, self.parent = {}, set(), parent
+        self.vocab = vocab or (parent.vocab if parent else current_vocab())
 
     def lookup(self, name):
         env = self
@@ -375,7 +546,7 @@ class Env:
 
     def declare(self, name, value, const=False):
         if name in self.consts:
-            raise LangError(f"'{name}' sudah dideklarasikan sebagai konstanta")
+            raise LangError(msg("msg.name.already_const", name=name), vocab=self.vocab)
         self.vars[name] = value
         if const:
             self.consts.add(name)
@@ -383,43 +554,48 @@ class Env:
     def get(self, name):
         env = self.lookup(name)
         if not env:
-            raise LangError(f"Nama belum didefinisikan: {name}")
+            raise LangError(msg("msg.name.undefined", name=name), vocab=self.vocab)
         return env.vars[name]
 
     def assign(self, name, value):
         env = self.lookup(name)
         if not env:
-            raise LangError(f"Nama belum dideklarasikan: {name} (pakai '{KEYWORDS['VAR']}' dulu)")
+            raise LangError(msg("msg.name.undeclared", name=name,
+                                var_word=self.vocab.word("kw.var")), vocab=self.vocab)
         if name in env.consts:
-            raise LangError(f"'{name}' adalah konstanta ('{KEYWORDS['CONST']}') dan tidak bisa diubah")
+            raise LangError(msg("msg.name.constant", name=name,
+                                const_word=self.vocab.word("kw.const")), vocab=self.vocab)
         env.vars[name] = value
 
 
-def show(v, nested=False):
-    if v is None:  return KEYWORDS["NULL"]
-    if v is True:  return KEYWORDS["TRUE"]
-    if v is False: return KEYWORDS["FALSE"]
+def show(v, vocab=None, nested=False):
+    vocab = vocab or current_vocab()
+    if v is None:  return vocab.word("kw.null")
+    if v is True:  return vocab.word("kw.true")
+    if v is False: return vocab.word("kw.false")
     if isinstance(v, list):
-        return "[" + ", ".join(show(x, True) for x in v) + "]"
+        return "[" + ", ".join(show(x, vocab, True) for x in v) + "]"
     if isinstance(v, dict):
-        return "{" + ", ".join(f"{show(k, True)}: {show(x, True)}" for k, x in v.items()) + "}"
+        return "{" + ", ".join(f"{show(k, vocab, True)}: {show(x, vocab, True)}"
+                               for k, x in v.items()) + "}"
     if isinstance(v, str) and nested:
         return f'"{v}"'
     if isinstance(v, Berkas):
-        return f'<{TYPE_NAMES["file"]} "{v.path}">'
+        return f'<{vocab.word("type.file")} "{v.path}">'
     if isinstance(v, tuple) and v and v[0] == "closure":
-        return f"<{KEYWORDS['FUNC']}>"
+        return f"<{vocab.word('kw.func')}>"
     if isinstance(v, tuple) and v and v[0] == "builtin":
-        return f"<{KEYWORDS['FUNC']} {v[1]}>"
+        return f"<{vocab.word('kw.func')} {vocab.word(v[1])}>"
     return str(v)
 
 
-def binary_op(o, l, r):
-    """Shared by operators (+ - * / ...) and the built-ins tambah/kurang/kali/bagi."""
+def binary_op(o, l, r, vocab=None):
+    """Shared by operators (+ - * / ...) and the built-ins add/subtract/..."""
+    vocab = vocab or current_vocab()
     try:
         if o == "+":
             if isinstance(l, str) or isinstance(r, str):
-                return show(l) + show(r)
+                return show(l, vocab) + show(r, vocab)
             return l + r                                    # numbers add, lists join
         if o == "/":
             if isinstance(l, int) and isinstance(r, int) and r != 0 and l % r == 0:
@@ -430,21 +606,22 @@ def binary_op(o, l, r):
                 "<": lambda: l < r, ">": lambda: l > r,
                 "<=": lambda: l <= r, ">=": lambda: l >= r}[o]()
     except ZeroDivisionError:
-        raise LangError("Pembagian dengan nol")
+        raise LangError(msg("msg.value.div_zero"))
     except TypeError:
-        raise LangError(f"Operator {o!r} tidak bisa dipakai pada {show(l, True)} dan {show(r, True)}")
+        raise LangError(msg("msg.value.operator", op=repr(o),
+                            left=show(l, vocab, True), right=show(r, vocab, True)))
 
 
 def check_key(k):
     if isinstance(k, bool) or not isinstance(k, (str, int)):
-        raise LangError("Kunci peta harus teks atau bilangan bulat")
+        raise LangError(msg("msg.value.key_type"))
 
 
 def get_item(obj, idx):
     if isinstance(obj, dict):
         check_key(idx)
         if idx not in obj:
-            raise LangError(f"Kunci tidak ditemukan: {show(idx, True)}")
+            raise LangError(msg("msg.value.key_missing", key=show(idx, None, True)))
         return obj[idx]
     check_index(obj, idx)
     return obj[idx]
@@ -452,61 +629,67 @@ def get_item(obj, idx):
 
 def check_index(obj, idx):
     if not isinstance(obj, (list, str)):
-        raise LangError("Hanya daftar, peta, dan teks yang bisa diindeks")
+        raise LangError(msg("msg.value.index_kind"))
     if isinstance(idx, bool) or not isinstance(idx, int):
-        raise LangError("Indeks harus bilangan bulat")
+        raise LangError(msg("msg.value.index_type"))
     if idx < 0 or idx >= len(obj):
-        raise LangError(f"Indeks di luar jangkauan: {idx} (panjang {len(obj)})")
+        raise LangError(msg("msg.value.index_range", index=idx, length=len(obj)))
 
 
 def iterate(v):
-    if isinstance(v, Berkas):               # untuk baris alem berkas { ... } reads line by line
-        need_handle(v, ("baco",), KEYWORDS["FOR"])
+    vocab = current_vocab()
+    if isinstance(v, Berkas):               # for line in file { ... } reads line by line
+        need_handle(v, ("mode.read",), "kw.for")
         return read_from(v.handle, v.path, as_lines=True)
     if isinstance(v, (list, str, dict)):
-        return list(v)                      # a peta gives its keys
+        return list(v)                      # a map gives its keys
     if isinstance(v, int) and not isinstance(v, bool):
-        raise LangError(f"Untuk mengulang beberapa kali, pakai jarak(n): "
-                        f"{KEYWORDS['FOR']} i {KEYWORDS['IN']} jarak(5)")
-    raise LangError(f"Nilai ini tidak bisa diulang dengan '{KEYWORDS['FOR']}'")
+        raise LangError(msg("msg.loop.use_range",
+                            range_fn=vocab.word("fn.range"),
+                            for_word=vocab.word("kw.for"),
+                            in_word=vocab.word("kw.in")))
+    raise LangError(msg("msg.loop.not_iterable", for_word=vocab.word("kw.for")))
 
 
-# ---- built-in functions: name -> (number of arguments or None for any, python function)
+# ---- built-in functions: ID -> (number of arguments or None for any, python function)
 def b_panjang(x):
     if isinstance(x, (list, str, dict)):
         return len(x)
-    raise LangError("'panjang' hanya untuk daftar, peta, dan teks")
+    raise LangError(msg("msg.fn.length_kind", fn=current_vocab().word("fn.length")))
 
 
 MAX_JARAK = 1_000_000
 
 
 def b_jarak(*args):
+    vocab = current_vocab()
+    fn = vocab.word("fn.range")
     if not 1 <= len(args) <= 3:
-        raise LangError(f"Fungsi jarak butuh 1 sampai 3 argumen, diberi {len(args)}")
+        raise LangError(msg("msg.fn.range_arity", fn=fn, count=len(args)))
     if any(isinstance(a, bool) or not isinstance(a, int) for a in args):
-        raise LangError("Argumen jarak harus bilangan bulat")
+        raise LangError(msg("msg.fn.range_args", fn=fn))
     if len(args) == 3 and args[2] == 0:
-        raise LangError("Langkah jarak tidak boleh 0")
+        raise LangError(msg("msg.fn.range_step", fn=fn))
     r = range(*args)
     if len(r) > MAX_JARAK:
-        raise LangError(f"Jarak terlalu besar (maksimal {MAX_JARAK})")
+        raise LangError(msg("msg.fn.range_too_big", max=MAX_JARAK))
     return list(r)
 
 
-def need_list(name, x):
+def need_list(fn_id, x):
     if not isinstance(x, list):
-        raise LangError(f"'{name}' hanya untuk daftar")
+        raise LangError(msg("msg.fn.list_only", fn=current_vocab().word(fn_id)))
 
 
 def b_nambahkah(xs, value):
-    need_list("nambahkah", xs)
+    need_list("fn.append", xs)
     xs.append(value)                      # changes the list itself
     return None
 
 
 def b_isi(container, item):
-    if isinstance(container, dict):         # for a peta: is it a key?
+    vocab = current_vocab()
+    if isinstance(container, dict):         # for a map: is it a key?
         try:
             return item in container
         except TypeError:
@@ -515,17 +698,17 @@ def b_isi(container, item):
         return item in container
     if isinstance(container, str):
         if not isinstance(item, str):
-            raise LangError("Untuk mencari dalam teks, yang dicari juga harus teks")
+            raise LangError(msg("msg.fn.contains_type"))
         return item in container
-    raise LangError("'isi' hanya untuk daftar, peta, dan teks")
+    raise LangError(msg("msg.fn.contains_kind", fn=vocab.word("fn.contains")))
 
 
 def b_milih(xs):
-    need_list("milih", xs)
+    need_list("fn.sort", xs)
     try:
         return sorted(xs)                 # returns a new list; the original is unchanged
     except TypeError:
-        raise LangError("Daftar berisi nilai yang tidak bisa dibandingkan, jadi tidak bisa diurutkan")
+        raise LangError(msg("msg.fn.sort_type"))
 
 
 def b_pulang(x):
@@ -533,94 +716,98 @@ def b_pulang(x):
         return x[::-1]                    # new list
     if isinstance(x, str):
         return x[::-1]
-    raise LangError("'pulang' hanya untuk daftar dan teks")
+    raise LangError(msg("msg.fn.reverse_kind", fn=current_vocab().word("fn.reverse")))
 
 
-def cannot_convert(x, target):
-    raise LangError(f"Tidak bisa mengubah {show(x, True)} menjadi {target}")
+def cannot_convert(x, target_id):
+    raise LangError(msg("msg.value.convert", value=show(x, None, True),
+                        target=current_vocab().word(target_id)))
 
 
 def b_bilangan(x):
     if isinstance(x, bool):
-        cannot_convert(x, "bilangan")
+        cannot_convert(x, "fn.int")
     if isinstance(x, int):
         return x
     if isinstance(x, float):
         try:
             return int(x)                   # cuts off the decimals: 3.7 -> 3, -3.7 -> -3
         except (OverflowError, ValueError):
-            cannot_convert(x, "bilangan")
+            cannot_convert(x, "fn.int")
     if isinstance(x, str) and re.fullmatch(r"\s*[+-]?[0-9]+\s*", x):
         return int(x)
-    cannot_convert(x, "bilangan")
+    cannot_convert(x, "fn.int")
 
 
 def b_pecahan(x):
     if isinstance(x, bool):
-        cannot_convert(x, "pecahan")
+        cannot_convert(x, "fn.float")
     if isinstance(x, (int, float)):
         return float(x)
     if isinstance(x, str) and re.fullmatch(r"\s*[+-]?[0-9]+(\.[0-9]+)?\s*", x):
         return float(x)
-    cannot_convert(x, "pecahan")
+    cannot_convert(x, "fn.float")
 
 
 def b_mecem(x):
-    if x is None:                return TYPE_NAMES["null"]
-    if isinstance(x, bool):      return TYPE_NAMES["bool"]
-    if isinstance(x, int):       return TYPE_NAMES["int"]
-    if isinstance(x, float):     return TYPE_NAMES["float"]
-    if isinstance(x, str):       return TYPE_NAMES["str"]
-    if isinstance(x, list):      return TYPE_NAMES["list"]
-    if isinstance(x, dict):      return TYPE_NAMES["map"]
-    if isinstance(x, Berkas):    return TYPE_NAMES["file"]
-    return TYPE_NAMES["func"]
+    vocab = current_vocab()
+    if x is None:                return vocab.word("type.null")
+    if isinstance(x, bool):      return vocab.word("type.bool")
+    if isinstance(x, int):       return vocab.word("type.int")
+    if isinstance(x, float):     return vocab.word("type.float")
+    if isinstance(x, str):       return vocab.word("type.str")
+    if isinstance(x, list):      return vocab.word("type.list")
+    if isinstance(x, dict):      return vocab.word("type.map")
+    if isinstance(x, Berkas):    return vocab.word("type.file")
+    return vocab.word("type.func")
 
 
 def b_peta(*pairs):
     result = {}
     for pair in pairs:
         if not (isinstance(pair, list) and len(pair) == 2):
-            raise LangError("Setiap pasangan peta harus berupa daftar [kunci, nilai]")
+            raise LangError(msg("msg.value.map_pair"))
         check_key(pair[0])
         result[pair[0]] = pair[1]
     return result
 
 
 class Berkas:
-    """An open file. Made by bukak(), used with baco / tulis, closed with tutup."""
+    """An open file. Made by open(), used with read/write, closed with close."""
     def __init__(self, path, mode, handle):
         self.path, self.mode, self.handle, self.closed = path, mode, handle, False
 
 
 OPEN_FILES = []
-MODES = {"baco": "r", "tulis": "w", "nambahkah": "a"}   # the mode is given as one of these words
 MAX_NANTIK = 3600
 
 
 def file_error(err, path):
     if isinstance(err, FileNotFoundError):
-        return LangError(f"Berkas tidak ditemukan: {path}")
+        return LangError(msg("msg.file.not_found", path=path))
     if isinstance(err, PermissionError):
-        return LangError(f"Tidak punya izin untuk berkas: {path}")
+        return LangError(msg("msg.file.permission", path=path))
     if isinstance(err, IsADirectoryError):
-        return LangError(f"Ini folder, bukan berkas: {path}")
-    return LangError(f"Kesalahan berkas {path}: {err.strerror or err}")
+        return LangError(msg("msg.file.is_dir", path=path))
+    return LangError(msg("msg.file.io", path=path, reason=err.strerror or err))
 
 
-def need_path(x, verb):
+def need_path(x, fn_id):
     if not isinstance(x, str):
-        raise LangError(f"'{verb}' butuh nama berkas berupa teks")
+        raise LangError(msg("msg.file.path_type", fn=current_vocab().word(fn_id)))
     return x
 
 
-def need_handle(x, allowed, verb):
+def need_handle(x, allowed, fn_id):
+    vocab = current_vocab()
+    fn = vocab.word(fn_id)
     if not isinstance(x, Berkas):
-        raise LangError(f"'{verb}' butuh berkas yang dibuka dengan bukak")
+        raise LangError(msg("msg.file.handle_required", fn=fn,
+                            open_fn=vocab.word("fn.open")))
     if x.closed:
-        raise LangError(f"Berkas sudah ditutup: {x.path}")
+        raise LangError(msg("msg.file.closed", path=x.path))
     if x.mode not in allowed:
-        raise LangError(f"Berkas ini dibuka untuk '{x.mode}', tidak bisa dipakai oleh '{verb}'")
+        raise LangError(msg("msg.file.wrong_mode", mode=vocab.word(x.mode), fn=fn))
     return x
 
 
@@ -635,17 +822,26 @@ def close_all_files():
 
 
 def b_bukak(*args):
+    vocab = current_vocab()
+    fn = vocab.word("fn.open")
     if not 1 <= len(args) <= 2:
-        raise LangError(f"Fungsi bukak butuh 1 atau 2 argumen, diberi {len(args)}")
-    path = need_path(args[0], "bukak")
-    mode = args[1] if len(args) == 2 else "baco"
-    if not isinstance(mode, str) or mode not in MODES:
-        raise LangError('Mode harus "baco", "tulis", atau "nambahkah", bukan ' + show(mode, True))
+        raise LangError(msg("msg.fn.open_arity", fn=fn, count=len(args)))
+    path = need_path(args[0], "fn.open")
+    mode_id = "mode.read"
+    if len(args) == 2:
+        mode_id = vocab.mode_id(args[1]) if isinstance(args[1], str) else None
+        if mode_id is None:
+            raise LangError(msg("msg.file.mode_invalid",
+                                read=vocab.word("mode.read"),
+                                write=vocab.word("mode.write"),
+                                append=vocab.word("mode.append"),
+                                value=show(args[1], vocab, True)))
     try:
-        handle = open(path, MODES[mode], encoding="utf-8", newline=None if mode == "baco" else "\n")
+        handle = open(path, FILE_MODE_CHARS[mode_id], encoding="utf-8",
+                      newline=None if mode_id == "mode.read" else "\n")
     except OSError as err:
         raise file_error(err, path)
-    f = Berkas(path, mode, handle)
+    f = Berkas(path, mode_id, handle)
     OPEN_FILES.append(f)
     return f
 
@@ -656,30 +852,30 @@ def read_from(handle, path, as_lines=False):
             return [line[:-1] if line.endswith("\n") else line for line in handle]
         return handle.read()
     except UnicodeDecodeError:
-        raise LangError(f"Berkas bukan teks UTF-8: {path}")
+        raise LangError(msg("msg.file.not_utf8", path=path))
     except OSError as err:
         raise file_error(err, path)
 
 
 def b_baco(x):
-    if isinstance(x, str):                       # baco("nama.txt") reads a whole file
+    if isinstance(x, str):                       # read("name.txt") reads a whole file
         try:
             with open(x, encoding="utf-8") as handle:
                 return read_from(handle, x)
         except OSError as err:
             raise file_error(err, x)
-    need_handle(x, ("baco",), "baco")
+    need_handle(x, ("mode.read",), "fn.read")
     return read_from(x.handle, x.path)
 
 
 def b_tulis(x, value):
     text = value if isinstance(value, str) else show(value)
     try:
-        if isinstance(x, str):                   # tulis("nama.txt", teks) replaces the whole file
+        if isinstance(x, str):                   # write("name.txt", text) replaces the file
             with open(x, "w", encoding="utf-8", newline="\n") as handle:
                 handle.write(text)
         else:
-            need_handle(x, ("tulis", "nambahkah"), "tulis")
+            need_handle(x, ("mode.write", "mode.append"), "fn.write")
             x.handle.write(text)
     except OSError as err:
         raise file_error(err, x if isinstance(x, str) else x.path)
@@ -687,8 +883,10 @@ def b_tulis(x, value):
 
 
 def b_tutup(x):
+    vocab = current_vocab()
     if not isinstance(x, Berkas):
-        raise LangError("'tutup' butuh berkas yang dibuka dengan bukak")
+        raise LangError(msg("msg.file.handle_required", fn=vocab.word("fn.close"),
+                            open_fn=vocab.word("fn.open")))
     if not x.closed:
         x.handle.close()
         x.closed = True
@@ -698,7 +896,7 @@ def b_tutup(x):
 
 
 def b_hapus(path):
-    need_path(path, "hapus")
+    need_path(path, "fn.delete")
     try:
         os.remove(path)
     except OSError as err:
@@ -707,104 +905,113 @@ def b_hapus(path):
 
 
 def b_nantik(seconds):
+    vocab = current_vocab()
+    fn = vocab.word("fn.wait")
     if isinstance(seconds, bool) or not isinstance(seconds, (int, float)):
-        raise LangError("'nantik' butuh bilangan detik")
+        raise LangError(msg("msg.fn.wait_number", fn=fn))
     if seconds < 0 or seconds > MAX_NANTIK:
-        raise LangError(f"Waktu nantik harus antara 0 dan {MAX_NANTIK} detik")
+        raise LangError(msg("msg.fn.wait_range", fn=fn, max=MAX_NANTIK))
     time.sleep(seconds)
     return None
 
 
 def b_pisah(*args):
+    vocab = current_vocab()
+    fn = vocab.word("fn.split")
     if not 1 <= len(args) <= 2:
-        raise LangError(f"Fungsi pisah butuh 1 atau 2 argumen, diberi {len(args)}")
+        raise LangError(msg("msg.fn.split_arity", fn=fn, count=len(args)))
     text = args[0]
     if not isinstance(text, str):
-        raise LangError("'pisah' hanya untuk teks")
+        raise LangError(msg("msg.fn.split_kind", fn=fn))
     if len(args) == 1:
         return text.split()                       # on any spaces; no empty pieces
     sep = args[1]
     if not isinstance(sep, str):
-        raise LangError("Pemisah harus berupa teks")
+        raise LangError(msg("msg.value.separator"))
     if sep == "":
         return list(text)                         # one piece per character
     return text.split(sep)
 
 
 def b_disatu(*args):
+    vocab = current_vocab()
+    fn = vocab.word("fn.join")
     if not 1 <= len(args) <= 2:
-        raise LangError(f"Fungsi disatu butuh 1 atau 2 argumen, diberi {len(args)}")
-    need_list("disatu", args[0])
+        raise LangError(msg("msg.fn.join_arity", fn=fn, count=len(args)))
+    need_list("fn.join", args[0])
     sep = args[1] if len(args) == 2 else ""
     if not isinstance(sep, str):
-        raise LangError("Pemisah harus berupa teks")
-    return sep.join(show(x) for x in args[0])
+        raise LangError(msg("msg.value.separator"))
+    return sep.join(show(x, vocab) for x in args[0])
 
 
-BUILTINS = {
-    "panjang": (1, b_panjang),
-    "daftar":  (None, lambda *items: list(items)),
-    "tambah":  (2, lambda a, b: binary_op("+", a, b)),
-    "kurang":  (2, lambda a, b: binary_op("-", a, b)),
-    "kali":    (2, lambda a, b: binary_op("*", a, b)),
-    "bagi":    (2, lambda a, b: binary_op("/", a, b)),
-    "jarak":     (None, b_jarak),      # jarak(5) = [0..4], jarak(2, 5) = [2..4], jarak(0, 10, 3)
-    "nambahkah": (2, b_nambahkah),     # append (changes the list)
-    "isi":       (2, b_isi),           # contains: isi(daftar_atau_teks, yang_dicari)
-    "milih":     (1, b_milih),         # sort (new list)
-    "pulang":    (1, b_pulang),        # reverse (new list or text)
-    "bilangan":  (1, b_bilangan),      # to whole number: bilangan("42"), bilangan(3.7)
-    "pecahan":   (1, b_pecahan),       # to decimal: pecahan("2.5")
-    "kato":      (1, lambda x: show(x)),   # to text
-    "mecem":     (1, b_mecem),         # type name of a value
-    "peta":      (None, b_peta),       # peta() or peta(["a", 1], ["b", 2])
-    "pisah":     (None, b_pisah),      # pisah("a,b", ",") = ["a", "b"]; pisah("a b") splits on spaces
-    "disatu":    (None, b_disatu),     # disatu(["a", "b"], ", ") = "a, b"
-    "bukak":     (None, b_bukak),      # bukak("a.txt") or bukak("a.txt", "tulis")
-    "baco":      (1, b_baco),          # read a whole file (handle or name)
-    "tulis":     (2, b_tulis),         # write text to a file (handle or name)
-    "tutup":     (1, b_tutup),         # close a file
-    "hapus":     (1, b_hapus),         # delete a file
-    "nantik":    (1, b_nantik),        # wait this many seconds
+BUILTIN_IDS = {
+    "fn.length": (1, b_panjang),
+    "fn.list":   (None, lambda *items: list(items)),
+    "fn.add":    (2, lambda a, b: binary_op("+", a, b)),
+    "fn.sub":    (2, lambda a, b: binary_op("-", a, b)),
+    "fn.mul":    (2, lambda a, b: binary_op("*", a, b)),
+    "fn.div":    (2, lambda a, b: binary_op("/", a, b)),
+    "fn.range":    (None, b_jarak),
+    "fn.append":   (2, b_nambahkah),
+    "fn.contains": (2, b_isi),
+    "fn.sort":     (1, b_milih),
+    "fn.reverse":  (1, b_pulang),
+    "fn.int":      (1, b_bilangan),
+    "fn.float":    (1, b_pecahan),
+    "fn.text":     (1, lambda x: show(x)),
+    "fn.type":     (1, b_mecem),
+    "fn.map":      (None, b_peta),
+    "fn.split":    (None, b_pisah),
+    "fn.join":     (None, b_disatu),
+    "fn.open":     (None, b_bukak),
+    "fn.read":     (1, b_baco),
+    "fn.write":    (2, b_tulis),
+    "fn.close":    (1, b_tutup),
+    "fn.delete":   (1, b_hapus),
+    "fn.wait":     (1, b_nantik),
 }
 
 
-def new_global():
+def new_global(vocab=None):
     """Built-ins live in a parent scope, so programs can freely reuse their names."""
-    base = Env()
-    for name, (arity, fn) in BUILTINS.items():
-        base.vars[name] = ("builtin", name, arity, fn)
-    return Env(base)
+    vocab = vocab or current_vocab()
+    base = Env(vocab=vocab)
+    for fn_id, (arity, fn) in BUILTIN_IDS.items():
+        base.vars[vocab.word(fn_id)] = ("builtin", fn_id, arity, fn)
+    return Env(base, vocab=vocab)
 
 
-# ---- imports (ambik)
+# ---- imports --------------------------------------------------------------
 IMPORT_STACK = []     # directory of the file being run, innermost last
 LOADING = []          # files currently being loaded (to catch circular imports)
 LOADED = {}           # file path -> module scope (each file runs once per program)
 
 
 def do_import(name, env):
+    vocab = env.vocab
     if not isinstance(name, str):
-        raise LangError(f"'{KEYWORDS['IMPORT']}' butuh nama berkas berupa teks")
+        raise LangError(msg("msg.import.not_text", kw=vocab.word("kw.import")))
     base = IMPORT_STACK[-1] if IMPORT_STACK else os.getcwd()
     path = os.path.join(base, name)
     candidates = [path] if path.endswith(".krc") else [path, path + ".krc"]
     found = next((c for c in candidates if os.path.isfile(c)), None)
     if not found:
-        raise LangError(f"Berkas tidak ditemukan: {name}")
+        raise LangError(msg("msg.import.not_found", name=name))
     found = os.path.abspath(found)
     if found in LOADING:
-        raise LangError(f"Impor melingkar: {name}")
+        raise LangError(msg("msg.import.circular", name=name))
     if found not in LOADED:
         with open(found, encoding="utf-8") as f:
             src = f.read()
-        module = new_global()
+        module = new_global(vocab)
         LOADING.append(found)
         IMPORT_STACK.append(os.path.dirname(found))
         try:
-            run_block(Parser(tokenize(src)).program(), module)
+            with use_vocab(vocab):
+                run_block(Parser(tokenize(src, vocab), vocab).program(), module)
         except LangError as err:
-            raise LangError(f"Dalam '{name}': {err}")
+            raise LangError(msg("msg.import.in_module", name=name, message=str(err)))
         finally:
             IMPORT_STACK.pop()
             LOADING.pop()
@@ -826,13 +1033,13 @@ def run(s, env):
     elif op == "setindex":
         obj, idx, value = ev(s[1], env), ev(s[2], env), ev(s[3], env)
         if isinstance(obj, str):
-            raise LangError("Teks tidak bisa diubah per huruf")
+            raise LangError(msg("msg.value.text_immutable"))
         if isinstance(obj, dict):
             check_key(idx)
         else:
             check_index(obj, idx)
         obj[idx] = value
-    elif op == "print":    print(show(ev(s[1], env)))
+    elif op == "print":    print(show(ev(s[1], env), env.vocab))
     elif op == "expr":     ev(s[1], env)
     elif op == "func":     env.declare(s[1], ("closure", s[2], s[3], env))
     elif op == "if":       run_block(s[2] if ev(s[1], env) else s[3], Env(env))
@@ -856,14 +1063,15 @@ def run(s, env):
                 continue
     elif op == "raise":
         value = ev(s[1], env)
-        raise LangError(value if isinstance(value, str) else show(value))
+        raise LangError(value if isinstance(value, str) else show(value, env.vocab))
     elif op == "try":
         try:
             run_block(s[1], Env(env))
         except (LangError, RecursionError) as err:
             local = Env(env)
             if s[2]:
-                local.vars[s[2]] = str(err) if isinstance(err, LangError) else "Terlalu dalam"
+                local.vars[s[2]] = (str(err) if isinstance(err, LangError)
+                                    else env.vocab.message("msg.runtime.too_deep"))
             run_block(s[3], local)
     elif op == "switch":
         subject = ev(s[1], env)
@@ -892,7 +1100,7 @@ def ev(e, env):
     if op == "neg":
         v = ev(e[1], env)
         if isinstance(v, bool) or not isinstance(v, (int, float)):
-            raise LangError(f"Tanda minus hanya untuk bilangan, bukan {show(v, True)}")
+            raise LangError(msg("msg.value.neg_type", value=show(v, env.vocab, True)))
         return -v
     if op == "not":   return not ev(e[1], env)
     if op == "list":  return [ev(x, env) for x in e[1]]
@@ -907,62 +1115,89 @@ def ev(e, env):
         return get_item(ev(e[1], env), ev(e[2], env))
     if op == "bin":
         o = e[1]
-        if o == KEYWORDS["AND"]:
+        if o == "kw.and":
             l = ev(e[2], env)
             return l and ev(e[3], env)
-        if o == KEYWORDS["OR"]:
+        if o == "kw.or":
             l = ev(e[2], env)
             return l or ev(e[3], env)
-        return binary_op(o, ev(e[2], env), ev(e[3], env))
+        return binary_op(o, ev(e[2], env), ev(e[3], env), env.vocab)
     if op == "call":
         fn = ev(e[1], env)
         args = [ev(a, env) for a in e[2]]
+        vocab = env.vocab
         if isinstance(fn, tuple) and fn[0] == "builtin":
-            _, name, arity, impl = fn
+            _, fn_id, arity, impl = fn
             if arity is not None and len(args) != arity:
-                raise LangError(f"Fungsi {name} butuh {arity} argumen, diberi {len(args)}")
+                raise LangError(msg("msg.call.builtin_arity", fn=vocab.word(fn_id),
+                                    arity=arity, count=len(args)))
             return impl(*args)
         if not (isinstance(fn, tuple) and fn[0] == "closure"):
-            raise LangError("Yang dipanggil bukan fungsi")
+            raise LangError(msg("msg.call.not_function"))
         _, params, body, closure = fn
         if len(args) != len(params):
-            raise LangError(f"Fungsi butuh {len(params)} argumen, diberi {len(args)}")
+            raise LangError(msg("msg.call.arity", arity=len(params), count=len(args)))
         local = Env(closure)
         local.vars.update(zip(params, args))
         if CALL_DEPTH[0] >= MAX_CALL_DEPTH:
-            raise LangError(f"Panggilan fungsi terlalu dalam (lebih dari {MAX_CALL_DEPTH}). "
-                            f"Mungkin fungsi memanggil dirinya tanpa henti?")
+            raise LangError(msg("msg.call.depth", max=MAX_CALL_DEPTH))
         CALL_DEPTH[0] += 1
         try:
             run_block(body, local)
         except ReturnSignal as r:
             return r.value
         except RecursionError:
-            raise LangError("Panggilan fungsi terlalu dalam")
+            raise LangError(msg("msg.call.depth_short"))
         finally:
             CALL_DEPTH[0] -= 1
         return None
-    raise LangError(f"Ekspresi tidak dikenal: {op}")
+    raise LangError(msg("msg.runtime.unknown_expr", op=op))
 
 
-def run_source(src, env=None):
+def run_source(src, env=None, vocab=None):
     if not LOADING:
         LOADED.clear()                      # a fresh run re-reads imported files
-    env = env or new_global()
-    run_block(Parser(tokenize(src)).program(), env)
+    if env is None:
+        env = new_global(vocab)
+    elif vocab is not None:
+        env.vocab = vocab
+    with use_vocab(env.vocab):
+        run_block(Parser(tokenize(src, env.vocab), env.vocab).program(), env)
     return env
 
 
-def run_file(path, env=None):
+def run_file(path, env=None, vocab=None):
     """Run a .krc file; `ambik` paths are relative to that file."""
     with open(path, encoding="utf-8") as f:
         src = f.read()
     IMPORT_STACK.append(os.path.dirname(os.path.abspath(path)))
     try:
-        return run_source(src, env)
+        return run_source(src, env, vocab)
     finally:
         IMPORT_STACK.pop()
         close_all_files()
+
+
+# ---- compatibility views (Siulak 0.5 shape) -------------------------------
+# These exist so tests, tools, and the VS Code grammar keep working unchanged.
+# They are generated from LEGACY_WORDS; do not hand-maintain a second table.
+KEYWORDS = {id.split(".", 1)[1].upper(): word
+            for id, word in LEGACY_WORDS.items() if id.startswith("kw.")}
+SURFACE = {word: name for name, word in KEYWORDS.items()}
+assert len(SURFACE) == len(KEYWORDS), "Two keywords share the same word"
+
+ENABLE_WORD_OPERATORS = True
+WORD_OPERATORS = {word: symbol for word, symbol in LEGACY_OPERATORS.values()}
+assert not set(WORD_OPERATORS) & set(SURFACE), "A word is both a keyword and an operator"
+
+RESERVED = {word for id, word in LEGACY_WORDS.items() if id.startswith("reserved.")}
+
+TYPE_NAMES = {id.split(".", 1)[1]: word
+              for id, word in LEGACY_WORDS.items() if id.startswith("type.")}
+
+MODES = {LEGACY_WORDS[id]: char for id, char in FILE_MODE_CHARS.items()}
+
+BUILTINS = {LEGACY_WORDS[id]: spec for id, spec in BUILTIN_IDS.items()}
 
 
 USAGE = f"""KerinciLang {__version__}
@@ -978,10 +1213,10 @@ Pemakaian:
 OPENERS, CLOSERS = {"(", "{", "["}, {")", "}", "]"}
 
 
-def is_incomplete(src):
-    """True while a ( { [ or 'mulai' block is still open, so the REPL keeps reading."""
+def is_incomplete(src, vocab=None):
+    """True while a ( { [ or block is still open, so the REPL keeps reading."""
     depth = 0
-    for kind, text, _ in tokenize(src):
+    for kind, text, _ in tokenize(src, vocab):
         if kind == "OP":
             depth += text in OPENERS
             depth -= text in CLOSERS
@@ -1004,7 +1239,7 @@ def repl():
             continue
         buffer += line + "\n"
         try:
-            if is_incomplete(buffer):
+            if is_incomplete(buffer, env.vocab):
                 continue
             run_source(buffer, env)
         except LangError as err:

@@ -16,3 +16,8 @@ krc = "kerincilang:main"
 
 [tool.setuptools]
 py-modules = ["kerincilang"]
+packages = ["core", "dialects"]
+
+[tool.setuptools.package-data]
+core = ["*.json"]
+dialects = ["*.json", "*.md"]

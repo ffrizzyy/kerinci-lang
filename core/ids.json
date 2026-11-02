@@ -1,0 +1,1486 @@
+{
+  "core": "0.6",
+  "ids": {
+    "fn.add": {
+      "arity": 2,
+      "description": "Adds two values.",
+      "en": "add",
+      "example": "tambah(nilai)",
+      "id_gloss": "tambah",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.append": {
+      "arity": 2,
+      "description": "Adds one item to the end of a list.",
+      "en": "append",
+      "example": "nambahkah(nilai)",
+      "id_gloss": "nambahkah",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.close": {
+      "arity": 1,
+      "description": "Closes an open file.",
+      "en": "close",
+      "example": "tutup()",
+      "id_gloss": "tutup",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.contains": {
+      "arity": 2,
+      "description": "Tells whether a list, map, or text holds a value.",
+      "en": "contains",
+      "example": "isi()",
+      "id_gloss": "isi",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.delete": {
+      "arity": 1,
+      "description": "Deletes a file.",
+      "en": "delete",
+      "example": "hapus()",
+      "id_gloss": "hapus",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.div": {
+      "arity": 2,
+      "description": "Divides the first value by the second.",
+      "en": "divide",
+      "example": "bagi(nilai)",
+      "id_gloss": "bagi",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.float": {
+      "arity": 1,
+      "description": "Converts a value to a decimal number.",
+      "en": "decimal",
+      "example": "pecahan(nilai)",
+      "id_gloss": "pecahan",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.int": {
+      "arity": 1,
+      "description": "Converts a value to a whole number.",
+      "en": "whole number",
+      "example": "bilangan(nilai)",
+      "id_gloss": "bilangan",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.join": {
+      "arity": null,
+      "description": "Joins a list into one text value.",
+      "en": "join",
+      "example": "disatu()",
+      "id_gloss": "disatu",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.length": {
+      "arity": 1,
+      "description": "Number of items in a list or map, or characters in text.",
+      "en": "length",
+      "example": "panjang()",
+      "id_gloss": "panjang",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.list": {
+      "arity": null,
+      "description": "Builds a list from the arguments.",
+      "en": "list",
+      "example": "daftar(nilai)",
+      "id_gloss": "daftar",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.map": {
+      "arity": null,
+      "description": "Builds a map from [key, value] pairs.",
+      "en": "map",
+      "example": "peta(nilai)",
+      "id_gloss": "peta",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.mul": {
+      "arity": 2,
+      "description": "Multiplies two values.",
+      "en": "multiply",
+      "example": "kali(nilai)",
+      "id_gloss": "kali",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.open": {
+      "arity": null,
+      "description": "Opens a file for reading, writing, or appending.",
+      "en": "open",
+      "example": "bukak()",
+      "id_gloss": "bukak",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.range": {
+      "arity": null,
+      "description": "Builds a list of numbers from 1 to 3 arguments.",
+      "en": "range",
+      "example": "jarak()",
+      "id_gloss": "jarak",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.read": {
+      "arity": 1,
+      "description": "Reads a whole file or the rest of an open file.",
+      "en": "read",
+      "example": "baco()",
+      "id_gloss": "baco",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.reverse": {
+      "arity": 1,
+      "description": "Returns a reversed copy of a list or text.",
+      "en": "reverse",
+      "example": "pulang()",
+      "id_gloss": "pulang",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.sort": {
+      "arity": 1,
+      "description": "Returns a sorted copy of a list.",
+      "en": "sort",
+      "example": "milih()",
+      "id_gloss": "milih",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.split": {
+      "arity": null,
+      "description": "Splits text into a list of pieces.",
+      "en": "split",
+      "example": "pisah()",
+      "id_gloss": "pisah",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.sub": {
+      "arity": 2,
+      "description": "Subtracts the second value from the first.",
+      "en": "subtract",
+      "example": "kurang(nilai)",
+      "id_gloss": "kurang",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.text": {
+      "arity": 1,
+      "description": "Converts a value to text.",
+      "en": "text",
+      "example": "kato(nilai)",
+      "id_gloss": "kato",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.type": {
+      "arity": 1,
+      "description": "Returns the type name of a value.",
+      "en": "type",
+      "example": "mecem(nilai)",
+      "id_gloss": "mecem",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.wait": {
+      "arity": 1,
+      "description": "Pauses for a number of seconds.",
+      "en": "wait",
+      "example": "nantik()",
+      "id_gloss": "nantik",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "fn.write": {
+      "arity": 2,
+      "description": "Writes text to a file.",
+      "en": "write",
+      "example": "tulis()",
+      "id_gloss": "tulis",
+      "namespace": "fn",
+      "placeholders": [],
+      "tier": 2
+    },
+    "kw.and": {
+      "arity": null,
+      "description": "True only when both sides are true.",
+      "en": "and",
+      "example": "a ngan b",
+      "id_gloss": "dan",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.begin": {
+      "arity": null,
+      "description": "Alternative spelling of the opening brace.",
+      "en": "begin block",
+      "example": "mulai nyetak 1 habih",
+      "id_gloss": "mulai blok kode",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.break": {
+      "arity": null,
+      "description": "Leaves the nearest loop.",
+      "en": "break",
+      "example": "putuh",
+      "id_gloss": "hentikan",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.catch": {
+      "arity": null,
+      "description": "Starts the error handler of a try block.",
+      "en": "catch",
+      "example": "tangkap e { nyetak e }",
+      "id_gloss": "tangkap",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.const": {
+      "arity": null,
+      "description": "Declares a value that cannot be changed.",
+      "en": "constant",
+      "example": "tetap pi = 3.14",
+      "id_gloss": "konstanta",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.continue": {
+      "arity": null,
+      "description": "Skips to the next loop turn.",
+      "en": "continue",
+      "example": "lanjut",
+      "id_gloss": "lanjutkan",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.else": {
+      "arity": null,
+      "description": "Starts the other branch of a conditional.",
+      "en": "else",
+      "example": "lain { nyetak 0 }",
+      "id_gloss": "selain itu",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.end": {
+      "arity": null,
+      "description": "Alternative spelling of the closing brace.",
+      "en": "end block",
+      "example": "mulai nyetak 1 habih",
+      "id_gloss": "akhiri blok kode",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.false": {
+      "arity": null,
+      "description": "The false value.",
+      "en": "false",
+      "example": "salah",
+      "id_gloss": "salah",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.for": {
+      "arity": null,
+      "description": "Repeats a block once per item.",
+      "en": "for",
+      "example": "untuk x dalam xs { nyetak x }",
+      "id_gloss": "untuk",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.func": {
+      "arity": null,
+      "description": "Defines a function.",
+      "en": "function",
+      "example": "guno kuadrat(x) { balik x * x }",
+      "id_gloss": "fungsi",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.if": {
+      "arity": null,
+      "description": "Starts a conditional block.",
+      "en": "if",
+      "example": "kalu x > 5 { nyetak x }",
+      "id_gloss": "jika",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.import": {
+      "arity": null,
+      "description": "Runs another file and shares its names.",
+      "en": "import",
+      "example": "ambik \"bantuan\"",
+      "id_gloss": "impor",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.in": {
+      "arity": null,
+      "description": "Separates the loop name from the collection.",
+      "en": "in",
+      "example": "untuk x dalam xs { }",
+      "id_gloss": "dalam",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.input": {
+      "arity": null,
+      "description": "Reads one line of text from the user.",
+      "en": "input",
+      "example": "tanyo()",
+      "id_gloss": "tanya",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.not": {
+      "arity": null,
+      "description": "Reverses a truth value.",
+      "en": "not",
+      "example": "idak betul",
+      "id_gloss": "tidak",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.null": {
+      "arity": null,
+      "description": "The empty value.",
+      "en": "null",
+      "example": "kosong",
+      "id_gloss": "kosong",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.or": {
+      "arity": null,
+      "description": "True when either side is true.",
+      "en": "or",
+      "example": "a apo b",
+      "id_gloss": "atau",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.print": {
+      "arity": null,
+      "description": "Writes a value followed by a newline.",
+      "en": "print",
+      "example": "nyetak \"halo\"",
+      "id_gloss": "cetak",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.raise": {
+      "arity": null,
+      "description": "Stops with an error message.",
+      "en": "raise",
+      "example": "ngangkat \"rusak\"",
+      "id_gloss": "angkat",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.return": {
+      "arity": null,
+      "description": "Sends a value back from a function.",
+      "en": "return",
+      "example": "balik x",
+      "id_gloss": "kembalikan",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.switch": {
+      "arity": null,
+      "description": "Chooses the block matching a value.",
+      "en": "switch",
+      "example": "pilih x { kalu 1 { } lain { } }",
+      "id_gloss": "pilih",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.true": {
+      "arity": null,
+      "description": "The true value.",
+      "en": "true",
+      "example": "betul",
+      "id_gloss": "benar",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.try": {
+      "arity": null,
+      "description": "Starts a block whose errors can be caught.",
+      "en": "try",
+      "example": "cubo { } tangkap e { }",
+      "id_gloss": "coba",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.var": {
+      "arity": null,
+      "description": "Declares a variable.",
+      "en": "variable",
+      "example": "barang umur = 20",
+      "id_gloss": "variabel",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "kw.while": {
+      "arity": null,
+      "description": "Repeats a block while a condition is true.",
+      "en": "while",
+      "example": "selamo x > 0 { x = x - 1 }",
+      "id_gloss": "selama",
+      "namespace": "kw",
+      "placeholders": [],
+      "tier": 1
+    },
+    "mode.append": {
+      "arity": null,
+      "description": "File mode used as the second argument of open.",
+      "en": "append",
+      "example": "bukak(\"a.txt\", \"tambah\")",
+      "id_gloss": "tambah",
+      "namespace": "mode",
+      "placeholders": [],
+      "tier": 2
+    },
+    "mode.read": {
+      "arity": null,
+      "description": "File mode used as the second argument of open.",
+      "en": "read",
+      "example": "bukak(\"a.txt\", \"baca\")",
+      "id_gloss": "baca",
+      "namespace": "mode",
+      "placeholders": [],
+      "tier": 2
+    },
+    "mode.write": {
+      "arity": null,
+      "description": "File mode used as the second argument of open.",
+      "en": "write",
+      "example": "bukak(\"a.txt\", \"tulis\")",
+      "id_gloss": "tulis",
+      "namespace": "mode",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.call.arity": {
+      "arity": null,
+      "description": "A user function got the wrong number of arguments.",
+      "en": "The function needs {arity} arguments, got {count}",
+      "example": "Fungsi butuh 2 argumen, diberi 1",
+      "id_gloss": "Fungsi butuh {arity} argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "arity",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.call.builtin_arity": {
+      "arity": null,
+      "description": "A built-in function got the wrong number of arguments.",
+      "en": "Function {fn} needs {arity} arguments, got {count}",
+      "example": "Fungsi panjang butuh 1 argumen, diberi 2",
+      "id_gloss": "Fungsi {fn} butuh {arity} argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "arity",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.call.depth": {
+      "arity": null,
+      "description": "User functions nested deeper than the limit.",
+      "en": "Function calls are too deep (more than {max}). Is a function calling itself without stopping?",
+      "example": "Panggilan fungsi terlalu dalam (lebih dari 400). Mungkin fungsi memanggil dirinya tanpa henti?",
+      "id_gloss": "Panggilan fungsi terlalu dalam (lebih dari {max}). Mungkin fungsi memanggil dirinya tanpa henti?",
+      "namespace": "msg",
+      "placeholders": [
+        "max"
+      ],
+      "tier": 2
+    },
+    "msg.call.depth_short": {
+      "arity": null,
+      "description": "Python's recursion limit was reached before the call-depth limit.",
+      "en": "Function calls are too deep",
+      "example": "Panggilan fungsi terlalu dalam",
+      "id_gloss": "Panggilan fungsi terlalu dalam",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.call.not_function": {
+      "arity": null,
+      "description": "A call targeted a value that is not callable.",
+      "en": "What is being called is not a function",
+      "example": "Yang dipanggil bukan fungsi",
+      "id_gloss": "Yang dipanggil bukan fungsi",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.file.closed": {
+      "arity": null,
+      "description": "An operation used a file that is already closed.",
+      "en": "File already closed: {path}",
+      "example": "Berkas sudah ditutup: a.txt",
+      "id_gloss": "Berkas sudah ditutup: {path}",
+      "namespace": "msg",
+      "placeholders": [
+        "path"
+      ],
+      "tier": 2
+    },
+    "msg.file.handle_required": {
+      "arity": null,
+      "description": "A file built-in got something that is not an open file.",
+      "en": "'{fn}' needs a file opened with {open_fn}",
+      "example": "'baco' butuh berkas yang dibuka dengan bukak",
+      "id_gloss": "'{fn}' butuh berkas yang dibuka dengan {open_fn}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "open_fn"
+      ],
+      "tier": 2
+    },
+    "msg.file.io": {
+      "arity": null,
+      "description": "Another operating-system file error.",
+      "en": "File error {path}: {reason}",
+      "example": "Kesalahan berkas a.txt: disk full",
+      "id_gloss": "Kesalahan berkas {path}: {reason}",
+      "namespace": "msg",
+      "placeholders": [
+        "path",
+        "reason"
+      ],
+      "tier": 2
+    },
+    "msg.file.is_dir": {
+      "arity": null,
+      "description": "A folder was opened as if it were a file.",
+      "en": "This is a folder, not a file: {path}",
+      "example": "Ini folder, bukan berkas: data",
+      "id_gloss": "Ini folder, bukan berkas: {path}",
+      "namespace": "msg",
+      "placeholders": [
+        "path"
+      ],
+      "tier": 2
+    },
+    "msg.file.mode_invalid": {
+      "arity": null,
+      "description": "The second argument of open is not a known mode.",
+      "en": "Mode must be \"{read}\", \"{write}\", or \"{append}\", not {value}",
+      "example": "Mode harus \"baco\", \"tulis\", atau \"nambahkah\", bukan \"x\"",
+      "id_gloss": "Mode harus \"{read}\", \"{write}\", atau \"{append}\", bukan {value}",
+      "namespace": "msg",
+      "placeholders": [
+        "read",
+        "write",
+        "append",
+        "value"
+      ],
+      "tier": 2
+    },
+    "msg.file.not_found": {
+      "arity": null,
+      "description": "A file path does not exist.",
+      "en": "File not found: {path}",
+      "example": "Berkas tidak ditemukan: a.txt",
+      "id_gloss": "Berkas tidak ditemukan: {path}",
+      "namespace": "msg",
+      "placeholders": [
+        "path"
+      ],
+      "tier": 2
+    },
+    "msg.file.not_utf8": {
+      "arity": null,
+      "description": "A file contains bytes that are not UTF-8 text.",
+      "en": "File is not UTF-8 text: {path}",
+      "example": "Berkas bukan teks UTF-8: a.txt",
+      "id_gloss": "Berkas bukan teks UTF-8: {path}",
+      "namespace": "msg",
+      "placeholders": [
+        "path"
+      ],
+      "tier": 2
+    },
+    "msg.file.path_type": {
+      "arity": null,
+      "description": "A file built-in got a non-text path.",
+      "en": "'{fn}' needs a file name as text",
+      "example": "'bukak' butuh nama berkas berupa teks",
+      "id_gloss": "'{fn}' butuh nama berkas berupa teks",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.file.permission": {
+      "arity": null,
+      "description": "The operating system refused access to a file.",
+      "en": "No permission for file: {path}",
+      "example": "Tidak punya izin untuk berkas: a.txt",
+      "id_gloss": "Tidak punya izin untuk berkas: {path}",
+      "namespace": "msg",
+      "placeholders": [
+        "path"
+      ],
+      "tier": 2
+    },
+    "msg.file.wrong_mode": {
+      "arity": null,
+      "description": "An operation needs a file opened in a different mode.",
+      "en": "This file is open for '{mode}', so it cannot be used by '{fn}'",
+      "example": "Berkas ini dibuka untuk 'baco', tidak bisa dipakai oleh 'tulis'",
+      "id_gloss": "Berkas ini dibuka untuk '{mode}', tidak bisa dipakai oleh '{fn}'",
+      "namespace": "msg",
+      "placeholders": [
+        "mode",
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.contains_kind": {
+      "arity": null,
+      "description": "The contains built-in got a value it cannot search.",
+      "en": "'{fn}' is only for lists, maps, and text",
+      "example": "'isi' hanya untuk daftar, peta, dan teks",
+      "id_gloss": "'{fn}' hanya untuk daftar, peta, dan teks",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.contains_type": {
+      "arity": null,
+      "description": "Searching text for a non-text value.",
+      "en": "To search in text, what you search for must also be text",
+      "example": "Untuk mencari dalam teks, yang dicari juga harus teks",
+      "id_gloss": "Untuk mencari dalam teks, yang dicari juga harus teks",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.fn.join_arity": {
+      "arity": null,
+      "description": "The join built-in got the wrong number of arguments.",
+      "en": "Function {fn} needs 1 or 2 arguments, got {count}",
+      "example": "Fungsi disatu butuh 1 atau 2 argumen, diberi 3",
+      "id_gloss": "Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.fn.length_kind": {
+      "arity": null,
+      "description": "The length built-in got a value without a length.",
+      "en": "'{fn}' is only for lists, maps, and text",
+      "example": "'panjang' hanya untuk daftar, peta, dan teks",
+      "id_gloss": "'{fn}' hanya untuk daftar, peta, dan teks",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.list_only": {
+      "arity": null,
+      "description": "A list built-in got a value that is not a list.",
+      "en": "'{fn}' is only for lists",
+      "example": "'milih' hanya untuk daftar",
+      "id_gloss": "'{fn}' hanya untuk daftar",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.open_arity": {
+      "arity": null,
+      "description": "The open built-in got the wrong number of arguments.",
+      "en": "Function {fn} needs 1 or 2 arguments, got {count}",
+      "example": "Fungsi bukak butuh 1 atau 2 argumen, diberi 3",
+      "id_gloss": "Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.fn.range_args": {
+      "arity": null,
+      "description": "The range built-in got a non-number argument.",
+      "en": "The arguments of {fn} must be whole numbers",
+      "example": "Argumen jarak harus bilangan bulat",
+      "id_gloss": "Argumen {fn} harus bilangan bulat",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.range_arity": {
+      "arity": null,
+      "description": "The range built-in got the wrong number of arguments.",
+      "en": "Function {fn} needs 1 to 3 arguments, got {count}",
+      "example": "Fungsi jarak butuh 1 sampai 3 argumen, diberi 4",
+      "id_gloss": "Fungsi {fn} butuh 1 sampai 3 argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.fn.range_step": {
+      "arity": null,
+      "description": "The range built-in got a step of zero.",
+      "en": "The step of {fn} cannot be 0",
+      "example": "Langkah jarak tidak boleh 0",
+      "id_gloss": "Langkah {fn} tidak boleh 0",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.range_too_big": {
+      "arity": null,
+      "description": "The range built-in would build more items than allowed.",
+      "en": "Range is too large (maximum {max})",
+      "example": "Jarak terlalu besar (maksimal 1000000)",
+      "id_gloss": "Jarak terlalu besar (maksimal {max})",
+      "namespace": "msg",
+      "placeholders": [
+        "max"
+      ],
+      "tier": 2
+    },
+    "msg.fn.reverse_kind": {
+      "arity": null,
+      "description": "The reverse built-in got a value it cannot reverse.",
+      "en": "'{fn}' is only for lists and text",
+      "example": "'pulang' hanya untuk daftar dan teks",
+      "id_gloss": "'{fn}' hanya untuk daftar dan teks",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.sort_type": {
+      "arity": null,
+      "description": "The sort built-in cannot order mixed values.",
+      "en": "The list contains values that cannot be compared, so it cannot be sorted",
+      "example": "Daftar berisi nilai yang tidak bisa dibandingkan, jadi tidak bisa diurutkan",
+      "id_gloss": "Daftar berisi nilai yang tidak bisa dibandingkan, jadi tidak bisa diurutkan",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.fn.split_arity": {
+      "arity": null,
+      "description": "The split built-in got the wrong number of arguments.",
+      "en": "Function {fn} needs 1 or 2 arguments, got {count}",
+      "example": "Fungsi pisah butuh 1 atau 2 argumen, diberi 3",
+      "id_gloss": "Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "count"
+      ],
+      "tier": 2
+    },
+    "msg.fn.split_kind": {
+      "arity": null,
+      "description": "The split built-in got a non-text value.",
+      "en": "'{fn}' is only for text",
+      "example": "'pisah' hanya untuk teks",
+      "id_gloss": "'{fn}' hanya untuk teks",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.wait_number": {
+      "arity": null,
+      "description": "The wait built-in got a non-number.",
+      "en": "'{fn}' needs a number of seconds",
+      "example": "'nantik' butuh bilangan detik",
+      "id_gloss": "'{fn}' butuh bilangan detik",
+      "namespace": "msg",
+      "placeholders": [
+        "fn"
+      ],
+      "tier": 2
+    },
+    "msg.fn.wait_range": {
+      "arity": null,
+      "description": "The wait built-in got a number outside the allowed range.",
+      "en": "The wait time of {fn} must be between 0 and {max} seconds",
+      "example": "Waktu nantik harus antara 0 dan 3600 detik",
+      "id_gloss": "Waktu {fn} harus antara 0 dan {max} detik",
+      "namespace": "msg",
+      "placeholders": [
+        "fn",
+        "max"
+      ],
+      "tier": 2
+    },
+    "msg.func.return_outside": {
+      "arity": null,
+      "description": "return appears outside a function.",
+      "en": "Line {line}: '{word}' is only allowed inside a function",
+      "example": "Baris 1: 'balik' hanya boleh di dalam fungsi",
+      "id_gloss": "Baris {line}: '{word}' hanya boleh di dalam fungsi",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "word"
+      ],
+      "tier": 2
+    },
+    "msg.import.circular": {
+      "arity": null,
+      "description": "Two files import each other.",
+      "en": "Circular import: {name}",
+      "example": "Impor melingkar: bantuan",
+      "id_gloss": "Impor melingkar: {name}",
+      "namespace": "msg",
+      "placeholders": [
+        "name"
+      ],
+      "tier": 2
+    },
+    "msg.import.in_module": {
+      "arity": null,
+      "description": "An error happened inside an imported file.",
+      "en": "In '{name}': {message}",
+      "example": "Dalam 'bantuan': Pembagian dengan nol",
+      "id_gloss": "Dalam '{name}': {message}",
+      "namespace": "msg",
+      "placeholders": [
+        "name",
+        "message"
+      ],
+      "tier": 2
+    },
+    "msg.import.not_found": {
+      "arity": null,
+      "description": "An imported file does not exist.",
+      "en": "File not found: {name}",
+      "example": "Berkas tidak ditemukan: bantuan",
+      "id_gloss": "Berkas tidak ditemukan: {name}",
+      "namespace": "msg",
+      "placeholders": [
+        "name"
+      ],
+      "tier": 2
+    },
+    "msg.import.not_text": {
+      "arity": null,
+      "description": "An import was given a non-text path.",
+      "en": "'{kw}' needs a file name as text",
+      "example": "'ambik' butuh nama berkas berupa teks",
+      "id_gloss": "'{kw}' butuh nama berkas berupa teks",
+      "namespace": "msg",
+      "placeholders": [
+        "kw"
+      ],
+      "tier": 2
+    },
+    "msg.loop.break_outside": {
+      "arity": null,
+      "description": "break or continue appears outside a loop.",
+      "en": "Line {line}: '{word}' is only allowed inside a loop",
+      "example": "Baris 1: 'putuh' hanya boleh di dalam perulangan",
+      "id_gloss": "Baris {line}: '{word}' hanya boleh di dalam perulangan",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "word"
+      ],
+      "tier": 2
+    },
+    "msg.loop.not_iterable": {
+      "arity": null,
+      "description": "A for loop was given a value that has no items.",
+      "en": "This value cannot be repeated with '{for_word}'",
+      "example": "Nilai ini tidak bisa diulang dengan 'untuk'",
+      "id_gloss": "Nilai ini tidak bisa diulang dengan '{for_word}'",
+      "namespace": "msg",
+      "placeholders": [
+        "for_word"
+      ],
+      "tier": 2
+    },
+    "msg.loop.use_range": {
+      "arity": null,
+      "description": "A for loop was given a number instead of a collection.",
+      "en": "To repeat several times, use {range_fn}(n): {for_word} i {in_word} {range_fn}(5)",
+      "example": "Untuk mengulang beberapa kali, pakai jarak(n): untuk i alem jarak(5)",
+      "id_gloss": "Untuk mengulang beberapa kali, pakai {range_fn}(n): {for_word} i {in_word} {range_fn}(5)",
+      "namespace": "msg",
+      "placeholders": [
+        "range_fn",
+        "for_word",
+        "in_word"
+      ],
+      "tier": 2
+    },
+    "msg.name.already_const": {
+      "arity": null,
+      "description": "A constant with this name already exists in the same scope.",
+      "en": "'{name}' is already declared as a constant",
+      "example": "'pi' sudah dideklarasikan sebagai konstanta",
+      "id_gloss": "'{name}' sudah dideklarasikan sebagai konstanta",
+      "namespace": "msg",
+      "placeholders": [
+        "name"
+      ],
+      "tier": 2
+    },
+    "msg.name.constant": {
+      "arity": null,
+      "description": "An assignment targets a constant.",
+      "en": "'{name}' is a constant ('{const_word}') and cannot be changed",
+      "example": "'pi' adalah konstanta ('tetap') dan tidak bisa diubah",
+      "id_gloss": "'{name}' adalah konstanta ('{const_word}') dan tidak bisa diubah",
+      "namespace": "msg",
+      "placeholders": [
+        "name",
+        "const_word"
+      ],
+      "tier": 2
+    },
+    "msg.name.undeclared": {
+      "arity": null,
+      "description": "A name is assigned before it is declared.",
+      "en": "Name not declared: {name} (use '{var_word}' first)",
+      "example": "Nama belum dideklarasikan: umur (pakai 'barang' dulu)",
+      "id_gloss": "Nama belum dideklarasikan: {name} (pakai '{var_word}' dulu)",
+      "namespace": "msg",
+      "placeholders": [
+        "name",
+        "var_word"
+      ],
+      "tier": 2
+    },
+    "msg.name.undefined": {
+      "arity": null,
+      "description": "A name is read before it exists anywhere.",
+      "en": "Name not defined: {name}",
+      "example": "Nama belum didefinisikan: umur",
+      "id_gloss": "Nama belum didefinisikan: {name}",
+      "namespace": "msg",
+      "placeholders": [
+        "name"
+      ],
+      "tier": 2
+    },
+    "msg.runtime.too_deep": {
+      "arity": null,
+      "description": "The catch variable for a recursion error.",
+      "en": "Too deep",
+      "example": "Terlalu dalam",
+      "id_gloss": "Terlalu dalam",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.runtime.unknown_expr": {
+      "arity": null,
+      "description": "The evaluator met an expression node it does not know.",
+      "en": "Unknown expression: {op}",
+      "example": "Ekspresi tidak dikenal: magic",
+      "id_gloss": "Ekspresi tidak dikenal: {op}",
+      "namespace": "msg",
+      "placeholders": [
+        "op"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.assign_target": {
+      "arity": null,
+      "description": "An assignment has something other than a name or index on the left.",
+      "en": "Line {line}: the left side of '=' must be a name or a list element",
+      "example": "Baris 1: sisi kiri '=' harus nama atau elemen daftar",
+      "id_gloss": "Baris {line}: sisi kiri '=' harus nama atau elemen daftar",
+      "namespace": "msg",
+      "placeholders": [
+        "line"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.bad_char": {
+      "arity": null,
+      "description": "The source contains a character the lexer cannot use.",
+      "en": "Line {line}: unknown character {text}",
+      "example": "Baris 1: karakter tidak dikenal '\"'",
+      "id_gloss": "Baris {line}: karakter tidak dikenal {text}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.escape": {
+      "arity": null,
+      "description": "An escape sequence inside text is not one of the supported ones.",
+      "en": "Line {line}: unknown escape sequence: \\{c}",
+      "example": "Baris 1: urutan escape tidak dikenal: \\q",
+      "id_gloss": "Baris {line}: urutan escape tidak dikenal: \\{c}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "c"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.expected": {
+      "arity": null,
+      "description": "A required token is missing.",
+      "en": "Line {line}: expected {what}, found {text}",
+      "example": "Baris 1: diharapkan 'IDENT', ditemukan '='",
+      "id_gloss": "Baris {line}: diharapkan {what}, ditemukan {text}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "what",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.expected_after_name": {
+      "arity": null,
+      "description": "The name in a for loop is not followed by the in word.",
+      "en": "Line {line}: expected '{word}' after the name, found {text}",
+      "example": "Baris 1: diharapkan 'alem' setelah nama, ditemukan '='",
+      "id_gloss": "Baris {line}: diharapkan '{word}' setelah nama, ditemukan {text}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "word",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.reserved": {
+      "arity": null,
+      "description": "A reserved word was used as a name.",
+      "en": "Line {line}: '{text}' is a reserved word for a future feature",
+      "example": "Baris 1: 'kelihu' adalah kata cadangan untuk fitur berikutnya",
+      "id_gloss": "Baris {line}: '{text}' adalah kata cadangan untuk fitur berikutnya",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.try_requires_catch": {
+      "arity": null,
+      "description": "A try block has no catch block.",
+      "en": "Line {line}: block '{try_word}' must be followed by '{catch_word}' and a handler block",
+      "example": "Baris 1: blok 'cubo' harus diikuti 'tangkap' dan blok penanganan",
+      "id_gloss": "Baris {line}: blok '{try_word}' harus diikuti '{catch_word}' dan blok penanganan",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "try_word",
+        "catch_word"
+      ],
+      "tier": 2
+    },
+    "msg.syntax.unexpected": {
+      "arity": null,
+      "description": "A token cannot start an expression.",
+      "en": "Line {line}: unexpected {text}",
+      "example": "Baris 1: tidak terduga '}'",
+      "id_gloss": "Baris {line}: tidak terduga {text}",
+      "namespace": "msg",
+      "placeholders": [
+        "line",
+        "text"
+      ],
+      "tier": 2
+    },
+    "msg.value.convert": {
+      "arity": null,
+      "description": "A conversion built-in cannot turn the value into the target type.",
+      "en": "Cannot convert {value} to {target}",
+      "example": "Tidak bisa mengubah \"abc\" menjadi bilangan",
+      "id_gloss": "Tidak bisa mengubah {value} menjadi {target}",
+      "namespace": "msg",
+      "placeholders": [
+        "value",
+        "target"
+      ],
+      "tier": 2
+    },
+    "msg.value.div_zero": {
+      "arity": null,
+      "description": "The right side of / or % is zero.",
+      "en": "Division by zero",
+      "example": "Pembagian dengan nol",
+      "id_gloss": "Pembagian dengan nol",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.index_kind": {
+      "arity": null,
+      "description": "Indexing was applied to a value that has no items.",
+      "en": "Only lists, maps, and text can be indexed",
+      "example": "Hanya daftar, peta, dan teks yang bisa diindeks",
+      "id_gloss": "Hanya daftar, peta, dan teks yang bisa diindeks",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.index_range": {
+      "arity": null,
+      "description": "An index is below zero or past the end.",
+      "en": "Index out of range: {index} (length {length})",
+      "example": "Indeks di luar jangkauan: 5 (panjang 2)",
+      "id_gloss": "Indeks di luar jangkauan: {index} (panjang {length})",
+      "namespace": "msg",
+      "placeholders": [
+        "index",
+        "length"
+      ],
+      "tier": 2
+    },
+    "msg.value.index_type": {
+      "arity": null,
+      "description": "An index is not a whole number.",
+      "en": "The index must be a whole number",
+      "example": "Indeks harus bilangan bulat",
+      "id_gloss": "Indeks harus bilangan bulat",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.key_missing": {
+      "arity": null,
+      "description": "A map lookup used a key the map does not contain.",
+      "en": "Key not found: {key}",
+      "example": "Kunci tidak ditemukan: \"a\"",
+      "id_gloss": "Kunci tidak ditemukan: {key}",
+      "namespace": "msg",
+      "placeholders": [
+        "key"
+      ],
+      "tier": 2
+    },
+    "msg.value.key_type": {
+      "arity": null,
+      "description": "A map key has a type that maps do not accept.",
+      "en": "Map keys must be text or whole numbers",
+      "example": "Kunci peta harus teks atau bilangan bulat",
+      "id_gloss": "Kunci peta harus teks atau bilangan bulat",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.map_pair": {
+      "arity": null,
+      "description": "The map built-in got something other than a two-item list.",
+      "en": "Each map pair must be a list [key, value]",
+      "example": "Setiap pasangan peta harus berupa daftar [kunci, nilai]",
+      "id_gloss": "Setiap pasangan peta harus berupa daftar [kunci, nilai]",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.neg_type": {
+      "arity": null,
+      "description": "A minus sign was applied to a non-number.",
+      "en": "The minus sign is only for numbers, not {value}",
+      "example": "Tanda minus hanya untuk bilangan, bukan \"a\"",
+      "id_gloss": "Tanda minus hanya untuk bilangan, bukan {value}",
+      "namespace": "msg",
+      "placeholders": [
+        "value"
+      ],
+      "tier": 2
+    },
+    "msg.value.operator": {
+      "arity": null,
+      "description": "An arithmetic or comparison operator got incompatible values.",
+      "en": "Operator {op} cannot be used on {left} and {right}",
+      "example": "Operator '-' tidak bisa dipakai pada \"a\" dan 1",
+      "id_gloss": "Operator {op} tidak bisa dipakai pada {left} dan {right}",
+      "namespace": "msg",
+      "placeholders": [
+        "op",
+        "left",
+        "right"
+      ],
+      "tier": 2
+    },
+    "msg.value.separator": {
+      "arity": null,
+      "description": "A separator argument is not text.",
+      "en": "The separator must be text",
+      "example": "Pemisah harus berupa teks",
+      "id_gloss": "Pemisah harus berupa teks",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "msg.value.text_immutable": {
+      "arity": null,
+      "description": "An index assignment targeted text.",
+      "en": "Text cannot be changed character by character",
+      "example": "Teks tidak bisa diubah per huruf",
+      "id_gloss": "Teks tidak bisa diubah per huruf",
+      "namespace": "msg",
+      "placeholders": [],
+      "tier": 2
+    },
+    "op.eq": {
+      "arity": null,
+      "description": "True when both sides are equal.",
+      "en": "equal",
+      "example": "a == b",
+      "id_gloss": "sama dengan",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "op.ge": {
+      "arity": null,
+      "description": "True when the left side is larger or equal.",
+      "en": "greater or equal",
+      "example": "a >= b",
+      "id_gloss": "lebih dari atau sama dengan",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "op.gt": {
+      "arity": null,
+      "description": "True when the left side is larger.",
+      "en": "greater than",
+      "example": "a > b",
+      "id_gloss": "lebih dari",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "op.le": {
+      "arity": null,
+      "description": "True when the left side is smaller or equal.",
+      "en": "less or equal",
+      "example": "a <= b",
+      "id_gloss": "kurang dari atau sama dengan",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "op.lt": {
+      "arity": null,
+      "description": "True when the left side is smaller.",
+      "en": "less than",
+      "example": "a < b",
+      "id_gloss": "kurang dari",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "op.ne": {
+      "arity": null,
+      "description": "True when the sides differ.",
+      "en": "not equal",
+      "example": "a != b",
+      "id_gloss": "tidak sama dengan",
+      "namespace": "op",
+      "placeholders": [],
+      "tier": 1
+    },
+    "reserved.error": {
+      "arity": null,
+      "description": "Reserved for a future error-value feature; it cannot be used as a name.",
+      "en": "error",
+      "example": "barang kelihu = 1",
+      "id_gloss": "kelihu",
+      "namespace": "reserved",
+      "placeholders": [],
+      "tier": 3
+    },
+    "type.bool": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "boolean",
+      "example": "mecem(nilai)",
+      "id_gloss": "boolean",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.file": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "file",
+      "example": "mecem(nilai)",
+      "id_gloss": "berkas",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.float": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "float",
+      "example": "mecem(nilai)",
+      "id_gloss": "pecahan",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.func": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "function",
+      "example": "mecem(nilai)",
+      "id_gloss": "fungsi",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.int": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "int",
+      "example": "mecem(nilai)",
+      "id_gloss": "bilangan",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.list": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "list",
+      "example": "mecem(nilai)",
+      "id_gloss": "daftar",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.map": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "map",
+      "example": "mecem(nilai)",
+      "id_gloss": "peta",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.null": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "null",
+      "example": "mecem(nilai)",
+      "id_gloss": "kosong",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    },
+    "type.str": {
+      "arity": null,
+      "description": "Type name returned by the type built-in.",
+      "en": "text",
+      "example": "mecem(nilai)",
+      "id_gloss": "kato",
+      "namespace": "type",
+      "placeholders": [],
+      "tier": 2
+    }
+  }
+}

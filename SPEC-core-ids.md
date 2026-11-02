@@ -1,7 +1,7 @@
 # Spec: core-ids
 
-Status: **draft for approval.** Parent: `SPEC.md`. Capability map: `core-ids`.
-Date: 2026-11-02.
+Status: **approved 2026-11-02; implemented 2026-11-02.** Parent: `SPEC.md`.
+Capability map: `core-ids`. Date: 2026-11-02.
 
 ## 1. Objective
 

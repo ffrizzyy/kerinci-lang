@@ -71,4 +71,5 @@ For 0.6, a new dialect is **data only**: one JSON file, one Markdown notes file,
 - [x] Module ids, dependency direction, and build order approved by the human (2026-11-02).
 - [x] First milestone agreed.
 - [x] `SPEC-core-ids.md` written.
-- [ ] `SPEC-core-ids.md` approved; then plan, implement, and proceed in order.
+- [x] `SPEC-core-ids.md` approved; `core-ids` implemented and green.
+- [ ] Next: `SPEC-dialect-model.md`.

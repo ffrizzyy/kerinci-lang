@@ -26,6 +26,9 @@ dist.mkdir(exist_ok=True)
 with tempfile.TemporaryDirectory() as tmp:
     tmp = pathlib.Path(tmp)
     shutil.copy(root / "kerincilang.py", tmp / "kerincilang.py")
+    # the neutral catalogue and the dialect data must travel with the program
+    shutil.copytree(root / "core", tmp / "core")
+    shutil.copytree(root / "dialects", tmp / "dialects")
     (tmp / "__main__.py").write_text(
         "import sys\nfrom kerincilang import main\nsys.exit(main())\n", encoding="utf-8")
     zipapp.create_archive(tmp, dist / "krc.pyz", interpreter="/usr/bin/env python3")

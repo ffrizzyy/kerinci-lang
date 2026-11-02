@@ -6,35 +6,72 @@
 README.md                  front page (English)
 GETTING-STARTED.md         step-by-step guide for a newly unzipped copy
 kerincilang.py             the whole interpreter (one file, no dependencies)
+core/ids.json              neutral ID catalogue: the language's contract (data)
+dialects/                  dialect data packages (data-only; no Python per dialect)
 pyproject.toml             packaging: provides the `krc` command
 build.py                   runs all tests, then builds dist/krc.pyz
-make_highlight.py          generates the VS Code grammar from the keyword table
+make_highlight.py          generates the VS Code grammar from the line's vocabulary
 examples/                  example programs (.krc)
 tutorial/                  13 lessons, answers, glossary in English; tutorial/id/ is the Indonesian copy (every code sample is tested)
-tests/                     test_kerincilang.py (language) and test_tutorial.py (tutorial + glossary)
+tests/                     test_kerincilang.py (language), test_tutorial.py (tutorial + glossary), test_ids.py (catalogue + seam + packaging)
 tools/                     sinkron_tutorial.py (check/refresh tutorial output), buat_glosarium.py
 docs/                      design documents (this folder)
+tasks/                     plan.md / todo.md for a working module
 vscode-extension/          syntax highlighting for .krc files
 .github/                   CI workflow and issue templates
 ```
 
-The full source of the interpreter is `kerincilang.py` (read it top to bottom: keyword tables, lexer, parser, built-ins, interpreter, command line).
+The full source of the interpreter is `kerincilang.py` (read it top to bottom: the legacy vocabulary, lexer, parser, built-ins, interpreter, command line).
 
 ## Architecture
 
 ```
 source (.krc)  ->  Lexer  ->  tokens  ->  Parser  ->  AST  ->  Interpreter  ->  output
-                     ^
-               KEYWORDS table (Siulak words)
+                      ^                                              ^
+                 Vocabulary (legacy Siulak today)  -------------  show()/messages
+                      ^
+                core/ids.json (neutral IDs)
 ```
 
 | Stage | Responsibility | Where in `kerincilang.py` |
 |---|---|---|
-| Keyword table | Internal name to Kerinci word; checked for duplicates at startup | `KEYWORDS`, `SURFACE` |
-| Lexer | Text to tokens; `mulai`/`habih` become `{`/`}` | `tokenize()` |
-| Parser | Tokens to AST, recursive descent, one method per grammar rule | `class Parser` |
-| Interpreter | Walks the AST; scopes via `Env`; lists are Python lists; built-ins live in a parent scope (`new_global()`); `balik`/`putuh`/`lanjut` via exceptions | `run()`, `ev()`, `Env` |
-| Errors | One `LangError` type, Indonesian messages with line numbers | `LangError` |
+| Catalogue | Neutral IDs, namespaces, tiers, arities, placeholder names | `core/ids.json`, `CATALOG` |
+| Vocabulary | Maps a neutral ID to one dialect's word and message | `Vocabulary`, `LegacySiulak` |
+| Lexer | Text to tokens; token kinds are IDs (`kw.if`, `op.eq`); `mulai`/`habih` become `{`/`}` | `tokenize()` |
+| Parser | Tokens to AST, recursive descent; compares IDs, never words | `class Parser` |
+| Interpreter | Walks the AST; scopes via `Env`; built-ins live in a parent scope (`new_global()`); `balik`/`putuh`/`lanjut` via exceptions | `run()`, `ev()`, `Env` |
+| Errors | One `LangError` type; text rendered from a `msg.*` template, with `msg_id` and `msg_args` kept | `LangError` |
+
+### The vocabulary seam (0.6)
+
+The engine has no dialect word in its logic. Each meaningful word has a stable
+neutral ID; a `Vocabulary` supplies the surface words and the message templates.
+
+```python
+from kerincilang import LegacySiulak, run_source, show
+
+v = LegacySiulak()
+run_source('nyetak betul', vocab=v)      # M1: Siulak is the only real dialect
+show(True, v)                            # -> "betul", not a hard-coded word
+```
+
+Rules:
+
+- `core/ids.json` owns identity. Add the ID there before using it anywhere.
+- `LegacySiulak` is the frozen Siulak 0.5 vocabulary; its output must match v0.5
+  byte for byte. `tests/test_kerincilang.py` and `tests/test_tutorial.py` are the
+  oracle and are not edited to fit a refactor.
+- Messages are catalogue entries. `id_gloss` is the Indonesian template, so
+  `LangError.text` is exactly the v0.5 string; `en` is the neutral English base.
+  Placeholders stay neutral (`{name}`, `{message}`) and are never translated.
+- `KEYWORDS`, `SURFACE`, `WORD_OPERATORS`, `BUILTINS`, `TYPE_NAMES`, `MODES`, and
+  `RESERVED` are compatibility views generated from `LegacySiulak`. Do not
+  hand-maintain a second table.
+
+**M1 limitation.** There is one vocabulary per run. `run_source`/`run_file` push
+it with `use_vocab`, and `Env` carries it, but `do_import` still uses the same
+vocabulary as its importer. `runtime-selection` will push the callee's vocabulary
+around a call and per module; the seam above is what makes that a small change.
 
 ## Running
 
@@ -64,16 +101,18 @@ Closed pipes (`krc program.krc | head`) and Ctrl+C are handled without a traceba
 
 | File | Role |
 |---|---|
-| `pyproject.toml` | Declares the package and the `krc` command (`krc = kerincilang:main`), so `pip install .` works |
-| `build.py` | Runs the test suite, then builds `dist/krc.pyz` (a Python zipapp, about 20 KB) and copies the examples into `dist/` |
+| `pyproject.toml` | Declares the package and the `krc` command (`krc = kerincilang:main`), and ships `core/` + `dialects/` as package data |
+| `build.py` | Runs the test suite, then builds `dist/krc.pyz` (a Python zipapp) and copies the examples into `dist/` |
+
+The zipapp and the wheel must contain `core/ids.json`, because the engine loads it at import time. `build.py` copies `core/` and `dialects/` into the archive; `pyproject.toml` declares them under `packages` and `package-data`. `tests/test_ids.py` builds a zipapp in a temporary folder and runs it from a directory with no checkout, so a missing data file fails CI instead of a release.
 
 To release a new version: change `__version__` in `kerincilang.py` and `version` in `pyproject.toml`, run `python3 build.py`, and share `dist/krc.pyz`. To publish on PyPI later, run `python3 -m build` and `twine upload dist/*` (needs an account and the `build` and `twine` packages).
 
 ## How it works
 
-**Lexer.** One regular expression with named groups. Identifiers use `[^\W\d]\w*`, so any Unicode letter works and words like `kurang_daripado` are single tokens. An identifier in `WORD_OPERATORS` becomes the matching symbol token, one in `SURFACE` becomes a keyword token, and one in `RESERVED` (`kelihu`) is rejected.
+**Lexer.** One regular expression with named groups. Identifiers use `[^\W\d]\w*`, so any Unicode letter works and words like `kurang_daripado` are single tokens. An identifier in the active vocabulary's operator map becomes the matching symbol token, one in its surface map becomes a neutral keyword token (`kw.if`), and one in its reserved set (`kelihu`) is rejected. The token *text* for a keyword is its ID, never the dialect word, so the parser cannot depend on a dialect.
 
-**Parser.** Each precedence level calls the next-higher one (`expression` -> `and_` -> `equality` -> ... -> `call` -> `primary`), which is why `1 + 2 * 3` is 7. `lain kalu` is just `lain` followed by another `kalu` statement, so any chain length works. The parser tracks loop depth so `putuh`/`lanjut` outside `selamo` are caught before the program runs.
+**Parser.** Each precedence level calls the next-higher one (`expression` -> `and_` -> `equality` -> ... -> `call` -> `primary`), which is why `1 + 2 * 3` is 7. `lain kalu` is just `lain` followed by another `kalu` statement, so any chain length works. Comparison words and symbols both arrive as the neutral symbol (`==`, `<`), so one code path serves each. The parser tracks loop depth so `putuh`/`lanjut` outside `selamo` are caught before the program runs. When an error names a token, `Parser.display()` turns the ID back into the active dialect's word, which is the only place the parser asks for a word.
 
 **Lists and `untuk`.** `[ ... ]` is parsed in `primary()`, and indexing `xs[i]` is handled in the same loop as function calls, so `m[1][0]` and `f(x)[2]` work. `xs[i] = v` is recognised after parsing an expression: if the left side is an index, it becomes a `setindex` statement. `untuk <name> alem <source>` evaluates its source once, turns it into a sequence (`iterate()`, lists and text only), and runs the body in a fresh scope per item. Counting loops use `jarak(n)`, which builds a list (capped at `MAX_JARAK`).
 
@@ -83,9 +122,9 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 **Imports.** `ambik` evaluates to a file name, resolves it against `IMPORT_STACK` (the directory of the file currently running), and runs the file once in its own scope (`LOADED` caches it; `LOADING` catches cycles). The module's top-level names are then copied into the importing scope. Functions keep the closure of their own module, so private helpers still work. `run_file()` sets up the import directory for the main program.
 
-**Files.** `bukak` returns a `Berkas` object (path, mode, Python file handle, closed flag), and every open one is tracked in `OPEN_FILES` so `run_file()` and `main()` can close them when the program ends. The mode is one of the words `"baco"`, `"tulis"`, `"nambahkah"`, mapped to Python's `r`, `w`, `a` in `MODES`. All Python `OSError`s are turned into `LangError`s by `file_error()`, so `kelihu` can catch them. Lines come from iterating the handle (`untuk b alem f`), through the same `iterate()` used for lists and maps.
+**Files.** `bukak` returns a `Berkas` object (path, mode, Python file handle, closed flag), and every open one is tracked in `OPEN_FILES` so `run_file()` and `main()` can close them when the program ends. The mode is written in the dialect's words (`"baco"`, `"tulis"`, `"nambahkah"` in Siulak) but stored as a neutral `mode.*` ID and mapped to Python's `r`, `w`, `a` in `FILE_MODE_CHARS`, so changing dialect cannot break an open handle. All Python `OSError`s are turned into `LangError`s by `file_error()`, so `kelihu` can catch them. Lines come from iterating the handle (`untuk b alem f`), through the same `iterate()` used for lists and maps.
 
-**Errors (`cubo`, `tangkap`, `ngangkat`).** The parser reads `cubo <block> tangkap [name] <block>` into a `try` node and `ngangkat <expression>` into a `raise` node. At run time the first block runs in its own scope, and a `LangError` (or `RecursionError`) sends control to the handler with the message bound to the name. `ngangkat` simply raises a `LangError` with the given text, so there is only one kind of error in the interpreter. Control-flow signals (`balik`, `putuh`, `lanjut`) are Python exceptions of other types, so they pass through untouched. `kelihu` ("error") is in `RESERVED`, so using it as a name is rejected by the lexer.
+**Errors (`cubo`, `tangkap`, `ngangkat`).** The parser reads `cubo <block> tangkap [name] <block>` into a `try` node and `ngangkat <expression>` into a `raise` node. At run time the first block runs in its own scope, and a `LangError` (or `RecursionError`) sends control to the handler with the message bound to the name. Internal errors are built with `msg("msg.area.name", ...)`: `LangError` renders the active dialect's template at construction, so `str(err)` is stable and `err.msg_id` / `err.msg_args` stay available. `ngangkat` simply raises a `LangError` with the user's text, so there is only one kind of error in the interpreter. Control-flow signals (`balik`, `putuh`, `lanjut`) are Python exceptions of other types, so they pass through untouched. `kelihu` is `reserved.error`, so using it as a name is rejected by the lexer.
 
 **Text functions.** `pisah` and `disatu` are ordinary built-ins that wrap Python's `str.split` and `str.join` (with `pisah(text)` splitting on whitespace and an empty separator splitting into letters).
 
@@ -93,15 +132,15 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 **Text escapes.** The lexer's `STRING` pattern allows backslash pairs, and `unescape()` converts `\n`, `\t`, `\"` and `\\` when the literal is parsed; anything else is an error with a line number.
 
-**Conversions.** `bilangan` and `pecahan` accept numbers and ASCII number text only (a regular expression, so Unicode digits and `1_000` are rejected). `mecem` reads its names from `TYPE_NAMES`, where the boolean name is a marked placeholder.
+**Conversions.** `bilangan` and `pecahan` accept numbers and ASCII number text only (a regular expression, so Unicode digits and `1_000` are rejected). `mecem` asks the active vocabulary for the `type.*` words, so the boolean name is the marked placeholder `boolean` in Siulak until speakers supply one.
 
-**Built-ins.** `BUILTINS` maps a name to (argument count, Python function). `new_global()` puts them in a parent scope of the program's global scope, so user code can redefine any of them without touching the originals. To add one, write a Python function, add a line to `BUILTINS`, and add tests. Functions that change their argument (`nambahkah`) return `None`; the others return new values.
+**Built-ins.** `BUILTIN_IDS` maps a neutral `fn.*` ID to (argument count, Python function), and `new_global()` registers each one under `vocab.word(fn_id)` in a parent scope of the program's global scope, so user code can redefine any of them without touching the originals. To add one, write a Python function, add an ID to `core/ids.json`, map it in `LegacySiulak`, add a line to `BUILTIN_IDS`, and add tests. Functions that change their argument (`nambahkah`) return `None`; the others return new values.
 
 **Interpreter.** `Env` objects chain to their parent for lexical scope, and a function value stores the `Env` it was defined in, which is what makes closures work. `tetap` names are recorded in the scope's `consts` set and rejected on reassignment.
 
 ## Test suite
 
-`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message).
+`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data.
 
 ## Next steps
 
@@ -116,11 +155,14 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 ## Adding a keyword (recipe)
 
-1. Add it to `KEYWORDS` (right-hand side is the Kerinci word).
-2. Add parsing in `Parser.statement()` or `Parser.primary()`.
-3. Add execution in `run()` or `ev()`.
-4. Add it to `make_highlight.py` and run it.
-5. Add tests and a line to `03-syntax-design.md`.
+1. Add the neutral ID to `core/ids.json` (namespace, tier, `en`, `id_gloss`,
+   description, example, arity, placeholders).
+2. Map the ID to the Siulak word in `LEGACY_WORDS` (and every other dialect later).
+3. Add parsing in `Parser.statement()` or `Parser.primary()`, comparing the ID.
+4. Add execution in `run()` or `ev()`, and any user text as a `msg.*` entry.
+5. Run `python3 make_highlight.py` and `python3 tools/buat_glosarium.py`.
+6. Add tests and a line to `03-syntax-design.md`; `tests/test_ids.py` will fail
+   if the catalogue, the word map, or the message set disagree.
 
 ## Learning resources
 
