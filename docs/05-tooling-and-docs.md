@@ -42,13 +42,21 @@ MESSAGES = {
 
 ### VS Code syntax highlighting
 
-Already included in `vscode-extension/`. It is generated from the keyword table, so it stays in sync:
+Already included in `vscode-extension/`. The grammar is a **union** generated
+from every dialect's resolved words, so it stays in sync and no dialect is
+presented as the standard:
 
 ```bash
 python3 make_highlight.py
 ```
 
-To try it locally, copy the `vscode-extension` folder into your VS Code extensions directory (`~/.vscode/extensions/kerincilang`) and reload VS Code. Files ending in `.krc` get colors for keywords, strings, numbers and comments, plus bracket matching and `#` comment toggling. To publish it, package it with `vsce`.
+To try it locally, copy the `vscode-extension` folder into your VS Code
+extensions directory (`~/.vscode/extensions/kerincilang`) and reload VS Code.
+Files ending in `.krc` get colors for keywords, strings, numbers and comments,
+plus bracket matching and `#` comment toggling. The extension README explains
+the union rule. A per-dialect picker is not part of 0.6: a grammar cannot switch
+on the `# dialek:` line, so every valid word from every dialect is highlighted.
+To publish it, package it with `vsce`.
 
 ## Documentation set
 
@@ -62,6 +70,8 @@ To try it locally, copy the `vscode-extension` folder into your VS Code extensio
 | Language reference (`docs/03-syntax-design.md`) | English | done |
 | Keyword glossary (`tutorial/glossary.md`, Indonesian: `tutorial/id/glosarium.md`) | Kerinci, English, Indonesian | done; checked against the language |
 | Contributing guide (`CONTRIBUTING.md`) | English (+ Indonesian summary) | done |
+| Adding a dialect (`docs/09-adding-a-dialect.md`) | English | done; every command is exercised by `tests/test_docs_release.py` |
+| Release checklist (`RELEASING.md`) | English | done |
 | Getting-started guide (`GETTING-STARTED.md`) | English | done |
 
 ### Keeping the tutorial correct
@@ -189,6 +199,7 @@ The cycle is one tool:
 
 ```bash
 python3 tools/lembar_kerja.py buat     --kode koto-payang   # create the sheet
+python3 tools/lembar_kerja.py rangka   --kode koto-payang --nama "Koto Payang"
 python3 tools/lembar_kerja.py perbarui --kode koto-payang   # add new catalogue IDs
 python3 tools/lembar_kerja.py periksa  --kode koto-payang --tulis
 python3 tools/lembar_kerja.py docx     --kode koto-payang   # reviewable table
@@ -230,4 +241,4 @@ speaker pass, not a script.
 - Version control (the folder is ready to be a git repository; `.gitignore` is included)
 - Versioning: `0.x` while the language and vocabulary are still being reviewed by speakers
 - `CHANGELOG.md` records every release
-- Automated tests on every change: `.github/workflows/tests.yml` runs both test files on Python 3.9 to 3.13
+- Automated tests on every change: `.github/workflows/tests.yml` runs the offline suites, the freshness diffs, and the wheel smoke on Python 3.9 to 3.13, with Windows and macOS smoke jobs

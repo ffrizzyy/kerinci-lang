@@ -18,7 +18,7 @@ try:
 except ImportError:                                   # pragma: no cover - Python < 3.9
     _resource_files = None
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
 # `python kerincilang.py` runs this file as __main__. Registering the alias means
 # a lazy `import kerincilang` (dialects.loader) reuses this module instead of

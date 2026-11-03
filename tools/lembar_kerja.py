@@ -5,6 +5,7 @@ an export that fills an existing dialect skeleton. `core/ids.json` is read-only
 here; this tool never changes the runtime or a dialect's metadata.
 
     python3 tools/lembar_kerja.py buat     --kode koto-payang
+    python3 tools/lembar_kerja.py rangka   --kode koto-payang --nama "Koto Payang"
     python3 tools/lembar_kerja.py perbarui --kode koto-payang
     python3 tools/lembar_kerja.py periksa  --kode koto-payang --tulis
     python3 tools/lembar_kerja.py docx     --kode koto-payang
@@ -47,13 +48,15 @@ MAX_CSV_BYTES = 2 * 1024 * 1024
 MAX_DOCX_BYTES = 8 * 1024 * 1024
 MAX_ZIP_ENTRIES = 32
 
-COMMANDS = ("buat", "perbarui", "periksa", "docx", "baca", "laporan", "json")
+COMMANDS = ("buat", "rangka", "perbarui", "periksa", "docx", "baca", "laporan",
+            "json")
 
 HELP = """Usage:
   python3 tools/lembar_kerja.py COMMAND --kode CODE [options]
 
 Commands:
   buat      create dialects/src/CODE.csv from core/ids.json
+  rangka    write a draft dialects/CODE.json and dialects/CODE.md stub
   perbarui  reconcile an existing CSV with a grown catalogue
   periksa   validate answers and print every problem by row and ID
   docx      render the CSV as a reviewable Word table
@@ -62,14 +65,18 @@ Commands:
   json      merge accepted answers into dialects/CODE.json
 
 Options:
-  --kode CODE   dialect code matching ^[a-z0-9-]+$ (required)
-  --csv PATH    default dialects/src/CODE.csv
-  --docx PATH   default dialects/src/CODE.docx
-  --json PATH   default dialects/CODE.json
-  --paksa       buat/docx may replace an existing file
-  --tulis       periksa/baca may write the CSV
-  --siap        apply the readiness gate to periksa
-  -h, --help    show this help
+  --kode CODE       dialect code matching ^[a-z0-9-]+$ (required)
+  --nama NAME       display name for rangka (required there)
+  --csv PATH        default dialects/src/CODE.csv
+  --docx PATH       default dialects/src/CODE.docx
+  --json PATH       default dialects/CODE.json
+  --md PATH         default dialects/CODE.md
+  --pemelihara TEXT rangka maintainer; default pending
+  --ortografi TEXT  rangka spelling note; default pending
+  --paksa           buat/rangka/docx may replace an existing file
+  --tulis           periksa/baca may write the CSV
+  --siap            apply the readiness gate to periksa
+  -h, --help        show this help
 
 Exit: 0 ok, 1 validation or file problem, 2 bad usage."""
 
@@ -187,6 +194,7 @@ def _default_paths(code):
         "csv": base / "src" / (code + ".csv"),
         "docx": base / "src" / (code + ".docx"),
         "json": base / (code + ".json"),
+        "md": base / (code + ".md"),
     }
 
 
@@ -784,6 +792,90 @@ def cmd_buat(options):
     return 0
 
 
+def cmd_rangka(options):
+    """Write a valid draft skeleton and a notes stub; add no dialect words."""
+    code = options["kode"]
+    name = options["nama"].strip()
+    maintainer = (options["pemelihara"] or "pending").strip() or "pending"
+    orthography = (options["ortografi"] or
+                   "Pending: write this dialect's spelling rules before "
+                   "filling the worksheet.").strip()
+    json_path = _selection(options, "json")
+    md_path = _selection(options, "md")
+    for path in (json_path, md_path):
+        if path.exists() and not options["paksa"]:
+            print("lembar_kerja: write: %s already exists; use --paksa" % path)
+            return 1
+
+    data = {
+        "code": code,
+        "name": name,
+        "status": "draft",
+        "core": CORE_VERSION,
+        "revision": 1,
+        "parent": None,
+        "license": "CC BY-SA 4.0",
+        "maintainer": maintainer,
+        "reviewer": None,
+        "sources": [],
+        "orthography": orthography,
+        "notes": "",
+        "words": {},
+        "messages": {},
+    }
+    problems = loader.validate_dialect(data, filename=code,
+                                       root=json_path.parent)
+    if problems:
+        _print_findings([Finding(problem.code, problem.id, problem.message,
+                                 problem.severity) for problem in problems])
+        print("nothing written")
+        return 1
+
+    text = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    notes = """# %s
+
+Status: **draft.** This file is a scaffold. Replace every placeholder and
+record the real speaker decisions before asking for review.
+
+## Provenance
+
+- Speaker(s): pending
+- Maintainer: %s
+- Reviewer: none yet
+- Sources: none yet
+- Licence: CC BY-SA 4.0
+- Canonical worksheet: `dialects/src/%s.csv`
+- Runtime data: `dialects/%s.json`
+
+## Orthography
+
+%s
+
+## Mapping decisions
+
+- No words are mapped yet. Start with Tier 1 in the worksheet.
+
+## Review record
+
+- Not reviewed. `draft` is not `review`; do not claim a speaker review that has
+  not happened.
+
+## Gaps
+
+- Every catalogue ID is still open. Record alternatives and their source in
+  the worksheet's `notes` column.
+""" % (name, maintainer, code, code, orthography)
+    try:
+        _atomic_write_text(json_path, text)
+        _atomic_write_text(md_path, notes)
+    except OSError as err:
+        print("lembar_kerja: write: cannot write the skeleton: %s" % err)
+        return 1
+    print("wrote %s: draft dialect %r" % (json_path, code))
+    print("wrote %s: notes stub" % md_path)
+    return 0
+
+
 def cmd_perbarui(options):
     path = _selection(options, "csv")
     sheet = read_sheet(path)
@@ -1049,6 +1141,7 @@ def cmd_json(options):
 
 DISPATCH = {
     "buat": cmd_buat,
+    "rangka": cmd_rangka,
     "perbarui": cmd_perbarui,
     "periksa": cmd_periksa,
     "docx": cmd_docx,
@@ -1074,16 +1167,22 @@ def _parse(argv):
     options = {
         "command": command,
         "kode": None,
+        "nama": None,
         "csv": None,
         "docx": None,
         "json": None,
+        "md": None,
+        "pemelihara": None,
+        "ortografi": None,
         "paksa": False,
         "tulis": False,
         "siap": False,
         "explicit": set(),
     }
-    value_flags = {"--kode": "kode", "--csv": "csv", "--docx": "docx",
-                   "--json": "json"}
+    value_flags = {"--kode": "kode", "--nama": "nama", "--csv": "csv",
+                   "--docx": "docx", "--json": "json", "--md": "md",
+                   "--pemelihara": "pemelihara",
+                   "--ortografi": "ortografi"}
     bool_flags = {"--paksa": "paksa", "--tulis": "tulis", "--siap": "siap"}
     index = 1
     while index < len(argv):
@@ -1112,6 +1211,9 @@ def _parse(argv):
         raise UsageError("--kode is required")
     if not CODE_RE.match(options["kode"]):
         raise UsageError("--kode must match ^[a-z0-9-]+$")
+    if command == "rangka":
+        if not options["nama"] or not options["nama"].strip():
+            raise UsageError("rangka needs --nama NAME")
     return options
 
 

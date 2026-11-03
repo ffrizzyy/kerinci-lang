@@ -9,12 +9,12 @@ kerincilang.py             the whole interpreter (one file, no dependencies)
 core/ids.json              neutral ID catalogue: the language's contract (data)
 dialects/                  dialect JSON files (data) + loader.py (validation only); dialects/src/ holds worksheet CSVs
 pyproject.toml             packaging: provides the `krc` command
-build.py                   runs all tests, then builds dist/krc.pyz
-make_highlight.py          generates the VS Code grammar from the line's vocabulary
+build.py                   runs every offline suite, then builds dist/krc.pyz
+make_highlight.py          generates one union VS Code grammar from every dialect's resolved words
 examples/                  example programs (.krc)
 tutorial/                  13 lessons, answers, glossary in English; tutorial/id/ is the Indonesian copy; tutorial/{en,id}/koto-payang/ are generated Koto Payang trees (every code sample is tested)
-tests/                     test_kerincilang.py (language), test_tutorial.py (baseline tutorial + glossary), test_tutorial_dialects.py (generated trees), test_ids.py (catalogue + seam + packaging), test_dialects.py (dialect files), test_runtime_selection.py (selection), test_worksheet.py (worksheet pipeline)
-tools/                     sinkron_tutorial.py, buat_glosarium.py, cek_dialek.py (dialect CI gate), lembar_kerja.py (worksheet pipeline)
+tests/                     test_kerincilang.py (language), test_tutorial.py (baseline tutorial + glossary), test_tutorial_dialects.py (generated trees), test_ids.py (catalogue + seam + packaging), test_dialects.py (dialect files), test_runtime_selection.py (selection), test_worksheet.py (worksheet pipeline), test_migration.py, test_translator.py, test_docs_release.py (offline docs/release gate); test_release.py is the separate wheel smoke
+tools/                     sinkron_tutorial.py, buat_glosarium.py, cek_dialek.py (dialect CI gate), lembar_kerja.py (worksheet pipeline and `rangka` scaffolds)
 docs/                      design documents (this folder)
 tasks/                     plan.md / todo.md for a working module
 vscode-extension/          syntax highlighting for .krc files
@@ -235,6 +235,7 @@ read-only.
 
 ```bash
 python3 tools/lembar_kerja.py buat     --kode koto-payang
+python3 tools/lembar_kerja.py rangka   --kode koto-payang --nama "Koto Payang"
 python3 tools/lembar_kerja.py periksa  --kode koto-payang --tulis
 python3 tools/lembar_kerja.py docx     --kode koto-payang
 python3 tools/lembar_kerja.py baca     --kode koto-payang --tulis
@@ -253,8 +254,8 @@ NFC and trim only, and its placeholders must match the catalogue. Alternatives
 message, and clash rules have one source of truth. It reports every problem by
 row and ID; `--tulis` writes the normalized CSV only when there are no errors.
 `--siap` reads the target skeleton's status: `draft` needs valid structure,
-`review` needs every Tier 1 row `reviewed`, and `approved` needs Tier 1 and
-Tier 2 reviewed.
+`review` needs every Tier 1 row `reviewed` and at least one source, and
+`approved` needs Tier 1 and Tier 2 reviewed plus a named reviewer.
 
 `docx` renders a dependency-free A4 landscape table; the same CSV produces
 byte-identical bytes. `baca` changes only `answer` and `notes`, downgrades a
@@ -266,6 +267,21 @@ result, and writes nothing if it would not load.
 The old `Translation Worksheet (Koto Payang).docx` is not ingested: it has no ID
 column and 287 rows for 137 IDs. `dialect-koto-payang` maps it by hand during
 the second speaker pass.
+
+## Adding a dialect
+
+The primary guide is [`09-adding-a-dialect.md`](09-adding-a-dialect.md). It is
+written for a contributor who does not read Python, and every command it names
+is exercised by `tests/test_docs_release.py`.
+
+The short version: `lembar_kerja.py buat` creates the worksheet,
+`lembar_kerja.py rangka` creates a validated `draft` JSON skeleton and notes
+stub, and `lembar_kerja.py json` merges accepted rows into the JSON. Then
+`cek_dialek.py` validates the file, `sinkron_tutorial.py --bangun <code>`
+generates the tutorial tree, and `make_highlight.py` regenerates the union
+grammar. No Python change is needed, and no dialect may borrow another
+dialect's word to fill a gap. The status gates and the review record are in the
+guide, not in this file.
 
 ## Dialect selection
 
@@ -349,7 +365,11 @@ Closed pipes (`krc program.krc | head`) and Ctrl+C are handled without a traceba
 
 The zipapp and the wheel must contain `core/ids.json`, because the engine loads it at import time. `build.py` copies `core/` and `dialects/` into the archive; `pyproject.toml` declares them under `packages` and `package-data`. `tests/test_ids.py` builds a zipapp in a temporary folder and runs it from a directory with no checkout, so a missing data file fails CI instead of a release.
 
-To release a new version: change `__version__` in `kerincilang.py` and `version` in `pyproject.toml`, run `python3 build.py`, and share `dist/krc.pyz`. To publish on PyPI later, run `python3 -m build` and `twine upload dist/*` (needs an account and the `build` and `twine` packages).
+To release a new version, follow [`RELEASING.md`](../RELEASING.md): change
+`__version__` in `kerincilang.py`, `version` in `pyproject.toml`, the extension
+version, the changelog, and the install guide, then run the offline suite and
+the wheel smoke. To publish on PyPI later, run `python3 -m build` and
+`twine upload dist/*` (needs an account and the `build` and `twine` packages).
 
 ## How it works
 
@@ -383,7 +403,7 @@ To release a new version: change `__version__` in `kerincilang.py` and `version`
 
 ## Test suite
 
-`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes. `tests/test_worksheet.py` covers the CSV contract, `buat`/`perbarui`, every worksheet code, normalization, the synthetic validator, DOCX determinism and round trips, export, readiness, and usage errors. `tests/test_siulak_legacy.py` checks the frozen file, every word and message mapping, `DialectVocabulary` against `LegacySiulak`, header and `--dialek` selection, the missing-file shim, and the `cek_dialek` gate. `tests/test_migration.py` covers single-file and recursive import migration, idempotence, `--semua`, `--dialek`, `--kering`, BOM/malformed-header/parse/dynamic-import refusals, CRLF and byte preservation, usage exits, the zipapp, the examples, and the CLI precedence table. `tests/test_translator.py` has 173 checks covering word/operator/built-in rewriting, user-name preservation, comments and strings, the five round-tripping examples, same-dialect copies, target-owned-ID and symbol refusals, mode/type strings, headers, CRLF and byte preservation, the CLI exit table, mixed-dialect imports, and the zipapp.
+`tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes. `tests/test_worksheet.py` covers the CSV contract, `buat`/`perbarui`, every worksheet code, normalization, the synthetic validator, DOCX determinism and round trips, export, readiness, and usage errors. `tests/test_siulak_legacy.py` checks the frozen file, every word and message mapping, `DialectVocabulary` against `LegacySiulak`, header and `--dialek` selection, the missing-file shim, and the `cek_dialek` gate. `tests/test_migration.py` covers single-file and recursive import migration, idempotence, `--semua`, `--dialek`, `--kering`, BOM/malformed-header/parse/dynamic-import refusals, CRLF and byte preservation, usage exits, the zipapp, the examples, and the CLI precedence table. `tests/test_translator.py` has 173 checks covering word/operator/built-in rewriting, user-name preservation, comments and strings, the five round-tripping examples, same-dialect copies, target-owned-ID and symbol refusals, mode/type strings, headers, CRLF and byte preservation, the CLI exit table, mixed-dialect imports, and the zipapp. `tests/test_docs_release.py` is the offline docs/release gate: it walks the contributor guide in a temporary repo, checks links and stale strings, compares the committed grammar with a fresh generation, checks every dialect word is highlighted, and checks the version, changelog, packaging configuration, and release document. `tests/test_release.py` is the separate network-dependent wheel smoke; `build.py` skips it and prints one line pointing at it.
 
 Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. The committed `dialects/` holds `__init__.py`, `loader.py`, the frozen `siulak.json`, and the review-state `koto-payang.json`; every other test dialect is temporary.
 

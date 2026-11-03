@@ -88,4 +88,7 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
 - [x] `SPEC-tutorial-multidialect.md` approved; `tutorial-multidialect`
       implemented and green (`tools/sinkron_tutorial.py --bangun`,
       `tutorial/{en,id}/koto-payang/`, `tests/test_tutorial_dialects.py`).
-- [ ] Next: `docs-release`.
+- [x] `SPEC-docs-release.md` approved; `docs-release` implemented and green
+      (`docs/09-adding-a-dialect.md`, `RELEASING.md`, the union grammar,
+      `tests/test_docs_release.py`, `tests/test_release.py`).
+- [ ] Next: tag and publish `v0.6.0` after human confirmation.

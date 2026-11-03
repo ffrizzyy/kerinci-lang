@@ -531,5 +531,56 @@ On approval:
 
 ## 15. Implementation log
 
-Not started. This section is filled in only after the module is green and
-committed.
+Implemented 2026-11-02 as specified.
+
+- `tools/lembar_kerja.py rangka --kode CODE --nama NAME` writes a validated
+  `draft` JSON skeleton and a notes stub through the loader. It refuses an
+  existing file without `--paksa`, requires `--nama`, and accepts
+  `--pemelihara`, `--ortografi`, `--json`, and `--md`. It adds no word and
+  changes no other command, exit code, or help line.
+- `docs/09-adding-a-dialect.md` has all twelve required sections, uses the
+  exact scaffold sequence, and labels `dialek-baru` as a temporary placeholder.
+  `tests/test_docs_release.py` runs that walkthrough in a clean copy: `buat`,
+  `rangka`, 32 reviewed Tier 1 answers, `status: review`, `periksa --siap`,
+  `laporan`, `json` (32 words, no messages), `cek_dialek` twice, and a headered
+  program printing its output.
+- The truth audit updated `README.md`, `GETTING-STARTED.md`, `CONTRIBUTING.md`,
+  `docs/01` through `docs/07`, and `docs/README.md`. The stale-string audit
+  covers the forbidden phrases; history (`SPEC-*`, `docs/08`, `CHANGELOG.md`)
+  is exempt. `docs/README.md` indexes 08, 09, and `RELEASING.md`;
+  `CONTRIBUTING.md` links both.
+- `make_highlight.py` now loads every dialect through `available_dialects()` and
+  `load_dialect()`, resolves the union of `kw.*`, `op.*`, and `fn.*`, and emits
+  deterministic JSON through `render()` relative to the repository root. The
+  committed grammar is byte-identical to a fresh generation and includes
+  `contains`, `list`, `map`, `wait`, `nytak`, and `nyetak`; it excludes
+  `type.*`, `mode.*`, `reserved.*`, and messages.
+- `vscode-extension/README.md` explains the union rule and why 0.6 has no
+  picker. `package.json` is 0.6.0 and names both dialects.
+- `CHANGELOG.md` has the 0.6.0 entry with the real tier table and the
+  "Not in this release" paragraph naming Semurup, Sungai Liuk, and Rawang.
+  `RELEASING.md` gives the repeatable clean-copy, freshness, offline, wheel,
+  zipapp, tag, and post-release steps.
+- Every version location says 0.6.0: `kerincilang.py`, `pyproject.toml`, the
+  extension, `README.md`, `GETTING-STARTED.md`, `CHANGELOG.md`, `RELEASING.md`,
+  and `docs/07`. `core/ids.json` stays `"core": "0.6"`.
+- `pyproject.toml` ships `core/*.json` and `dialects/*.json` / `*.md` only.
+  `tests/test_release.py` copies the checkout without VCS or build output,
+  builds a wheel, checks those members and the absence of CSV and bytecode,
+  installs it into a target, and runs both dialects from outside the checkout.
+  `build.py` discovers every offline `test_*.py`, skips `test_release.py`, and
+  prints one line pointing at it.
+- `tests/test_docs_release.py` implements the twelve groups in section 9.1
+  (as eleven test functions; freshness and coverage share one), including the
+  guide walkthrough, path and link checks, the stale-string audit, version
+  consistency, release notes, grammar freshness and coverage, extension
+  metadata, packaging, `RELEASING.md`, and the unchanged baseline.
+- CI runs the full offline suite, `compileall`, `cek_dialek --semua`, the
+  freshness diffs, and the wheel smoke, then installs and runs both dialects on
+  Ubuntu 3.12. The 3.9-3.13 and Windows/macOS jobs run the offline suites.
+- All twelve offline suites, `cek_dialek --semua`, `buat_glosarium.py`,
+  `make_highlight.py`, `sinkron_tutorial.py --bangun koto-payang`,
+  `compileall`, `build.py`, `tests/test_release.py` (23 checks), and a zipapp
+  run of both dialects pass. The baseline is still 550 blocks and 271 language
+  checks, Koto Payang is still `review`, and no dialect word, CLI text,
+  `--ketat` behavior, or expected output changed.

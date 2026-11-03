@@ -1,49 +1,49 @@
 {
-  "scopeName": "source.krc",
   "name": "KerinciLang",
   "patterns": [
     {
-      "name": "comment.line.number-sign.krc",
-      "match": "#.*$"
+      "match": "#.*$",
+      "name": "comment.line.number-sign.krc"
     },
     {
-      "name": "string.quoted.double.krc",
       "begin": "\"",
       "end": "\"",
+      "name": "string.quoted.double.krc",
       "patterns": [
         {
-          "name": "constant.character.escape.krc",
-          "match": "\\\\."
+          "match": "\\\\.",
+          "name": "constant.character.escape.krc"
         }
       ]
     },
     {
-      "name": "constant.numeric.krc",
-      "match": "\\b\\d+(\\.\\d+)?\\b"
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.krc"
     },
     {
-      "name": "keyword.control.krc",
-      "match": "\\b(kalu|lain|selamo|untuk|alem|pilih|ambik|cubo|tangkap|ngangkat|putuh|lanjut|balik|mulai|habih)\\b"
+      "match": "\\b(alem|ambik|balik|baluikka|cocokka|cubea|cubo|daling|habih|impor|kalu|kecuali|lain|lanjut|lanjutka|mulai|ndik|nga_laen|ngangkat|pilih|putuh|selamo|selamu|selesai|slese|tangkap|timbaoka|untuk)\\b",
+      "name": "keyword.control.krc"
     },
     {
-      "name": "storage.type.krc",
-      "match": "\\b(barang|tetap|guno)\\b"
+      "match": "\\b(barang|guno|jeloehka|netakka_konstanta|netakka_variabel|tetap)\\b",
+      "name": "storage.type.krc"
     },
     {
-      "name": "keyword.operator.word.krc",
-      "match": "\\b(ngan|apo|idak|samo|dak_samo|lebih_daripado|kurang_daripado|lebih_samo|kurang_samo)\\b"
+      "match": "\\b(apo|atau|dak_samo|idak|iduak|iduak_samu_dinga|kurang_daripado|kurang_samo|lebih_daripado|lebih_geduang_atau_samu_dinga|lebih_geduang_dari|lebih_nik_atau_samu_dinga|lebih_nik_dari|lebih_samo|nga|ngan|samo|samu_dinga)\\b",
+      "name": "keyword.operator.word.krc"
     },
     {
-      "name": "support.function.krc",
-      "match": "\\b(nyetak|tanyo)\\b"
+      "match": "\\b(masukka|nyetak|nytak|tanyo)\\b",
+      "name": "support.function.krc"
     },
     {
-      "name": "support.function.builtin.krc",
-      "match": "\\b(panjang|daftar|tambah|kurang|kali|bagi|jarak|nambahkah|isi|milih|pulang|bilangan|pecahan|kato|mecem|peta|pisah|disatu|bukak|baco|tulis|tutup|hapus|nantik)(?=\\()"
+      "match": "\\b(betiu|betul|kosong|kusao|salah)\\b",
+      "name": "constant.language.krc"
     },
     {
-      "name": "constant.language.krc",
-      "match": "\\b(betul|salah|kosong)\\b"
+      "match": "\\b(bacea|baco|bagi|basatau|bilangan|bilangan_buluak|bukak|bukuak|contains|daftar|desimal|disatu|hapus|isi|jarak|kali|kato|kura|kurang|list|map|mecem|milih|nambahkah|nantik|ngapih_berkas|panja|panjang|pecah|pecahan|peta|pisah|pulang|rentang|tambah|tambahka|tebaluik|terurut|tipe|tulaih|tulis|tulisan|tutamp|tutup|wait)(?=\\()\\b",
+      "name": "support.function.builtin.krc"
     }
-  ]
+  ],
+  "scopeName": "source.krc"
 }

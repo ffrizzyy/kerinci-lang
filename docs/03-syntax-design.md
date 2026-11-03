@@ -13,6 +13,10 @@ File extension: `.krc`. Encoding: UTF-8.
 
 ## Keywords
 
+The words below are the **Siulak** list, frozen at v0.5 for compatibility.
+Another dialect may spell them differently; the grammar and meaning are the
+same. Do not read this list as a standard that another dialect must copy.
+
 `barang` `tetap` `guno` `balik` `kalu` `lain` `selamo` `untuk` `alem` `pilih` `ambik` `cubo` `tangkap` `ngangkat` `putuh` `lanjut` `nyetak` `tanyo` `betul` `salah` `kosong` `ngan` `apo` `idak` `mulai` `habih`
 
 Comparison words: `samo` `dak_samo` `lebih_daripado` `kurang_daripado` `lebih_samo` `kurang_samo`
@@ -28,7 +32,7 @@ Siulak is the default. A file may choose another dialect on line 1:
 
 ```
 # dialek: koto-payang
-nyetak "halo"
+nytak "halo"
 ```
 
 - The header must be the first line; a `# dialek:` line anywhere else is an
@@ -47,6 +51,10 @@ with Koto Payang code in `tutorial/en/koto-payang/` and
 indexes list the English base words its lessons still use (`contains` and
 `boolean`); they are not invented replacements, and a second speaker pass is
 required before approval.
+
+To add a dialect, follow [`09-adding-a-dialect.md`](09-adding-a-dialect.md).
+A dialect is a data file with its own speakers; it never borrows another
+dialect's words to fill a gap.
 
 ## Migrating old programs
 

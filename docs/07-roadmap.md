@@ -7,10 +7,10 @@
 - [x] Core language: variables, constants, arithmetic, strings, logic, `kalu`/`lain kalu`/`lain`, `selamo`, `putuh`, `lanjut`, functions, closures, `nyetak`, `tanyo`
 - [x] `mulai` / `habih` as block delimiters
 - [x] Keyword uniqueness check at startup
-- [x] 271 language tests + tutorial tests (275 tested code samples)
+- [x] 271 language checks + 550 baseline tutorial code blocks + the generated Koto Payang trees
 - [x] Conflicts resolved: `salah` = false, `kelihu` = error (reserved); try/catch/raise = `cubo`/`tangkap`/`ngangkat`; `kurang` = subtract, `kurang_daripado` / `lebih_daripado` = less / greater than
 - [x] Comparison words (`samo`, `dak_samo`, `lebih_daripado`, `kurang_daripado`, `lebih_samo`, `kurang_samo`)
-- [x] VS Code syntax highlighting generated from the keyword table
+- [x] VS Code syntax highlighting generated as a union of every dialect's words
 - [x] Example programs in `examples/`
 - [x] `krc` command (`pip install .`), single-file build `dist/krc.pyz`, multi-line REPL, `-c`, `--version`, clean exit codes
 
@@ -27,7 +27,7 @@
 - [x] Repository layout, `.gitignore`, CI workflow, issue templates
 - [ ] Replace the copyright holder in `LICENSE`; add the full CC BY-SA 4.0 text; credit the dictionary (see `06`)
 - [ ] Translate the error messages and REPL banner into Kerinci with speakers
-- [ ] Create the public repository and push; attach `dist/krc.pyz` to a `v0.5.0` release
+- [ ] Create the public repository and push; attach `dist/krc.pyz` to a `v0.5` release
 
 ## Milestone 3: v0.2, data (done)
 
@@ -76,6 +76,22 @@
 - [ ] Investigate Incung script support
 - [ ] Browser playground (transpile to JavaScript), so people can try the language without installing Python
 - [ ] More text tools (uppercase/lowercase, find, replace, trim), random numbers, dates (all need words)
+
+## Milestone 8: v0.6.0, multi-dialect (done; release pending)
+
+- [x] Neutral ID catalogue in `core/ids.json`; the engine compares IDs, never words
+- [x] Dialect loader and validation: `dialects/<code>.json`, parents, fallbacks, status gates
+- [x] `# dialek:` header, `--dialek`, per-file vocabulary, fallback warnings, `--ketat`
+- [x] `krc migrasi` for old programs and their literal imports
+- [x] `krc terjemah` for a lossless rewrite between dialects
+- [x] Worksheet pipeline (`lembar_kerja.py buat/rangka/periksa/laporan/json`) and the canonical CSVs
+- [x] Siulak frozen at its v0.5 vocabulary as `dialects/siulak.json` (`draft`)
+- [x] Koto Payang at `status: review`: 32/32 Tier 1, 57/104 Tier 2, 0/1 Tier 3
+- [x] Generated English and Indonesian Koto Payang tutorial trees, every block tested
+- [x] One union VS Code grammar, `docs/09-adding-a-dialect.md`, and `RELEASING.md`
+- [ ] Second Koto Payang speaker pass, then promote `review` -> `approved`
+- [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
+- [ ] Tag and publish `v0.6.0`
 
 ## Weekly rhythm
 

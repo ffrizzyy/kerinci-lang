@@ -1,8 +1,8 @@
 {
   "name": "kerincilang",
   "displayName": "KerinciLang",
-  "description": "Syntax highlighting for KerinciLang (.krc)",
-  "version": "0.5.0",
+  "description": "Syntax highlighting for KerinciLang (.krc), covering Siulak and Koto Payang",
+  "version": "0.6.0",
   "engines": {
     "vscode": "^1.70.0"
   },

@@ -1,12 +1,18 @@
 # 02. Vocabulary
 
+Status (2026-11-02): this page is the **frozen provenance and speaker checklist
+for the Siulak v0.5 vocabulary**. Siulak is the first dialect and ships at
+`status: draft`; its words are kept byte for byte for compatibility. To add a
+new dialect, start at [`09-adding-a-dialect.md`](09-adding-a-dialect.md), not
+here. A dialect never borrows these words to fill a gap.
+
 Source: `tabel_kata_bahasa_pemrograman_kerinci.md` (Siulak dialect), plus decisions made while building.
 
 ## Decisions log
 
 | Decision | Result |
 |---|---|
-| Speaker review (v0.5.0) | Every word and design choice in the checklist below was approved by Kerinci speakers. |
+| Speaker review (v0.5) | Every word and design choice in the checklist below was approved by Kerinci speakers. |
 | `salah` was both "false" and "error" | `salah` = **false**. "error" = **`kelihu`** (reserved for a future feature, see below) |
 | `kurang` was both "subtract" and "less than" | `kurang` = **subtract**. "less than" = **`kurang_daripado`** |
 | greater than | **`lebih_daripado`** (replaces `lebih`) |
@@ -128,7 +134,7 @@ Design choices: only `nambahkah` changes a list in place. `milih` and `pulang` r
 | function | `guno` |
 | null | `kosong` |
 | open file | `berkas` |
-| true / false | `boolean` ⚠️ **placeholder**: the table has no Kerinci word for "boolean". Change `TYPE_NAMES["bool"]` in `kerincilang.py` when speakers supply one. |
+| true / false | `boolean` ⚠️ **placeholder**: the neutral base still uses the English word for this type name; a Siulak word is one of the questions still open below. |
 
 ## Error handling: `cubo`, `tangkap`, `ngangkat`
 
@@ -177,7 +183,7 @@ guno periksa(x) {
 
 Words and design choices that were put to Kerinci speakers, grouped by when they were added.
 
-**Status (v0.5.0): the speaker review is complete and every item below was approved.** The two questions that remain open are listed at the end.
+**Status (v0.5): the speaker review is complete and every item below was approved.** The two questions that remain open are listed at the end.
 
 **Core (v0.1)**
 - [x] Does `idak betul` read naturally?
@@ -209,19 +215,22 @@ Words and design choices that were put to Kerinci speakers, grouped by when they
 - [x] `pisah(teks, pemisah)` and `disatu(daftar, pemisah)`: natural names and argument order?
 
 **Still open**
-- [ ] A Kerinci word for "boolean". `mecem(betul)` still returns the temporary English word `boolean` (`TYPE_NAMES["bool"]` in `kerincilang.py`).
+- [ ] A Kerinci word for "boolean". `mecem(betul)` still returns the temporary English word `boolean`; the Siulak word is still open.
 - [ ] What should `kelihu` ("error") be used for, now that it is reserved? (For example, error values that carry more than a message.)
 
 ## Changing a word
 
-Edit the right-hand side of `KEYWORDS` (or `WORD_OPERATORS`) in `kerincilang.py`, then:
+This page records the **frozen Siulak v0.5 vocabulary**. Do not edit it, or
+`dialects/siulak.json`, to make a new dialect pass.
 
-```bash
-python3 make_highlight.py
-python3 tests/test_kerincilang.py
-```
+A new dialect starts from its own worksheet, not from Siulak. Follow
+[`09-adding-a-dialect.md`](09-adding-a-dialect.md); that guide covers the
+worksheet, the JSON file, the notes, the status ladder, and the tests.
 
-The tests and `contoh.krc` contain Kerinci words, so update them when you rename a keyword.
+A correction to Siulak itself is a product decision. Open an issue with the
+dictionary or speaker source, update this page and `dialects/siulak.json`
+together, regenerate the grammar, glossary, and tutorial, and run the full
+suite. No Siulak word changes silently.
 
 ## Dictionary bibliography
 
