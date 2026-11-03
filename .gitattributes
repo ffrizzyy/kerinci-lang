@@ -6,3 +6,10 @@ tutorial/id/koto-payang/** text eol=lf
 # The generated grammar is compared byte for byte by the offline suite.
 # Without this, a Windows checkout gets CRLF and the freshness test fails.
 vscode-extension/syntaxes/krc.tmLanguage.json text eol=lf
+
+# The catalogue, dialect data, notes, and worksheets are contracts checked
+# byte for byte (BOM, LF, sorted JSON). Keep them LF on every platform.
+core/*.json text eol=lf
+dialects/*.json text eol=lf
+dialects/*.md text eol=lf
+dialects/src/*.csv text eol=lf
