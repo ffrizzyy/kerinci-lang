@@ -125,9 +125,9 @@ python3 tools/cek_dialek.py --kode koto-payang                    # CI gate
 guess, or borrow a Siulak word to make the counts look complete. The generated
 Koto Payang tutorial is honest about this: it lists `contains` and `boolean`
 as base words in both indexes until speakers supply the dialect's own terms.
-The second speaker pass supplies the 42 messages, 6 words, and 4 draft
-confirmations; only then can the file carry a named reviewer and
-`status: approved`.
+The 42 messages, 6 words, and 4 drafts remain open; they are recorded in the
+worksheet, not guessed. The file stays at `review` until a speaker supplies
+them and a reviewer is named.
 
 ## Migrating old programs
 
@@ -225,8 +225,8 @@ writes nothing unless the merged file validates.
 
 The old `Translation Worksheet (Koto Payang).docx` cannot be read by `baca`: it
 has no ID column and 287 rows for 137 IDs. It was mapped by hand into
-`dialects/src/koto-payang.csv`; the remaining gaps are part of the second
-speaker pass, not a script.
+`dialects/src/koto-payang.csv`; the remaining gaps are open worksheet rows, not
+a script.
 
 ## Teaching materials
 

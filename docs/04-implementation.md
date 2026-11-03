@@ -168,8 +168,9 @@ for 48 (`{1: (32, 32), 2: (57, 104), 3: (0, 1)}`). All 32 Tier 1 IDs are
 reviewed, so `--ketat` and `cek_dialek --ketat` still exit 0; the gaps are Tier 2
 and warn once per `(dialect, id)`. Four rows are provisional `draft`s
 (`type.float`, `type.null`, `msg.name.constant`, `msg.value.convert`) and 48
-are `todo`. A second speaker pass fills those and is the only path to
-`approved`; nothing is guessed to close a gap.
+are `todo`. Those rows are recorded as open worksheet work and nothing is
+guessed to close a gap; the file stays at `review` until a speaker supplies
+them.
 
 `tests/test_koto_payang.py` pins the exact word and message maps, the CSV status
 counts, `periksa --siap` readiness (review yes, approved no), header and
@@ -265,8 +266,8 @@ changed answer to `draft`, clears an empty answer to `todo`, and never invents
 result, and writes nothing if it would not load.
 
 The old `Translation Worksheet (Koto Payang).docx` is not ingested: it has no ID
-column and 287 rows for 137 IDs. `dialect-koto-payang` maps it by hand during
-the second speaker pass.
+column and 287 rows for 137 IDs. `dialect-koto-payang` maps it by hand into
+`dialects/src/koto-payang.csv`.
 
 ## Adding a dialect
 

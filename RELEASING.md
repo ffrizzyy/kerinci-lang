@@ -129,6 +129,6 @@ record is written. To add one:
 5. Update the version if the scope changes the compatibility tuple.
 
 Never attach a dialect name to a release before its file exists, and never
-promote `review` to `approved` without the second speaker pass. The 0.6.0 scope
-is Siulak (frozen `draft`) and Koto Payang (`review`); Semurup, Sungai Liuk,
-and Rawang are not included.
+promote `review` to `approved` without the review gate: every Tier 1 and Tier 2
+row reviewed and a named reviewer. The 0.6.0 scope is Siulak (frozen `draft`)
+and Koto Payang (`review`); Semurup, Sungai Liuk, and Rawang are not included.

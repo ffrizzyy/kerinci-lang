@@ -89,9 +89,9 @@
 - [x] Koto Payang at `status: review`: 32/32 Tier 1, 57/104 Tier 2, 0/1 Tier 3
 - [x] Generated English and Indonesian Koto Payang tutorial trees, every block tested
 - [x] One union VS Code grammar, `docs/09-adding-a-dialect.md`, and `RELEASING.md`
-- [ ] Second Koto Payang speaker pass, then promote `review` -> `approved`
+- [ ] Koto Payang Tier 2 vocabulary (optional; the dialect is included at `review`)
 - [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
-- [ ] Tag and publish `v0.6.0`
+- [x] Tag and publish `v0.6.0`
 
 ## Weekly rhythm
 

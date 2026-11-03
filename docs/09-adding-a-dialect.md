@@ -50,7 +50,7 @@ Decide and write down:
 - **Maintainer.** The person who keeps the files current. It may be a role
   (`KerinciLang core`), not necessarily a person.
 - **Reviewer.** Required only for `approved`. Leave it empty until a named
-  reviewer has done the second pass.
+  reviewer has completed the review.
 - **Source(s).** The dictionary, worksheet, recording, or named speaker
   consultation behind the answers. At least one source is required for
   `review` and `approved`.
@@ -263,7 +263,7 @@ word for the print function. Run the file with `krc` (or
 
 If your dialect does not own a word the program needs, the runtime uses the
 English base and prints one warning per missing ID on stderr. Stdout stays
-clean. A warning is not an error; it is a to-do for the next speaker pass.
+clean. A warning is not an error; it is a to-do for the next review.
 
 ## 9. Tutorial
 

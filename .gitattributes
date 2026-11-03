@@ -2,3 +2,7 @@
 # so a fresh build is byte-identical to the committed tree.
 tutorial/en/koto-payang/** text eol=lf
 tutorial/id/koto-payang/** text eol=lf
+
+# The generated grammar is compared byte for byte by the offline suite.
+# Without this, a Windows checkout gets CRLF and the freshness test fails.
+vscode-extension/syntaxes/krc.tmLanguage.json text eol=lf

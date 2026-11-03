@@ -103,10 +103,11 @@ vocabulary instead of running a new approval pass. Its 271 language tests and
 output changed in 0.6.
 
 Koto Payang owns 89 of the 137 neutral IDs and falls back to the English base
-for the other 48. A second speaker pass is still required before it can be
-called `approved`. The generated tutorial names the two base words its lessons
-actually use (`contains` and `boolean`) instead of inventing replacements. The
-checklist Siulak speakers worked through is in
+for the other 48. It is included at `status: review`: its Tier 1 vocabulary is
+complete, and its remaining Tier 2 rows are recorded as open rather than
+guessed. The generated tutorial names the two base words its lessons actually
+use (`contains` and `boolean`) instead of inventing replacements. The checklist
+Siulak speakers worked through is in
 [`docs/02-vocabulary-worksheet.md`](docs/02-vocabulary-worksheet.md); the Koto
 Payang record is in [`dialects/koto-payang.md`](dialects/koto-payang.md).
 

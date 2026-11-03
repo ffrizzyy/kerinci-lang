@@ -1,7 +1,8 @@
 # Koto Payang
 
-Status: **review.** Tier 1 is complete; Tier 2 is partly mapped. This is not an
-`approved` dialect and has no named reviewer yet.
+Status: **review.** Tier 1 is complete; Tier 2 is partly mapped. The dialect is
+included at this status, with no named reviewer. The open Tier 2 rows fall back
+to the English base.
 
 ## Provenance
 
@@ -48,7 +49,7 @@ Status: **review.** Tier 1 is complete; Tier 2 is partly mapped. This is not an
 | Date | Step | Result |
 |---|---|---|
 | 2026-11-02 | First normalization pass | 32/32 Tier 1 reviewed; 53 Tier 2 reviewed; 4 Tier 2 draft; 48 todo |
-| pending | Second speaker pass | Fill the gaps, confirm the drafts, then promote to `approved` |
+| — | Current state | Included at `review`; 51 Tier 2 rows remain open |
 
 `reviewer` is `null`. `python3 tools/lembar_kerja.py periksa --kode koto-payang
 --siap` passes for `review` and reports `approved` as not ready (51 Tier 2 rows
@@ -86,12 +87,12 @@ msg.value.neg_type             msg.value.separator
 ```
 
 Do not fill a gap with a guessed word, a Siulak word, or an Indonesian phrase.
-The second pass supplies the answer or leaves the fallback in place.
+An open row stays on the English fallback until a speaker supplies an answer.
 
 ## Change policy
 
 - A `reviewed` row may change only with a speaker decision and a new revision.
-- A `draft` row is provisional; the second pass confirms or replaces it.
+- A `draft` row is provisional; only a speaker can confirm or replace it.
 - A `todo` row is empty on purpose; do not invent an answer.
 - Promoting to `approved` requires every Tier 1 and Tier 2 row reviewed and a
   named reviewer. That is a separate change.

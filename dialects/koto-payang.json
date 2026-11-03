@@ -32,7 +32,7 @@
     "msg.value.text_immutable": "Tulisan nyendak diubuah per huruf"
   },
   "name": "Koto Payang",
-  "notes": "Tier 1 review complete; Tier 2 second speaker pass pending. Missing IDs fall back to the English base.",
+  "notes": "Tier 1 review complete; 51 Tier 2 rows open (47 todo, 4 draft). Missing IDs fall back to the English base.",
   "orthography": "Koto Payang spelling: final -u (kalu, selamu, daling); nga for and; multi-word concepts use underscores (lebih_nik_dari).",
   "parent": null,
   "reviewer": null,

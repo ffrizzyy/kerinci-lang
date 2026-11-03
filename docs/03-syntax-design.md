@@ -49,8 +49,7 @@ The lessons in `tutorial/` are written in Siulak. The same course is generated
 with Koto Payang code in `tutorial/en/koto-payang/` and
 `tutorial/id/koto-payang/`. Koto Payang is at `status: review`, so the generated
 indexes list the English base words its lessons still use (`contains` and
-`boolean`); they are not invented replacements, and a second speaker pass is
-required before approval.
+`boolean`); they are not invented replacements.
 
 To add a dialect, follow [`09-adding-a-dialect.md`](09-adding-a-dialect.md).
 A dialect is a data file with its own speakers; it never borrows another

@@ -39,7 +39,7 @@ Each item is done only when the listed check passes.
 
 ## Follow-ups (not part of docs-release)
 
-- Koto Payang second speaker pass, then `approved`.
+- Koto Payang Tier 2 rows remain open; the dialect is included at `review`.
 - Semurup, Sungai Liuk, Rawang: speaker-approved files, then the guide.
 - A per-dialect VS Code picker, if it ever earns its complexity.
 - A full Koto Payang glossary after `approved`.

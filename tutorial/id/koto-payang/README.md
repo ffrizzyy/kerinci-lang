@@ -6,7 +6,7 @@
 
 Belajar memprogram dengan kata-kata bahasa Kerinci. Tutorial ini ditulis dalam bahasa Indonesia; semua kode memakai kata Kerinci dialek Koto Payang.
 
-**Edisi Koto Payang:** pelajaran yang sama dibuat dengan kode Koto Payang di `tutorial/en/koto-payang/` dan `tutorial/id/koto-payang/`. Koto Payang masih berstatus `review`; setiap indeks hasil bangun mencantumkan kata dasar yang masih dipinjam (`contains` dan `boolean`), dan pemeriksaan penutur kedua masih diperlukan sebelum disetujui.
+**Edisi Koto Payang:** pelajaran yang sama dibuat dengan kode Koto Payang di `tutorial/en/koto-payang/` dan `tutorial/id/koto-payang/`. Koto Payang masih berstatus `review`; setiap indeks hasil bangun mencantumkan kata dasar yang masih dipinjam (`contains` dan `boolean`). Kata-kata itu bukan pengganti buatan.
 
 ## Daftar pelajaran
 

@@ -17,8 +17,8 @@ missing ID; it never invents or borrows a word. There is no standard dialect.
 
 Siulak owns every ID but stays `draft` because this release freezes the
 approved v0.5 vocabulary for compatibility instead of running a new approval
-pass. Koto Payang owns 89 of the 137 IDs; a second speaker pass is required
-before `approved`.
+pass. Koto Payang owns 89 of the 137 IDs and is included at `status: review`;
+its 48 open IDs fall back to the English base.
 
 **New**
 - `core/ids.json`: neutral IDs, tiers, namespaces, arities, and message

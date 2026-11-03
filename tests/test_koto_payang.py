@@ -236,8 +236,8 @@ def test_metadata():
         "multi-word concepts use underscores (lebih_nik_dari)."),
         "the orthography note is exact", data.get("orthography"))
     check(data.get("notes") == (
-        "Tier 1 review complete; Tier 2 second speaker pass pending. Missing "
-        "IDs fall back to the English base."),
+        "Tier 1 review complete; 51 Tier 2 rows open (47 todo, 4 draft). "
+        "Missing IDs fall back to the English base."),
         "the notes are exact", data.get("notes"))
     check(len(data.get("words", {})) == 63, "the JSON has 63 words",
           len(data.get("words", {})))
@@ -353,8 +353,7 @@ def test_csv():
 
     missing_notes = [row["id"] for row in rows
                      if row["status"] == "todo" and not row["notes"].strip()]
-    check(missing_notes == [], "every todo row keeps a note for the second pass",
-          missing_notes)
+    check(missing_notes == [], "every todo row keeps a note", missing_notes)
 
     tool = os.path.join(ROOT, "tools", "lembar_kerja.py")
     result = subprocess.run(
