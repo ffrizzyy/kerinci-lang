@@ -80,9 +80,9 @@ def gap_root(tmp):
     data["status"] = "draft"
     for ident in ("fn.wait", "fn.list", "fn.map", "fn.contains"):
         data["words"].pop(ident, None)
-    (root / "koto-gap.json").write_text(
-        json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8", newline="\n")
+    with (root / "koto-gap.json").open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(
+            json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     return root
 
 
