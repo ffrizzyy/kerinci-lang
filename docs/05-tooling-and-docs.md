@@ -110,9 +110,9 @@ needs a Siulak speaker review and a new revision.
 ## The Koto Payang review
 
 Koto Payang is the worked example of the worksheet cycle, committed at
-`status: review`. `dialects/src/koto-payang.csv` holds 137 rows: 85 `reviewed`,
-4 `draft`, and 48 `todo`. The JSON owns the 89 accepted answers and lets the
-other 48 fall back to the base.
+`status: review`. `dialects/src/koto-payang.csv` holds 137 rows: 85 `reviewed`
+and 52 `draft`. The JSON still owns the 89 reviewed answers and lets the other
+48 fall back to the base until the drafts are merged.
 
 ```bash
 python3 tools/lembar_kerja.py periksa --kode koto-payang --siap   # review gate
@@ -125,9 +125,10 @@ python3 tools/cek_dialek.py --kode koto-payang                    # CI gate
 guess, or borrow a Siulak word to make the counts look complete. The generated
 Koto Payang tutorial is honest about this: it lists `contains` and `boolean`
 as base words in both indexes until speakers supply the dialect's own terms.
-The 42 messages, 6 words, and 4 drafts remain open; they are recorded in the
-worksheet, not guessed. The file stays at `review` until a speaker supplies
-them and a reviewer is named.
+The 42 open messages and 6 open words are now `draft`, composed from
+vocabulary the dialect already owns; the 4 existing drafts are unchanged.
+None is speaker-reviewed, and none is in the runtime JSON. The file stays at
+`review` until a speaker confirms them and a reviewer is named.
 
 ## Migrating old programs
 

@@ -333,9 +333,8 @@ def test_csv():
 
     counts = collections.Counter((row["tier"], row["status"]) for row in rows)
     check(counts == {("1", "reviewed"): 32, ("2", "reviewed"): 53,
-                     ("2", "draft"): 4, ("2", "todo"): 47,
-                     ("3", "todo"): 1},
-          "the status counts are 85 reviewed, 4 draft, 48 todo", counts)
+                     ("2", "draft"): 51, ("3", "draft"): 1},
+          "the status counts are 85 reviewed and 52 draft", counts)
     check(all(row["status"] == "reviewed" for row in rows if row["tier"] == "1"),
           "every Tier 1 row is reviewed")
 

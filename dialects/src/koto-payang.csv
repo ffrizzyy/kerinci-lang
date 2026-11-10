@@ -34,15 +34,15 @@ op.ne,1,op,not equal,tidak sama dengan,iduak_samu_dinga,worksheet row 23; phrase
 fn.add,2,fn,add,tambah,tambah,worksheet row 43,reviewed
 fn.append,2,fn,append,nambahkah,tambahka,worksheet row 54,reviewed
 fn.close,2,fn,close,tutup,tutamp,worksheet row 62,reviewed
-fn.contains,2,fn,contains,isi,,"worksheet row 57 is a gloss, not a name",todo
+fn.contains,2,fn,contains,isi,meriksu,the verb in worksheet row 57's gloss; used as the function name; not speaker-reviewed,draft
 fn.delete,2,fn,delete,hapus,ngapih_berkas,worksheet row 63; phrase joined,reviewed
 fn.div,2,fn,divide,bagi,bagi,worksheet row 46,reviewed
 fn.float,2,fn,decimal,pecahan,desimal,worksheet row 52,reviewed
 fn.int,2,fn,whole number,bilangan,bilangan_buluak,worksheet row 51; row 34 also,reviewed
 fn.join,2,fn,join,disatu,basatau,worksheet row 56,reviewed
 fn.length,2,fn,length,panjang,panja,worksheet row 47,reviewed
-fn.list,2,fn,list,daftar,,no worksheet row for list(),todo
-fn.map,2,fn,map,peta,,no worksheet row for map(),todo
+fn.list,2,fn,list,daftar,daftar,"reuses daftar, the attested list type; not speaker-reviewed",draft
+fn.map,2,fn,map,peta,peta,"reuses peta, the word used in the message catalogue; not speaker-reviewed",draft
 fn.mul,2,fn,multiply,kali,kali,worksheet row 45,reviewed
 fn.open,2,fn,open,bukak,bukuak,worksheet row 59,reviewed
 fn.range,2,fn,range,jarak,rentang,worksheet row 48,reviewed
@@ -53,80 +53,80 @@ fn.split,2,fn,split,pisah,pecah,worksheet row 55,reviewed
 fn.sub,2,fn,subtract,kurang,kura,worksheet row 44,reviewed
 fn.text,2,fn,text,kato,tulisan,worksheet row 53,reviewed
 fn.type,2,fn,type,mecem,tipe,worksheet row 40; () removed,reviewed
-fn.wait,2,fn,wait,nantik,,"worksheet row 58 is a gloss, not a name",todo
+fn.wait,2,fn,wait,nantik,nunggu,the verb in worksheet row 58's gloss; used as the function name; not speaker-reviewed,draft
 fn.write,2,fn,write,tulis,tulaih,worksheet row 61,reviewed
 mode.append,2,mode,append,tambah,tambah,worksheet row 66,reviewed
 mode.read,2,mode,read,baca,bacea,worksheet row 64,reviewed
 mode.write,2,mode,write,tulis,tulaih,worksheet row 65,reviewed
 msg.call.arity,2,msg,"The function needs {arity} arguments, got {count}","Fungsi butuh {arity} argumen, diberi {count}","Pungsi butuh {arity} argumen, dibaguih {count}",worksheet row 81; placeholders neutralized,reviewed
-msg.call.builtin_arity,2,msg,"Function {fn} needs {arity} arguments, got {count}","Fungsi {fn} butuh {arity} argumen, diberi {count}",,no matching worksheet row; second pass,todo
+msg.call.builtin_arity,2,msg,"Function {fn} needs {arity} arguments, got {count}","Fungsi {fn} butuh {arity} argumen, diberi {count}","Pungsi {fn} butuh {arity} argumen, dibaguih {count}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.call.depth,2,msg,Function calls are too deep (more than {max}). Is a function calling itself without stopping?,Panggilan fungsi terlalu dalam (lebih dari {max}). Mungkin fungsi memanggil dirinya tanpa henti?,Panggilan pungsi daling nia (lebih dari {max}),worksheet row 83; placeholders neutralized,reviewed
-msg.call.depth_short,2,msg,Function calls are too deep,Panggilan fungsi terlalu dalam,,worksheet row 83 maps to msg.call.depth; needs its own answer,todo
+msg.call.depth_short,2,msg,Function calls are too deep,Panggilan fungsi terlalu dalam,Panggilan pungsi daling nia,one row used by two IDs; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.call.not_function,2,msg,What is being called is not a function,Yang dipanggil bukan fungsi,Nga diimbua iduak pungsi,worksheet row 82,reviewed
-msg.dialect.header,2,msg,Line {line}: invalid dialect header: {text},Baris {line}: header dialek tidak valid: {text},,runtime-selection message; no worksheet row,todo
-msg.dialect.invalid,2,msg,Dialect {code} is not valid: {detail},Dialek {code} tidak valid: {detail},,runtime-selection message; no worksheet row,todo
-msg.dialect.unknown,2,msg,Unknown dialect: {code},Dialek tidak dikenal: {code},,runtime-selection message; no worksheet row,todo
+msg.dialect.header,2,msg,Line {line}: invalid dialect header: {text},Baris {line}: header dialek tidak valid: {text},Baris {line}: header dialek dak valid: {text},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.dialect.invalid,2,msg,Dialect {code} is not valid: {detail},Dialek {code} tidak valid: {detail},Dialek {code} dak valid: {detail},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.dialect.unknown,2,msg,Unknown dialect: {code},Dialek tidak dikenal: {code},Dialek nga sidiak dikenal: {code},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.file.closed,2,msg,File already closed: {path},Berkas sudah ditutup: {path},Berkas lah ditutamp {path},worksheet row 85; placeholders neutralized,reviewed
-msg.file.handle_required,2,msg,'{fn}' needs a file opened with {open_fn},'{fn}' butuh berkas yang dibuka dengan {open_fn},,no matching worksheet row; second pass,todo
-msg.file.io,2,msg,File error {path}: {reason},Kesalahan berkas {path}: {reason},,no matching worksheet row; second pass,todo
-msg.file.is_dir,2,msg,"This is a folder, not a file: {path}","Ini folder, bukan berkas: {path}",,no matching worksheet row; second pass,todo
-msg.file.mode_invalid,2,msg,"Mode must be ""{read}"", ""{write}"", or ""{append}"", not {value}","Mode harus ""{read}"", ""{write}"", atau ""{append}"", bukan {value}",,no matching worksheet row; second pass,todo
+msg.file.handle_required,2,msg,'{fn}' needs a file opened with {open_fn},'{fn}' butuh berkas yang dibuka dengan {open_fn},'{fn}' butuh berkas dibukuak dinga {open_fn},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.file.io,2,msg,File error {path}: {reason},Kesalahan berkas {path}: {reason},Kesalahan berkas {path}: {reason},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.file.is_dir,2,msg,"This is a folder, not a file: {path}","Ini folder, bukan berkas: {path}","Inih folder, iduak berkas: {path}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.file.mode_invalid,2,msg,"Mode must be ""{read}"", ""{write}"", or ""{append}"", not {value}","Mode harus ""{read}"", ""{write}"", atau ""{append}"", bukan {value}","Mode harus ""{read}"", ""{write}"", atau ""{append}"", iduak {value}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.file.not_found,2,msg,File not found: {path},Berkas tidak ditemukan: {path},Sidiak besuao berkas: {path},worksheet row 84; placeholders neutralized,reviewed
-msg.file.not_utf8,2,msg,File is not UTF-8 text: {path},Berkas bukan teks UTF-8: {path},,no matching worksheet row; second pass,todo
-msg.file.path_type,2,msg,'{fn}' needs a file name as text,'{fn}' butuh nama berkas berupa teks,,no matching worksheet row; second pass,todo
-msg.file.permission,2,msg,No permission for file: {path},Tidak punya izin untuk berkas: {path},,no matching worksheet row; second pass,todo
+msg.file.not_utf8,2,msg,File is not UTF-8 text: {path},Berkas bukan teks UTF-8: {path},Berkas inih iduak tulisan UTF-8: {path},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.file.path_type,2,msg,'{fn}' needs a file name as text,'{fn}' butuh nama berkas berupa teks,'{fn}' butuh namu berkas jadi tulisan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.file.permission,2,msg,No permission for file: {path},Tidak punya izin untuk berkas: {path},Sidiak ado izin ndik berkas: {path},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.file.wrong_mode,2,msg,"This file is open for '{mode}', so it cannot be used by '{fn}'","Berkas ini dibuka untuk '{mode}', tidak bisa dipakai oleh '{fn}'","Berkas inih dibukuak ndik '{mode}', dak buluih dipake oleh '{fn}'",worksheet row 86; placeholders neutralized,reviewed
-msg.fn.contains_kind,2,msg,"'{fn}' is only for lists, maps, and text","'{fn}' hanya untuk daftar, peta, dan teks",,no matching worksheet row; second pass,todo
-msg.fn.contains_type,2,msg,"To search in text, what you search for must also be text","Untuk mencari dalam teks, yang dicari juga harus teks",,no matching worksheet row; second pass,todo
-msg.fn.join_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",,no matching worksheet row; second pass,todo
-msg.fn.length_kind,2,msg,"'{fn}' is only for lists, maps, and text","'{fn}' hanya untuk daftar, peta, dan teks",,no matching worksheet row; second pass,todo
-msg.fn.list_only,2,msg,'{fn}' is only for lists,'{fn}' hanya untuk daftar,,no matching worksheet row; second pass,todo
-msg.fn.open_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",,no matching worksheet row; second pass,todo
-msg.fn.range_args,2,msg,The arguments of {fn} must be whole numbers,Argumen {fn} harus bilangan bulat,,no matching worksheet row; second pass,todo
-msg.fn.range_arity,2,msg,"Function {fn} needs 1 to 3 arguments, got {count}","Fungsi {fn} butuh 1 sampai 3 argumen, diberi {count}",,no matching worksheet row; second pass,todo
-msg.fn.range_step,2,msg,The step of {fn} cannot be 0,Langkah {fn} tidak boleh 0,,no matching worksheet row; second pass,todo
-msg.fn.range_too_big,2,msg,Range is too large (maximum {max}),Jarak terlalu besar (maksimal {max}),,no matching worksheet row; second pass,todo
-msg.fn.reverse_kind,2,msg,'{fn}' is only for lists and text,'{fn}' hanya untuk daftar dan teks,,no matching worksheet row; second pass,todo
-msg.fn.sort_type,2,msg,"The list contains values that cannot be compared, so it cannot be sorted","Daftar berisi nilai yang tidak bisa dibandingkan, jadi tidak bisa diurutkan",,no matching worksheet row; second pass,todo
-msg.fn.split_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}",,no matching worksheet row; second pass,todo
-msg.fn.split_kind,2,msg,'{fn}' is only for text,'{fn}' hanya untuk teks,,no matching worksheet row; second pass,todo
-msg.fn.wait_number,2,msg,'{fn}' needs a number of seconds,'{fn}' butuh bilangan detik,,no matching worksheet row; second pass,todo
-msg.fn.wait_range,2,msg,The wait time of {fn} must be between 0 and {max} seconds,Waktu {fn} harus antara 0 dan {max} detik,,no matching worksheet row; second pass,todo
+msg.fn.contains_kind,2,msg,"'{fn}' is only for lists, maps, and text","'{fn}' hanya untuk daftar, peta, dan teks","'{fn}' hanya ndik daftar, peta, nga tulisan",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.contains_type,2,msg,"To search in text, what you search for must also be text","Untuk mencari dalam teks, yang dicari juga harus teks","Ndik meriksu daling tulisan, item harus tulisan",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.join_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}","Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.length_kind,2,msg,"'{fn}' is only for lists, maps, and text","'{fn}' hanya untuk daftar, peta, dan teks","'{fn}' hanya ndik daftar, peta, nga tulisan",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.list_only,2,msg,'{fn}' is only for lists,'{fn}' hanya untuk daftar,'{fn}' hanya ndik daftar,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.open_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}","Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.range_args,2,msg,The arguments of {fn} must be whole numbers,Argumen {fn} harus bilangan bulat,Argumen {fn} harus bilangan buluak,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.range_arity,2,msg,"Function {fn} needs 1 to 3 arguments, got {count}","Fungsi {fn} butuh 1 sampai 3 argumen, diberi {count}","Pungsi {fn} butuh 1, 2, atau 3 argumen, dibaguih {count}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.range_step,2,msg,The step of {fn} cannot be 0,Langkah {fn} tidak boleh 0,Langkah {fn} iduak buluih 0,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.range_too_big,2,msg,Range is too large (maximum {max}),Jarak terlalu besar (maksimal {max}),Rentang lebih geduang (maksimum {max}),no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.reverse_kind,2,msg,'{fn}' is only for lists and text,'{fn}' hanya untuk daftar dan teks,'{fn}' hanya ndik daftar nga tulisan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.sort_type,2,msg,"The list contains values that cannot be compared, so it cannot be sorted","Daftar berisi nilai yang tidak bisa dibandingkan, jadi tidak bisa diurutkan",Daftar iduak bisa diurutkan: ado nilai nga dak bisa dibandingkan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.split_arity,2,msg,"Function {fn} needs 1 or 2 arguments, got {count}","Fungsi {fn} butuh 1 atau 2 argumen, diberi {count}","Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.split_kind,2,msg,'{fn}' is only for text,'{fn}' hanya untuk teks,'{fn}' hanya ndik tulisan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.wait_number,2,msg,'{fn}' needs a number of seconds,'{fn}' butuh bilangan detik,'{fn}' butuh bilangan waktiu,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.fn.wait_range,2,msg,The wait time of {fn} must be between 0 and {max} seconds,Waktu {fn} harus antara 0 dan {max} detik,Waktiu nunggu {fn} harus antara 0 nga {max},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.func.return_outside,2,msg,Line {line}: '{word}' is only allowed inside a function,Baris {line}: '{word}' hanya boleh di dalam fungsi,Baris {line}: '{word}' hanya buluih daling pungsi,worksheet row 90; line prefix added,reviewed
 msg.import.circular,2,msg,Circular import: {name},Impor melingkar: {name},Impor melingkar: {name},worksheet row 93; placeholders neutralized,reviewed
 msg.import.in_module,2,msg,In '{name}': {message},Dalam '{name}': {message},daling modul '{name}': {message},worksheet row 69; placeholders neutralized,reviewed
-msg.import.not_found,2,msg,File not found: {name},Berkas tidak ditemukan: {name},,worksheet row 84 maps to msg.file.not_found; needs its own answer,todo
-msg.import.not_text,2,msg,'{kw}' needs a file name as text,'{kw}' butuh nama berkas berupa teks,,no matching worksheet row; second pass,todo
+msg.import.not_found,2,msg,File not found: {name},Berkas tidak ditemukan: {name},Sidiak besuao berkas: {name},one row used by two IDs; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.import.not_text,2,msg,'{kw}' needs a file name as text,'{kw}' butuh nama berkas berupa teks,'{kw}' butuh namu berkas jadi tulisan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.loop.break_outside,2,msg,Line {line}: '{word}' is only allowed inside a loop,Baris {line}: '{word}' hanya boleh di dalam perulangan,Baris {line}: '{word}' hanya buluih daling pangulangan,worksheet row 91; line prefix added,reviewed
-msg.loop.not_iterable,2,msg,This value cannot be repeated with '{for_word}',Nilai ini tidak bisa diulang dengan '{for_word}',,no matching worksheet row; second pass,todo
-msg.loop.use_range,2,msg,"To repeat several times, use {range_fn}(n): {for_word} i {in_word} {range_fn}(5)","Untuk mengulang beberapa kali, pakai {range_fn}(n): {for_word} i {in_word} {range_fn}(5)",,no matching worksheet row; second pass,todo
-msg.name.already_const,2,msg,'{name}' is already declared as a constant,'{name}' sudah dideklarasikan sebagai konstanta,,no matching worksheet row; second pass,todo
+msg.loop.not_iterable,2,msg,This value cannot be repeated with '{for_word}',Nilai ini tidak bisa diulang dengan '{for_word}',Nilai inih iduak bisa diulang dinga '{for_word}',no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.loop.use_range,2,msg,"To repeat several times, use {range_fn}(n): {for_word} i {in_word} {range_fn}(5)","Untuk mengulang beberapa kali, pakai {range_fn}(n): {for_word} i {in_word} {range_fn}(5)","Ndik ngulang beberapa kali, maki {range_fn}(n): {for_word} i {in_word} {range_fn}(5)",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.name.already_const,2,msg,'{name}' is already declared as a constant,'{name}' sudah dideklarasikan sebagai konstanta,'{name}' lah ditetakka jadi konstanta,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.name.constant,2,msg,'{name}' is a constant ('{const_word}') and cannot be changed,'{name}' adalah konstanta ('{const_word}') dan tidak bisa diubah,'{name}' adalah konstanta ('{const_word}') nga dak bisa diubuah,worksheet row 72; const_word added; confirm,draft
 msg.name.undeclared,2,msg,Name not declared: {name} (use '{var_word}' first),Nama belum dideklarasikan: {name} (pakai '{var_word}' dulu),namu lao ditetakka: {name} (maki '{var_word}' duliu),worksheet row 71; placeholders neutralized,reviewed
 msg.name.undefined,2,msg,Name not defined: {name},Nama belum didefinisikan: {name},namu lao dijeloehka: {name},worksheet row 70; placeholders neutralized,reviewed
-msg.runtime.too_deep,2,msg,Too deep,Terlalu dalam,,no matching worksheet row; second pass,todo
-msg.runtime.unknown_expr,2,msg,Unknown expression: {op},Ekspresi tidak dikenal: {op},,no matching worksheet row; second pass,todo
-msg.syntax.assign_target,2,msg,Line {line}: the left side of '=' must be a name or a list element,Baris {line}: sisi kiri '=' harus nama atau elemen daftar,,no matching worksheet row; second pass,todo
+msg.runtime.too_deep,2,msg,Too deep,Terlalu dalam,Daling nia,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.runtime.unknown_expr,2,msg,Unknown expression: {op},Ekspresi tidak dikenal: {op},Ekspresi nga sidiak dikenal: {op},no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.syntax.assign_target,2,msg,Line {line}: the left side of '=' must be a name or a list element,Baris {line}: sisi kiri '=' harus nama atau elemen daftar,Baris {line}: sisi kiri '=' harus namu atau elemen daftar,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.syntax.bad_char,2,msg,Line {line}: unknown character {text},Baris {line}: karakter tidak dikenal {text},Baris {line}: karakter nga sidiak dikenal {text},worksheet row 87; line prefix added,reviewed
 msg.syntax.escape,2,msg,Line {line}: unknown escape sequence: \{c},Baris {line}: urutan escape tidak dikenal: \{c},Baris {line}: urutan escape nga sidiak dikenal: \{c},worksheet row 94; line prefix added,reviewed
 msg.syntax.expected,2,msg,"Line {line}: expected {what}, found {text}","Baris {line}: diharapkan {what}, ditemukan {text}","Baris {line}: diharaok {what}, basuao {text}",worksheet row 89; line prefix added,reviewed
-msg.syntax.expected_after_name,2,msg,"Line {line}: expected '{word}' after the name, found {text}","Baris {line}: diharapkan '{word}' setelah nama, ditemukan {text}",,no matching worksheet row; second pass,todo
-msg.syntax.reserved,2,msg,Line {line}: '{text}' is a reserved word for a future feature,Baris {line}: '{text}' adalah kata cadangan untuk fitur berikutnya,,no matching worksheet row; second pass,todo
+msg.syntax.expected_after_name,2,msg,"Line {line}: expected '{word}' after the name, found {text}","Baris {line}: diharapkan '{word}' setelah nama, ditemukan {text}","Baris {line}: diharaok '{word}' kik namu, basuao {text}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.syntax.reserved,2,msg,Line {line}: '{text}' is a reserved word for a future feature,Baris {line}: '{text}' adalah kata cadangan untuk fitur berikutnya,Baris {line}: '{text}' adalah kata cadangan ndik fitur mase depang,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.syntax.try_requires_catch,2,msg,Line {line}: block '{try_word}' must be followed by '{catch_word}' and a handler block,Baris {line}: blok '{try_word}' harus diikuti '{catch_word}' dan blok penanganan,Baris {line}: blok '{try_word}' harus dinga '{catch_word}' nga blok penanganan,worksheet row 92; line prefix added,reviewed
 msg.syntax.unexpected,2,msg,Line {line}: unexpected {text},Baris {line}: tidak terduga {text},Baris {line}: dak nyengkao {text},worksheet row 88; line prefix added,reviewed
 msg.value.convert,2,msg,Cannot convert {value} to {target},Tidak bisa mengubah {value} menjadi {target},Nynendak ngubuoah {value} jadi {target},worksheet row 75; target generalized; confirm,draft
 msg.value.div_zero,2,msg,Division by zero,Pembagian dengan nol,Pembagian dinga nol,worksheet row 73,reviewed
-msg.value.index_kind,2,msg,"Only lists, maps, and text can be indexed","Hanya daftar, peta, dan teks yang bisa diindeks",,no matching worksheet row; second pass,todo
+msg.value.index_kind,2,msg,"Only lists, maps, and text can be indexed","Hanya daftar, peta, dan teks yang bisa diindeks","Hanya daftar, peta, nga tulisan nga bisa diindeks",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.value.index_range,2,msg,Index out of range: {index} (length {length}),Indeks di luar jangkauan: {index} (panjang {length}),Indeks kik luwua jangkauan: {index} (panja {length}),worksheet row 76; placeholders neutralized,reviewed
 msg.value.index_type,2,msg,The index must be a whole number,Indeks harus bilangan bulat,Indeks harus bilangan buluak,worksheet row 77,reviewed
 msg.value.key_missing,2,msg,Key not found: {key},Kunci tidak ditemukan: {key},sidiak besuao kuncai: {key},worksheet row 78; placeholders neutralized,reviewed
 msg.value.key_type,2,msg,Map keys must be text or whole numbers,Kunci peta harus teks atau bilangan bulat,Kuncai peta harus tulisan atau bilangan buluak,worksheet row 79,reviewed
-msg.value.map_pair,2,msg,"Each map pair must be a list [key, value]","Setiap pasangan peta harus berupa daftar [kunci, nilai]",,no matching worksheet row; second pass,todo
-msg.value.neg_type,2,msg,"The minus sign is only for numbers, not {value}","Tanda minus hanya untuk bilangan, bukan {value}",,no matching worksheet row; second pass,todo
+msg.value.map_pair,2,msg,"Each map pair must be a list [key, value]","Setiap pasangan peta harus berupa daftar [kunci, nilai]","Tiap pasangan peta harus daftar [kuncai, nilai]",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
+msg.value.neg_type,2,msg,"The minus sign is only for numbers, not {value}","Tanda minus hanya untuk bilangan, bukan {value}","Tanda minus hanya ndik bilangan, iduak {value}",no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.value.operator,2,msg,Operator {op} cannot be used on {left} and {right},Operator {op} tidak bisa dipakai pada {left} dan {right},Operator '{op}' nyendak dipake kik {left} nga {right},worksheet row 74; placeholders neutralized,reviewed
-msg.value.separator,2,msg,The separator must be text,Pemisah harus berupa teks,,no matching worksheet row; second pass,todo
+msg.value.separator,2,msg,The separator must be text,Pemisah harus berupa teks,Pemisah harus tulisan,no worksheet row; composed from attested Koto Payang words; not speaker-reviewed,draft
 msg.value.text_immutable,2,msg,Text cannot be changed character by character,Teks tidak bisa diubah per huruf,Tulisan nyendak diubuah per huruf,worksheet row 80,reviewed
-type.bool,2,type,boolean,boolean,,worksheet row 37 is blank,todo
+type.bool,2,type,boolean,boolean,betiu_salah,composed from betiu (true) + salah (false); not speaker-reviewed,draft
 type.file,2,type,file,berkas,berkas,worksheet row 42,reviewed
 type.float,2,type,float,pecahan,bilangan_bakoma,worksheet row 35; first alternative; confirm,draft
 type.func,2,type,function,fungsi,pungsi,worksheet row 41,reviewed
@@ -135,4 +135,4 @@ type.list,2,type,list,daftar,daftar,"worksheet row 38; chose daftar, lis rejecte
 type.map,2,type,map,peta,kamus,worksheet row 39; dict maps to map,reviewed
 type.null,2,type,null,kosong,kusao,no worksheet row; inferred from kw.null; confirm,draft
 type.str,2,type,text,kato,tulisan,worksheet row 36; typo tuilsan corrected,reviewed
-reserved.error,3,reserved,error,kelihu,,no worksheet row; tier 3,todo
+reserved.error,3,reserved,error,kelihu,kesalahan,"kesalahan, the row 210 word for error; not speaker-reviewed",draft
