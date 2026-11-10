@@ -179,7 +179,7 @@ Benar! Percobaan: 3
 ## Ringkasan
 
 - `selamu syarat { }` mengulang selama syarat benar.
-- `untuk x alem daftar { }` mengulang untuk setiap anggota.
+- `ndik x daling daftar { }` mengulang untuk setiap anggota.
 - `rentang(a, b)` menghasilkan bilangan dari a sampai sebelum b.
 - `slese` berhenti; `lanjutka` melompat ke putaran berikutnya.
 
@@ -193,4 +193,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-6). Lanjut ke [Pelajaran 7](07-daftar
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

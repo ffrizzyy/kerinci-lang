@@ -84,4 +84,4 @@ Ready? Continue to [Lesson 1](01-hello-world.md).
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

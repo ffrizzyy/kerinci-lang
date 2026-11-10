@@ -89,7 +89,7 @@ Every value has a kind. The function `tipe` tells you which.
 | `"halo"` | `tulisan` | text |
 | `[1, 2]` | `daftar` | an ordered collection (Lesson 7) |
 | `{"a": 1}` | `kamus` | a collection of pairs (Lesson 9) |
-| `betiu`, `salah` | `boolean` | true or false |
+| `betiu`, `salah` | `betiu_salah` | true or false |
 | `kusao` | `kusao` | no value |
 
 ```krc
@@ -109,13 +109,13 @@ bilangan_bakoma
 tulisan
 daftar
 kamus
-boolean
+betiu_salah
 kusao
 ```
 
 `betiu` and `salah` are the values true and false. `kusao` means "nothing in it".
 
-> Note: the kind name for `betiu` and `salah` is currently `boolean`, a temporary English word, until Kerinci speakers contribute the right word.
+> Note: the kind name for `betiu` and `salah` is currently `betiu_salah`, a temporary English word, until Kerinci speakers contribute the right word.
 
 ## Summary
 
@@ -133,4 +133,4 @@ Answers: [answers.md](answers.md#lesson-2). Continue to [Lesson 3](03-arithmetic
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

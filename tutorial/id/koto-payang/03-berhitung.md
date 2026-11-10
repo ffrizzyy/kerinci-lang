@@ -161,4 +161,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-3). Lanjut ke [Pelajaran 4](04-bertan
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

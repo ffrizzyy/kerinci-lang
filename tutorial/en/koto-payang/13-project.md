@@ -187,7 +187,7 @@ Selesai
 
 Extend this gradebook yourself:
 
-1. Add a menu "4. Cari nilai seorang siswa" (look up one student's score) that checks with `contains` whether the name exists.
+1. Add a menu "4. Cari nilai seorang siswa" (look up one student's score) that checks with `meriksu` whether the name exists.
 2. Also show the student with the highest score.
 3. Refuse scores outside 0 to 100 with `timbaoka`.
 4. Move more functions into the module.
@@ -200,4 +200,4 @@ To find any Kerinci word, open the [glossary](glossary.md). If you are a Kerinci
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

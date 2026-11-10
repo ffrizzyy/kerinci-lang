@@ -56,7 +56,7 @@ nytak buah
 ["mangga", "apel", "jeruk"]
 ```
 
-`nambahkah(daftar, nilai)` menambahkan nilai di **ujung** daftar dan mengubah daftar itu sendiri.
+`tambahka(daftar, nilai)` menambahkan nilai di **ujung** daftar dan mengubah daftar itu sendiri.
 
 ## Alat-alat daftar
 
@@ -64,7 +64,7 @@ nytak buah
 |---|---|
 | `panja(d)` | jumlah anggota |
 | `tambahka(d, x)` | tambah `x` di ujung (mengubah `d`) |
-| `contains(d, x)` | apakah `x` ada di `d`? (`betiu`/`salah`) |
+| `meriksu(d, x)` | apakah `x` ada di `d`? (`betiu`/`salah`) |
 | `terurut(d)` | salinan yang **terurut** (`d` tidak berubah) |
 | `tebaluik(d)` | salinan yang **terbalik** (`d` tidak berubah) |
 | `d1 + d2` | gabungan dua daftar (daftar baru) |
@@ -75,8 +75,8 @@ netakka_variabel angka = [5, 2, 9, 1]
 nytak terurut(angka)
 nytak tebaluik(angka)
 nytak angka
-nytak contains(angka, 9)
-nytak contains(angka, 7)
+nytak meriksu(angka, 9)
+nytak meriksu(angka, 7)
 nytak angka + [100, 200]
 ```
 
@@ -112,7 +112,7 @@ Rata-rata: 73
 Tertinggi: 90
 ```
 
-Kalau butuh nomor urutnya, ulangi `jarak(panjang(daftar))`:
+Kalau butuh nomor urutnya, ulangi `rentang(panja(daftar))`:
 
 ```krc
 # dialek: koto-payang
@@ -171,7 +171,7 @@ nytak c
 ## Ringkasan
 
 - `[a, b, c]` membuat daftar; `d[0]` mengambil anggota pertama.
-- `tambahka`, `contains`, `terurut`, `tebaluik`, `panja`.
+- `tambahka`, `meriksu`, `terurut`, `tebaluik`, `panja`.
 - Nomor mulai dari 0.
 - `netakka_variabel b = a` berbagi daftar yang sama.
 
@@ -185,4 +185,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-7). Lanjut ke [Pelajaran 8](08-guno.m
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

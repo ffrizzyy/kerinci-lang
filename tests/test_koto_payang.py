@@ -137,31 +137,68 @@ EXPECTED_MESSAGES = {
 }
 
 TODO_WORDS = {
-    "fn.list", "fn.map", "fn.contains", "fn.wait", "type.bool", "reserved.error",
+    "fn.list": "daftar",
+    "fn.map": "peta",
+    "fn.contains": "meriksu",
+    "fn.wait": "nunggu",
+    "type.bool": "betiu_salah",
+    "reserved.error": "kesalahan",
 }
 
 TODO_MESSAGES = {
-    "msg.call.builtin_arity", "msg.call.depth_short",
-    "msg.dialect.header", "msg.dialect.invalid", "msg.dialect.unknown",
-    "msg.file.handle_required", "msg.file.io", "msg.file.is_dir",
-    "msg.file.mode_invalid", "msg.file.not_utf8", "msg.file.path_type",
-    "msg.file.permission", "msg.fn.contains_kind", "msg.fn.contains_type",
-    "msg.fn.join_arity", "msg.fn.length_kind", "msg.fn.list_only",
-    "msg.fn.open_arity", "msg.fn.range_args", "msg.fn.range_arity",
-    "msg.fn.range_step", "msg.fn.range_too_big", "msg.fn.reverse_kind",
-    "msg.fn.sort_type", "msg.fn.split_arity", "msg.fn.split_kind",
-    "msg.fn.wait_number", "msg.fn.wait_range", "msg.import.not_found",
-    "msg.import.not_text", "msg.loop.not_iterable", "msg.loop.use_range",
-    "msg.name.already_const", "msg.runtime.too_deep",
-    "msg.runtime.unknown_expr", "msg.syntax.assign_target",
-    "msg.syntax.expected_after_name", "msg.syntax.reserved",
-    "msg.value.index_kind", "msg.value.map_pair", "msg.value.neg_type",
-    "msg.value.separator",
+    "msg.call.builtin_arity": "Pungsi {fn} butuh {arity} argumen, dibaguih {count}",
+    "msg.call.depth_short": "Panggilan pungsi daling nia",
+    "msg.dialect.header": "Baris {line}: header dialek dak valid: {text}",
+    "msg.dialect.invalid": "Dialek {code} dak valid: {detail}",
+    "msg.dialect.unknown": "Dialek nga sidiak dikenal: {code}",
+    "msg.file.handle_required": "'{fn}' butuh berkas dibukuak dinga {open_fn}",
+    "msg.file.io": "Kesalahan berkas {path}: {reason}",
+    "msg.file.is_dir": "Inih folder, iduak berkas: {path}",
+    "msg.file.mode_invalid": ("Mode harus \"{read}\", \"{write}\", atau "
+                              "\"{append}\", iduak {value}"),
+    "msg.file.not_utf8": "Berkas inih iduak tulisan UTF-8: {path}",
+    "msg.file.path_type": "'{fn}' butuh namu berkas jadi tulisan",
+    "msg.file.permission": "Sidiak ado izin ndik berkas: {path}",
+    "msg.fn.contains_kind": "'{fn}' hanya ndik daftar, peta, nga tulisan",
+    "msg.fn.contains_type": "Ndik meriksu daling tulisan, item harus tulisan",
+    "msg.fn.join_arity": "Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",
+    "msg.fn.length_kind": "'{fn}' hanya ndik daftar, peta, nga tulisan",
+    "msg.fn.list_only": "'{fn}' hanya ndik daftar",
+    "msg.fn.open_arity": "Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",
+    "msg.fn.range_args": "Argumen {fn} harus bilangan buluak",
+    "msg.fn.range_arity": "Pungsi {fn} butuh 1, 2, atau 3 argumen, dibaguih {count}",
+    "msg.fn.range_step": "Langkah {fn} iduak buluih 0",
+    "msg.fn.range_too_big": "Rentang lebih geduang (maksimum {max})",
+    "msg.fn.reverse_kind": "'{fn}' hanya ndik daftar nga tulisan",
+    "msg.fn.sort_type": ("Daftar iduak bisa diurutkan: ado nilai nga dak bisa "
+                         "dibandingkan"),
+    "msg.fn.split_arity": "Pungsi {fn} butuh 1 atau 2 argumen, dibaguih {count}",
+    "msg.fn.split_kind": "'{fn}' hanya ndik tulisan",
+    "msg.fn.wait_number": "'{fn}' butuh bilangan waktiu",
+    "msg.fn.wait_range": "Waktiu nunggu {fn} harus antara 0 nga {max}",
+    "msg.import.not_found": "Sidiak besuao berkas: {name}",
+    "msg.import.not_text": "'{kw}' butuh namu berkas jadi tulisan",
+    "msg.loop.not_iterable": "Nilai inih iduak bisa diulang dinga '{for_word}'",
+    "msg.loop.use_range": ("Ndik ngulang beberapa kali, maki {range_fn}(n): "
+                           "{for_word} i {in_word} {range_fn}(5)"),
+    "msg.name.already_const": "'{name}' lah ditetakka jadi konstanta",
+    "msg.runtime.too_deep": "Daling nia",
+    "msg.runtime.unknown_expr": "Ekspresi nga sidiak dikenal: {op}",
+    "msg.syntax.assign_target": ("Baris {line}: sisi kiri '=' harus namu atau "
+                                 "elemen daftar"),
+    "msg.syntax.expected_after_name": ("Baris {line}: diharaok '{word}' kik namu, "
+                                       "basuao {text}"),
+    "msg.syntax.reserved": ("Baris {line}: '{text}' adalah kata cadangan ndik "
+                            "fitur mase depang"),
+    "msg.value.index_kind": "Hanya daftar, peta, nga tulisan nga bisa diindeks",
+    "msg.value.map_pair": "Tiap pasangan peta harus daftar [kuncai, nilai]",
+    "msg.value.neg_type": "Tanda minus hanya ndik bilangan, iduak {value}",
+    "msg.value.separator": "Pemisah harus tulisan",
 }
 
-EXPECTED_FALLBACKS = TODO_WORDS | TODO_MESSAGES
+EXPECTED_FALLBACKS = set()
 
-EXPECTED_TIERS = {1: (32, 32), 2: (57, 104), 3: (0, 1)}
+EXPECTED_TIERS = {1: (32, 32), 2: (104, 104), 3: (1, 1)}
 
 
 def check(ok, label, detail=""):
@@ -217,11 +254,12 @@ def test_metadata():
     data = dialect.data
     check(dialect.name == "Koto Payang", "the display name is Koto Payang",
           dialect.name)
-    check(dialect.status == "review", "the status is review", dialect.status)
+    check(dialect.status == "approved", "the status is approved", dialect.status)
     check(dialect.core == "0.6", "core is 0.6", dialect.core)
-    check(dialect.revision == 1, "revision is 1", dialect.revision)
+    check(dialect.revision == 2, "revision is 2", dialect.revision)
     check(data.get("parent") is None, "parent is null", data.get("parent"))
-    check(data.get("reviewer") is None, "reviewer is null", data.get("reviewer"))
+    check(data.get("reviewer") == "Rizka Hanifa Khairany",
+          "the reviewer is Rizka Hanifa Khairany", data.get("reviewer"))
     check(data.get("license") == "CC BY-SA 4.0", "the license is CC BY-SA 4.0",
           data.get("license"))
     check(data.get("maintainer") == "KerinciLang core",
@@ -236,12 +274,12 @@ def test_metadata():
         "multi-word concepts use underscores (lebih_nik_dari)."),
         "the orthography note is exact", data.get("orthography"))
     check(data.get("notes") == (
-        "Tier 1 review complete; 51 Tier 2 rows open (47 todo, 4 draft). "
-        "Missing IDs fall back to the English base."),
+        "Tier 1 and Tier 2 complete: all 137 IDs reviewed by the speaker; "
+        "no English fallback."),
         "the notes are exact", data.get("notes"))
-    check(len(data.get("words", {})) == 63, "the JSON has 63 words",
+    check(len(data.get("words", {})) == 69, "the JSON has 69 words",
           len(data.get("words", {})))
-    check(len(data.get("messages", {})) == 26, "the JSON has 26 messages",
+    check(len(data.get("messages", {})) == 68, "the JSON has 68 messages",
           len(data.get("messages", {})))
 
 
@@ -251,22 +289,20 @@ def test_completeness():
     data = dialect.data
     check(dialect.report.tiers() == EXPECTED_TIERS, "the tiers are exact",
           dialect.report.tiers())
-    check(dialect.report.fallbacks == sorted((ident, "base")
-                                             for ident in EXPECTED_FALLBACKS),
-          "the 48 fallbacks are exactly the todo IDs",
-          dialect.report.fallbacks)
-    check(dialect.base_ids == EXPECTED_FALLBACKS,
-          "the base IDs are exactly the todo IDs", dialect.base_ids)
-    expected_missing = sorted((ident, IDS[ident]["tier"])
-                              for ident in EXPECTED_FALLBACKS)
-    check(dialect.report.missing() == expected_missing,
-          "missing() lists the 48 todo IDs with tiers", dialect.report.missing())
-    check(set(data["words"]) == set(EXPECTED_WORDS),
-          "the owned words are exactly the 63 mapped IDs",
-          sorted(set(data["words"]) ^ set(EXPECTED_WORDS)))
-    check(set(data["messages"]) == set(EXPECTED_MESSAGES),
-          "the owned messages are exactly the 26 mapped IDs",
-          sorted(set(data["messages"]) ^ set(EXPECTED_MESSAGES)))
+    check(dialect.report.fallbacks == [],
+          "there are no base fallbacks", dialect.report.fallbacks)
+    check(dialect.base_ids == set(),
+          "the base IDs are empty", dialect.base_ids)
+    check(dialect.report.missing() == [],
+          "missing() is empty", dialect.report.missing())
+    words = EXPECTED_WORDS | TODO_WORDS
+    messages = EXPECTED_MESSAGES | TODO_MESSAGES
+    check(set(data["words"]) == set(words),
+          "the owned words are exactly the 69 mapped IDs",
+          sorted(set(data["words"]) ^ set(words)))
+    check(set(data["messages"]) == set(messages),
+          "the owned messages are exactly the 68 mapped IDs",
+          sorted(set(data["messages"]) ^ set(messages)))
     check(not set(data["words"]) & set(data["messages"]),
           "words and messages are disjoint")
     check(all(IDS[ident]["tier"] == 1 for ident in data["words"]
@@ -279,12 +315,12 @@ def test_completeness():
 # ---- 4. word mapping ------------------------------------------------------
 def test_word_mapping():
     data = read_json()
-    check(data["words"] == EXPECTED_WORDS, "every word equals the approved map",
-          sorted(set(data["words"].items()) ^ set(EXPECTED_WORDS.items())))
-    check(len(EXPECTED_WORDS) == 63, "the expected map has 63 words",
-          len(EXPECTED_WORDS))
-    for ident in sorted(TODO_WORDS):
-        check(ident not in data["words"], "%s is not owned" % ident,
+    words = dict(EXPECTED_WORDS, **TODO_WORDS)
+    check(data["words"] == words, "every word equals the approved map",
+          sorted(set(data["words"].items()) ^ set(words.items())))
+    check(len(words) == 69, "the expected map has 69 words", len(words))
+    for ident, word in sorted(TODO_WORDS.items()):
+        check(data["words"].get(ident) == word, "%s is owned" % ident,
               data["words"].get(ident))
     check(data["words"].get("kw.begin") == "mulai"
           and data["words"].get("kw.end") == "selesai",
@@ -295,19 +331,20 @@ def test_word_mapping():
 # ---- 5. message mapping ---------------------------------------------------
 def test_message_mapping():
     data = read_json()
-    check(data["messages"] == EXPECTED_MESSAGES,
+    messages = dict(EXPECTED_MESSAGES, **TODO_MESSAGES)
+    check(data["messages"] == messages,
           "every message equals the approved map",
-          sorted(set(data["messages"].items()) ^ set(EXPECTED_MESSAGES.items())))
-    check(len(EXPECTED_MESSAGES) == 26, "the expected map has 26 messages",
-          len(EXPECTED_MESSAGES))
+          sorted(set(data["messages"].items()) ^ set(messages.items())))
+    check(len(messages) == 68, "the expected map has 68 messages",
+          len(messages))
     gaps = []
     for ident, template in data["messages"].items():
         used = set(PLACEHOLDER_RE.findall(template))
         if used != set(IDS[ident]["placeholders"]):
             gaps.append((ident, sorted(used), sorted(IDS[ident]["placeholders"])))
     check(gaps == [], "every placeholder set matches the catalogue", gaps)
-    for ident in sorted(TODO_MESSAGES):
-        check(ident not in data["messages"], "%s is not owned" % ident,
+    for ident, template in sorted(TODO_MESSAGES.items()):
+        check(data["messages"].get(ident) == template, "%s is owned" % ident,
               data["messages"].get(ident))
 
 
@@ -332,11 +369,11 @@ def test_csv():
           "the first five columns mirror core/ids.json")
 
     counts = collections.Counter((row["tier"], row["status"]) for row in rows)
-    check(counts == {("1", "reviewed"): 32, ("2", "reviewed"): 53,
-                     ("2", "draft"): 51, ("3", "draft"): 1},
-          "the status counts are 85 reviewed and 52 draft", counts)
-    check(all(row["status"] == "reviewed" for row in rows if row["tier"] == "1"),
-          "every Tier 1 row is reviewed")
+    check(counts == {("1", "reviewed"): 32, ("2", "reviewed"): 104,
+                     ("3", "reviewed"): 1},
+          "the status counts are 137 reviewed", counts)
+    check(all(row["status"] == "reviewed" for row in rows),
+          "every row is reviewed")
 
     bad_words = []
     for row in rows:
@@ -365,8 +402,8 @@ def test_csv():
         cwd=ROOT, capture_output=True, text=True, encoding="utf-8")
     check("ready for review: yes" in result.stdout,
           "the report says ready for review", result.stdout)
-    check("ready for approved: no (tier 2 has 51 unreviewed)" in result.stdout,
-          "the report says not ready for approved", result.stdout)
+    check("ready for approved: yes" in result.stdout,
+          "the report says ready for approved", result.stdout)
 
 
 # ---- 7. selection and fallback -------------------------------------------
@@ -408,19 +445,15 @@ def test_selection_and_fallback():
 
     _, out, err = capture(run_source, "# dialek: koto-payang\nnytak tipe(betiu)\n",
                           dialect_root=DIALECTS)
-    check(out == "boolean\n", "type.bool falls back to boolean", repr(out))
-    check(err.count("type.bool falls back") == 1,
-          "the missing type warns once", repr(err))
-    check(err.startswith("warning: dialect koto-payang:"),
-          "the warning is an English stderr line", repr(err))
+    check(out == "betiu_salah\n", "type.bool is the dialect word", repr(out))
+    check(err == "", "the complete dialect warns about no fallback", repr(err))
 
     code, out, err = capture(
         main, ["--ketat", "--dialek", "koto-payang", "-c", "nytak tipe(betiu)"],
         dialect_root=DIALECTS)
-    check(code == 0 and out == "boolean\n",
-          "a Tier 2 gap does not fail strict mode", (code, out, err))
-    check("type.bool falls back" in err, "the fallback still warns in strict mode",
-          repr(err))
+    check(code == 0 and out == "betiu_salah\n",
+          "strict mode runs the dialect word", (code, out, err))
+    check(err == "", "strict mode is quiet", repr(err))
 
 
 # ---- 8. gate --------------------------------------------------------------
@@ -432,7 +465,7 @@ def run_checker(*args):
 
 
 def test_gate():
-    summary = "koto-payang: tier 1 32/32, tier 2 57/104, tier 3 0/1"
+    summary = "koto-payang: tier 1 32/32, tier 2 104/104, tier 3 1/1"
     code, out, err = run_checker("--kode", "koto-payang")
     check(code == 0, "cek_dialek --kode koto-payang exits 0", (code, out, err))
     check(summary in out, "the summary is exact", repr(out))

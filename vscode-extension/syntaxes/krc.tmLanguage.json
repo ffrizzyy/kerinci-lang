@@ -41,7 +41,7 @@
       "name": "constant.language.krc"
     },
     {
-      "match": "\\b(bacea|baco|bagi|basatau|bilangan|bilangan_buluak|bukak|bukuak|contains|daftar|desimal|disatu|hapus|isi|jarak|kali|kato|kura|kurang|list|map|mecem|milih|nambahkah|nantik|ngapih_berkas|panja|panjang|pecah|pecahan|peta|pisah|pulang|rentang|tambah|tambahka|tebaluik|terurut|tipe|tulaih|tulis|tulisan|tutamp|tutup|wait)(?=\\()\\b",
+      "match": "\\b(bacea|baco|bagi|basatau|bilangan|bilangan_buluak|bukak|bukuak|daftar|desimal|disatu|hapus|isi|jarak|kali|kato|kura|kurang|mecem|meriksu|milih|nambahkah|nantik|ngapih_berkas|nunggu|panja|panjang|pecah|pecahan|peta|pisah|pulang|rentang|tambah|tambahka|tebaluik|terurut|tipe|tulaih|tulis|tulisan|tutamp|tutup)(?=\\()\\b",
       "name": "support.function.builtin.krc"
     }
   ],

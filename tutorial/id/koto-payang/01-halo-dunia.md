@@ -112,4 +112,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-1). Lanjut ke [Pelajaran 2](02-barang
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

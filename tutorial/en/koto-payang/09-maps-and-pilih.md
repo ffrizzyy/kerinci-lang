@@ -38,7 +38,7 @@ Keys may be text or whole numbers. Values may be anything, even a list or anothe
 
 ## Checking for a key
 
-Getting a key that does not exist is an error, so check first with `contains`.
+Getting a key that does not exist is an error, so check first with `meriksu`.
 
 ```krc-error
 # dialek: koto-payang
@@ -53,7 +53,7 @@ Kesalahan: sidiak besuao kuncai: "Andi"
 ```krc
 # dialek: koto-payang
 netakka_variabel siswa = {"Budi": 80}
-kalu contains(siswa, "Andi") {
+kalu meriksu(siswa, "Andi") {
     nytak siswa["Andi"]
 } nga_laen {
     nytak "Andi tidak ada"
@@ -89,7 +89,7 @@ Dewi: 65
 netakka_variabel kalimat = "kalu kalu lain kalu lain"
 netakka_variabel jumlah = {}
 ndik kata daling pecah(kalimat) {
-    kalu contains(jumlah, kata) {
+    kalu meriksu(jumlah, kata) {
         jumlah[kata] = jumlah[kata] + 1
     } nga_laen {
         jumlah[kata] = 1
@@ -160,7 +160,7 @@ libur
 ## Summary
 
 - `{"key": value}` makes a map; `p["key"]` gets a value; `p["key"] = x` changes or adds.
-- `contains(p, key)` checks for a key; `ndik k daling p` goes through the keys.
+- `meriksu(p, key)` checks for a key; `ndik k daling p` goes through the keys.
 - `cocokka x { kalu a { } kalu b, c { } nga_laen { } }` chooses one branch.
 
 ## Exercises
@@ -173,4 +173,4 @@ Answers: [answers.md](answers.md#lesson-9). Continue to [Lesson 10](10-text.md).
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

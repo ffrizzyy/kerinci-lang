@@ -114,4 +114,4 @@ Answers: [answers.md](answers.md#lesson-1). Continue to [Lesson 2](02-barang.md)
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

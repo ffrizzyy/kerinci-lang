@@ -187,7 +187,7 @@ Selesai
 
 Kembangkan sendiri buku nilai ini:
 
-1. Tambah menu "4. Cari nilai seorang siswa" yang memeriksa dengan `contains` apakah namanya ada.
+1. Tambah menu "4. Cari nilai seorang siswa" yang memeriksa dengan `meriksu` apakah namanya ada.
 2. Tampilkan juga siswa dengan nilai tertinggi.
 3. Tolak nilai di luar 0 sampai 100 dengan `timbaoka`.
 4. Pisahkan lebih banyak fungsi ke dalam modul.
@@ -200,4 +200,4 @@ Untuk menemukan kata Kerinci apa pun, buka [glosarium](glosarium.md). Kalau kamu
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

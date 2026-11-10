@@ -2,6 +2,32 @@
 
 All notable changes to KerinciLang. Versions below 1.0 may still change vocabulary after review by speakers.
 
+## Unreleased
+
+Koto Payang is now `approved`. The speaker reviewed every open row, the JSON
+owns all 137 IDs, and the generated tutorial uses the dialect's own words with
+no English fallback.
+
+| Dialect | Code | Status | Tier 1 | Tier 2 | Tier 3 |
+|---|---|---|---|---|---|
+| Koto Payang | `koto-payang` | `approved` | 32/32 | 104/104 | 1/1 |
+
+**Changed**
+- `dialects/koto-payang.json` is `approved`, revision 2, reviewer Rizka Hanifa
+  Khairany. It has 69 words and 68 messages; `base_ids` is empty.
+- The 52 open worksheet rows were composed from Koto Payang's attested
+  vocabulary and reviewed. The CSV now has 137 `reviewed` rows.
+- The generated Koto Payang tutorial uses `meriksu`, `nunggu`, `daftar`, `peta`,
+  `betiu_salah`, and `kesalahan`; there is no “Base words used” section.
+- The tutorial generator counts a fallback only when the dialect actually takes
+  the ID from the neutral base, and its glossary stub no longer promises a
+  glossary “when approved”.
+- The VS Code grammar and both tutorial indexes were regenerated.
+
+**Fixed**
+- Windows CI keeps LF for grammar, core, dialect, and worksheet files.
+- Python 3.9 CI runs on Ubuntu 22.04 after `ubuntu-latest` moved to 26.04.
+
 ## 0.6.0 (2026-11-02)
 
 One language, many dialects. A program written in any dialect means the same

@@ -212,6 +212,11 @@ def _owns(vocab, id):
     return id not in dialect.base_ids
 
 
+def _allowed_base(vocab, id):
+    """True when `id` is a permitted fallback and the dialect still lacks it."""
+    return id in ALLOWED_FALLBACKS and id in _base_ids(vocab)
+
+
 def _load(code):
     from dialects.loader import DialectError, load_dialect
     try:
@@ -261,14 +266,14 @@ def _map_inline_span(text, source_maps, source_vocab, target_words,
         base = {id for id in used if id in _base_ids(target_vocab)}
         if base - ALLOWED_FALLBACKS:
             return text, set()
-        return new, {id for id in used if id in ALLOWED_FALLBACKS}
+        return new, {id for id in used if _allowed_base(target_vocab, id)}
     new, id = _map_bare_word(stripped, source_maps, source_vocab,
                              target_words, target_vocab, force_type)
     if new == stripped:
         return text, set()
     prefix = text[:len(text) - len(text.lstrip())]
     suffix = text[len(text.rstrip()):]
-    used = {id} if id in ALLOWED_FALLBACKS else set()
+    used = {id} if _allowed_base(target_vocab, id) else set()
     return prefix + new + suffix, used
 
 
@@ -501,27 +506,42 @@ def _render_file(src, dest, source_vocab, target_vocab, source_maps,
 
 def _glossary_stub(axis, code_name, name, status):
     if axis == "en":
+        if status == "approved":
+            follow = ("The %s glossary is not generated yet; the approved\n"
+                      "worksheet is its source." % name)
+            messages = ("They are not generated here yet; the approved worksheet\n"
+                        "is the source.")
+        else:
+            follow = ("A %s glossary\nfollows when the dialect is approved."
+                      % name)
+            messages = ("They will be\nlisted here when the dialect is approved.")
         return ("# Glossary\n\n"
                 "This tutorial is generated for %s (status: %s). The full glossary\n"
-                "is still the Siulak one: [glossary](../../glossary.md). A %s glossary\n"
-                "follows when the dialect is approved.\n"
+                "is still the Siulak one: [glossary](../../glossary.md). %s\n"
                 "\n"
                 "## Error messages\n"
                 "\n"
                 "The error messages are explained in the [Siulak glossary's error\n"
-                "messages section](../../glossary.md#error-messages). They will be\n"
-                "listed here when the dialect is approved.\n" % (name, status, name))
+                "messages section](../../glossary.md#error-messages). %s\n"
+                % (name, status, follow, messages))
+    if status == "approved":
+        follow = ("Glosarium %s belum dibuat; sumbernya adalah lembar kerja\n"
+                  "yang sudah disetujui." % name)
+        messages = ("Daftar lengkapnya belum dibuat di sini; sumbernya adalah\n"
+                    "lembar kerja yang sudah disetujui.")
+    else:
+        follow = ("Glosarium %s\nmenyusul setelah dialek ini disetujui." % name)
+        messages = ("Daftar lengkapnya akan ditulis di\nsini setelah dialek ini "
+                    "disetujui.")
     return ("# Glosarium\n\n"
             "Tutorial ini dibuat untuk %s (status: %s). Glosarium lengkapnya\n"
-            "masih glosarium Siulak: [glosarium](../../id/glosarium.md). "
-            "Glosarium %s\nmenyusul setelah dialek ini disetujui.\n"
+            "masih glosarium Siulak: [glosarium](../../id/glosarium.md). %s\n"
             "\n"
             "## Kesalahan\n"
             "\n"
             "Pesan kesalahan mengikuti glosarium Siulak: [glosarium\n"
-            "Indonesia](../../id/glosarium.md). Daftar lengkapnya akan ditulis di\n"
-            "sini setelah dialek ini disetujui.\n"
-            % (name, status, name))
+            "Indonesia](../../id/glosarium.md). %s\n"
+            % (name, status, follow, messages))
 
 
 def _insert_banner(text, axis, name, status):

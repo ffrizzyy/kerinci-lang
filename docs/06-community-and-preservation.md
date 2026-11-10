@@ -11,7 +11,7 @@ For a cultural project, this step determines whether the language is used or for
 - Speakers are also the audience: they decide whether the project honors the language.
 
 KerinciLang is multi-dialect. Siulak was the first dialect and is frozen at its
-v0.5 vocabulary for compatibility; Koto Payang is the second, at `review`.
+v0.5 vocabulary for compatibility; Koto Payang is the second, now `approved`.
 There is **no standard dialect**, and no dialect may borrow another's words to
 fill a gap. Adding one needs its own speakers and its own review record; see
 [`09-adding-a-dialect.md`](09-adding-a-dialect.md).

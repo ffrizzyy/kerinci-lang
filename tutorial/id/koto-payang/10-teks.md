@@ -11,8 +11,8 @@ nytak kata[0]
 nytak kata[panja(kata) - 1]
 nytak panja(kata)
 nytak tebaluik(kata)
-nytak contains(kata, "rin")
-nytak contains(kata, "xyz")
+nytak meriksu(kata, "rin")
+nytak meriksu(kata, "xyz")
 ```
 
 ```hasil
@@ -68,7 +68,7 @@ nytak pecah("belajar   bahasa kerinci")
 
 ## `basatau`: menyatukan daftar
 
-`disatu(daftar, pemisah)` adalah kebalikan `pecah`: ia menyambung anggota daftar menjadi satu teks.
+`basatau(daftar, pemisah)` adalah kebalikan `pecah`: ia menyambung anggota daftar menjadi satu teks.
 
 ```krc
 # dialek: koto-payang
@@ -110,7 +110,7 @@ Terurut: bahasa, belajar, kerinci, pemrograman
 netakka_variabel vokal = "aiueo"
 netakka_variabel jumlah = 0
 ndik huruf daling "pemrograman kerinci" {
-    kalu contains(vokal, huruf) {
+    kalu meriksu(vokal, huruf) {
         jumlah = jumlah + 1
     }
 }
@@ -159,7 +159,7 @@ nytak nilai
 
 ## Ringkasan
 
-- Teks bisa diindeks (`t[0]`), diukur (`panja`), dibalik (`tebaluik`), dan dicari (`contains`).
+- Teks bisa diindeks (`t[0]`), diukur (`panja`), dibalik (`tebaluik`), dan dicari (`meriksu`).
 - `pecah` memecah teks menjadi daftar; `basatau` menyatukan daftar menjadi teks.
 - Teks tidak bisa diubah per huruf.
 
@@ -173,4 +173,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-10). Lanjut ke [Pelajaran 11](11-berk
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

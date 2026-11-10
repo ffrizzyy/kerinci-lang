@@ -1,12 +1,12 @@
 # Tutorial KerinciLang (bahasa Indonesia)
 
-> **Tutorial hasil bangun:** kode dan kode sebaris di bawah memakai Koto Payang (status: review). Teksnya berasal dari pelajaran bahasa Indonesia dialek Siulak.
+> **Tutorial hasil bangun:** kode dan kode sebaris di bawah memakai Koto Payang (status: approved). Teksnya berasal dari pelajaran bahasa Indonesia dialek Siulak.
 
 *The main tutorial is in English: [../README.md](../../en/koto-payang/README.md). This folder is the same course in Indonesian.*
 
 Belajar memprogram dengan kata-kata bahasa Kerinci. Tutorial ini ditulis dalam bahasa Indonesia; semua kode memakai kata Kerinci dialek Koto Payang.
 
-**Edisi Koto Payang:** pelajaran yang sama dibuat dengan kode Koto Payang di `tutorial/en/koto-payang/` dan `tutorial/id/koto-payang/`. Koto Payang masih berstatus `review`; setiap indeks hasil bangun mencantumkan kata dasar yang masih dipinjam (`contains` dan `boolean`). Kata-kata itu bukan pengganti buatan.
+**Edisi Koto Payang:** pelajaran yang sama dibuat dengan kode Koto Payang di `tutorial/en/koto-payang/` dan `tutorial/id/koto-payang/`. Koto Payang sudah `approved` dan memiliki semua ID, jadi setiap indeks hasil bangun memakai kata dialek itu sendiri tanpa kata dasar pinjaman.
 
 ## Daftar pelajaran
 
@@ -19,9 +19,9 @@ Belajar memprogram dengan kata-kata bahasa Kerinci. Tutorial ini ditulis dalam b
 | 4 | [Bertanya kepada pengguna](04-bertanya.md) | `masukka`, `bilangan_buluak`, `desimal`, `tulisan` |
 | 5 | [Mengambil keputusan](05-keputusan.md) | `kalu`, `nga_laen`, `samu_dinga`, `nga`, `atau`, `iduak`, `betiu`, `salah` |
 | 6 | [Mengulang](06-perulangan.md) | `selamu`, `ndik`, `daling`, `rentang`, `slese`, `lanjutka` |
-| 7 | [Daftar](07-daftar.md) | `tambahka`, `contains`, `terurut`, `tebaluik` |
+| 7 | [Daftar](07-daftar.md) | `tambahka`, `meriksu`, `terurut`, `tebaluik` |
 | 8 | [Guno: fungsi](08-guno.md) | `jeloehka`, `baluikka` |
-| 9 | [Peta dan pilih](09-peta-dan-pilih.md) | `kamus`, `cocokka` |
+| 9 | [Peta dan pilih](09-peta-dan-pilih.md) | `peta`, `cocokka` |
 | 10 | [Mengolah teks](10-teks.md) | `pecah`, `basatau` |
 | 11 | [Berkas](11-berkas.md) | `bukuak`, `bacea`, `tulaih`, `tutamp`, `ngapih_berkas` |
 | 12 | [Menangani kesalahan](12-kesalahan.md) | `cubea`, `kecuali`, `timbaoka` |
@@ -54,15 +54,6 @@ Blok kode di tutorial memakai jenis khusus:
 
 Teks tutorial dalam bahasa Kerinci sebaiknya ditulis oleh penutur. Petunjuknya ada di [kerinci/README.md](../../kerinci/README.md).
 
-## Kata dasar yang dipakai (review)
-
-Koto Payang belum memiliki kata untuk hal berikut, jadi contoh yang dibangun memakai kata dasar Inggris. Kata ini akan berubah setelah dialek disetujui.
-
-| ID | Kata | Arti |
-|---|---|---|
-| `fn.contains` | `contains` | Tells whether a list, map, or text holds a value. |
-| `type.bool` | `boolean` | Type name returned by the type built-in. |
-
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

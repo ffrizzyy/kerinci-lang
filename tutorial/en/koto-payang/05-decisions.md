@@ -158,4 +158,4 @@ Answers: [answers.md](answers.md#lesson-5). Continue to [Lesson 6](06-loops.md).
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

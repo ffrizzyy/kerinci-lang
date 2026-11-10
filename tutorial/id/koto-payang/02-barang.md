@@ -89,7 +89,7 @@ Setiap nilai punya jenis. Fungsi `tipe` memberi tahu jenisnya.
 | `"halo"` | `tulisan` | teks |
 | `[1, 2]` | `daftar` | kumpulan berurutan (Pelajaran 7) |
 | `{"a": 1}` | `kamus` | kumpulan berpasangan (Pelajaran 9) |
-| `betiu`, `salah` | `boolean` | benar atau salah |
+| `betiu`, `salah` | `betiu_salah` | benar atau salah |
 | `kusao` | `kusao` | tidak ada nilai |
 
 ```krc
@@ -109,13 +109,13 @@ bilangan_bakoma
 tulisan
 daftar
 kamus
-boolean
+betiu_salah
 kusao
 ```
 
 `betiu` dan `salah` adalah nilai benar dan salah. `kusao` berarti "tidak ada isinya".
 
-> Catatan: nama jenis untuk `betiu` dan `salah` saat ini masih `boolean`, kata sementara dari bahasa Inggris, sampai penutur Kerinci menyumbangkan kata yang tepat.
+> Catatan: nama jenis untuk `betiu` dan `salah` saat ini masih `betiu_salah`, kata sementara dari bahasa Inggris, sampai penutur Kerinci menyumbangkan kata yang tepat.
 
 ## Ringkasan
 
@@ -133,4 +133,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-2). Lanjut ke [Pelajaran 3](03-berhit
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

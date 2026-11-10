@@ -157,25 +157,22 @@ defaults to `LegacySiulak`, and a missing `siulak.json` still resolves to it.
 
 ### The Koto Payang review
 
-`dialects/koto-payang.json` is the first non-Siulak dialect, at `status: review`.
+`dialects/koto-payang.json` is the first non-Siulak dialect, now `approved`.
 It is hand-mapped from the old worksheet, never ingested: the DOCX has no ID
 column and 287 rows for 137 IDs. The canonical answer file is
 `dialects/src/koto-payang.csv`; `dialects/koto-payang.md` records provenance,
 orthography, the mapping decisions, and the review record.
 
-The file owns 89 IDs (63 words + 26 messages) and falls back to the English base
-for 48 (`{1: (32, 32), 2: (57, 104), 3: (0, 1)}`). All 32 Tier 1 IDs are
-reviewed, so `--ketat` and `cek_dialek --ketat` still exit 0; the gaps are Tier 2
-and warn once per `(dialect, id)`. Four rows are provisional `draft`s
-(`type.float`, `type.null`, `msg.name.constant`, `msg.value.convert`) and 48
-are `todo`. Those rows are recorded as open worksheet work and nothing is
-guessed to close a gap; the file stays at `review` until a speaker supplies
-them.
+The file owns all 137 IDs (69 words + 68 messages), and every CSV row is
+`reviewed` (`{1: (32, 32), 2: (104, 104), 3: (1, 1)}`). There are no base
+fallbacks. `periksa --siap` reports ready for both `review` and `approved`, a
+clean run is quiet, and `--ketat` exits 0 because no Tier 1 or Tier 2 ID is
+borrowed. The reviewer is Rizka Hanifa Khairany, recorded at revision 2.
 
 `tests/test_koto_payang.py` pins the exact word and message maps, the CSV status
-counts, `periksa --siap` readiness (review yes, approved no), header and
-`--dialek` selection, a clean run with no warning, the `type.bool` fallback
-warning, and the `cek_dialek` summaries.
+counts, `periksa --siap` readiness, header and `--dialek` selection, a clean run
+with no warning, the dialect's own `type.bool` word, and the `cek_dialek`
+summaries.
 
 ### Dialect-templated tutorial
 
@@ -193,11 +190,11 @@ header. Any other helper is raw data and keeps its bytes, so `nilai.txt` in
 lesson 13 is not corrupted. The generator reuses `rewrite_dialect_words` from
 `kerincilang.py`, the same scanner as `krc terjemah`.
 
-A target that lacks a word may use the English base fallback. Koto Payang's
-tutorial uses two: `fn.contains` (`contains`) and `type.bool` (`boolean`). The
-build lists them in both indexes and warns once per ID on stderr; it never
-invents a word. Inline spans and the `Kind` / `Jenis` table columns have their
-own mapping rules, recorded in `SPEC-tutorial-multidialect.md`.
+A target that lacks a word may use the English base fallback. Koto Payang now
+owns every ID, so its tutorial uses no fallback; the generator still reports
+one on stderr if a future dialect lacks a permitted word. It never invents a
+word. Inline spans and the `Kind` / `Jenis` table columns have their own mapping
+rules, recorded in `SPEC-tutorial-multidialect.md`.
 
 `tests/test_tutorial_dialects.py` builds into temporary repo copies and checks
 determinism, the committed trees, the untouched baseline, the Siulak
@@ -406,7 +403,7 @@ the wheel smoke. To publish on PyPI later, run `python3 -m build` and
 
 `tests/test_kerincilang.py` has 151 valid-program tests, 84 error tests, 9 import tests that build temporary multi-file projects, and 27 file tests that work in a temporary folder. `tests/test_tutorial.py` runs all 550 code blocks in `tutorial/` (English and Indonesian) (comparing real output with the output printed in the lesson) and checks that the glossary mentions every keyword and built-in (precedence, string joining, logic operators, `lain kalu` chains, comparison words, `mulai/habih`, loops, break/continue, recursion, closures, constants, Unicode names, and every error message). `tests/test_ids.py` checks the catalogue, the namespace clash matrix, message placeholders, two synthetic dialects that prove the engine is neutral, that every internal error comes from a catalogue message, and that a zipapp built without a checkout still loads its data. `tests/test_dialects.py` checks the synthesized base, parent chains, every validation code, the clash matrix (including the full Siulak word table), the `--ketat` exit codes, and loading a dialect from a zipapp. `tests/test_runtime_selection.py` covers the line-1 header, the header > `--dialek` > Siulak precedence, per-module and per-call vocabulary, imports, fallback warnings, and the `--ketat` exit codes. `tests/test_worksheet.py` covers the CSV contract, `buat`/`perbarui`, every worksheet code, normalization, the synthetic validator, DOCX determinism and round trips, export, readiness, and usage errors. `tests/test_siulak_legacy.py` checks the frozen file, every word and message mapping, `DialectVocabulary` against `LegacySiulak`, header and `--dialek` selection, the missing-file shim, and the `cek_dialek` gate. `tests/test_migration.py` covers single-file and recursive import migration, idempotence, `--semua`, `--dialek`, `--kering`, BOM/malformed-header/parse/dynamic-import refusals, CRLF and byte preservation, usage exits, the zipapp, the examples, and the CLI precedence table. `tests/test_translator.py` has 173 checks covering word/operator/built-in rewriting, user-name preservation, comments and strings, the five round-tripping examples, same-dialect copies, target-owned-ID and symbol refusals, mode/type strings, headers, CRLF and byte preservation, the CLI exit table, mixed-dialect imports, and the zipapp. `tests/test_docs_release.py` is the offline docs/release gate: it walks the contributor guide in a temporary repo, checks links and stale strings, compares the committed grammar with a fresh generation, checks every dialect word is highlighted, and checks the version, changelog, packaging configuration, and release document. `tests/test_release.py` is the separate network-dependent wheel smoke; `build.py` skips it and prints one line pointing at it.
 
-Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. The committed `dialects/` holds `__init__.py`, `loader.py`, the frozen `siulak.json`, and the review-state `koto-payang.json`; every other test dialect is temporary.
+Fixtures for the dialect tests are written into `tempfile.TemporaryDirectory()` roots. The committed `dialects/` holds `__init__.py`, `loader.py`, the frozen `siulak.json`, and the approved `koto-payang.json`; every other test dialect is temporary.
 
 ## Next steps
 

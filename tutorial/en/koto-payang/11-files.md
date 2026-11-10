@@ -143,4 +143,4 @@ Answers: [answers.md](answers.md#lesson-11). Continue to [Lesson 12](12-errors.m
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

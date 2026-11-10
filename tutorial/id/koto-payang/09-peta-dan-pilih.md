@@ -38,7 +38,7 @@ Kunci boleh berupa teks atau bilangan bulat. Nilainya boleh apa saja, bahkan daf
 
 ## Memeriksa kunci
 
-Mengambil kunci yang tidak ada adalah kesalahan, jadi periksa dulu dengan `contains`.
+Mengambil kunci yang tidak ada adalah kesalahan, jadi periksa dulu dengan `meriksu`.
 
 ```krc-error
 # dialek: koto-payang
@@ -53,7 +53,7 @@ Kesalahan: sidiak besuao kuncai: "Andi"
 ```krc
 # dialek: koto-payang
 netakka_variabel siswa = {"Budi": 80}
-kalu contains(siswa, "Andi") {
+kalu meriksu(siswa, "Andi") {
     nytak siswa["Andi"]
 } nga_laen {
     nytak "Andi tidak ada"
@@ -89,7 +89,7 @@ Dewi: 65
 netakka_variabel kalimat = "kalu kalu lain kalu lain"
 netakka_variabel jumlah = {}
 ndik kata daling pecah(kalimat) {
-    kalu contains(jumlah, kata) {
+    kalu meriksu(jumlah, kata) {
         jumlah[kata] = jumlah[kata] + 1
     } nga_laen {
         jumlah[kata] = 1
@@ -160,7 +160,7 @@ libur
 ## Ringkasan
 
 - `{"kunci": nilai}` membuat peta; `p["kunci"]` mengambil; `p["kunci"] = x` mengubah atau menambah.
-- `contains(p, kunci)` memeriksa kunci; `ndik k daling p` melintasi kunci.
+- `meriksu(p, kunci)` memeriksa kunci; `ndik k daling p` melintasi kunci.
 - `cocokka x { kalu a { } kalu b, c { } nga_laen { } }` memilih satu cabang.
 
 ## Latihan
@@ -173,4 +173,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-9). Lanjut ke [Pelajaran 10](10-teks.
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

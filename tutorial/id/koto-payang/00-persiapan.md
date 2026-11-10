@@ -61,4 +61,4 @@ Siap? Lanjut ke [Pelajaran 1](01-halo-dunia.md).
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

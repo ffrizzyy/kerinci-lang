@@ -206,4 +206,4 @@ Answers: [answers.md](answers.md#lesson-8). Continue to [Lesson 9](09-maps-and-p
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

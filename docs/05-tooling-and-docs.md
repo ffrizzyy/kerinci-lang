@@ -65,7 +65,7 @@ To publish it, package it with `vsce`.
 | `README.md` (front page) | English | done |
 | Tutorial: 13 lessons, answers, glossary (`tutorial/`) | English, Kerinci code | done; every sample is tested |
 | The same tutorial in Indonesian (`tutorial/id/`) | Indonesian, Kerinci code | done; every sample is tested |
-| Generated Koto Payang tutorial (`tutorial/en/koto-payang/`, `tutorial/id/koto-payang/`) | English / Indonesian prose, Koto Payang code | done; review status, every block tested |
+| Generated Koto Payang tutorial (`tutorial/en/koto-payang/`, `tutorial/id/koto-payang/`) | English / Indonesian prose, Koto Payang code | done; approved status, every block tested |
 | Tutorial prose in Kerinci | Kerinci | **needs speakers** (guide in `tutorial/kerinci/README.md`) |
 | Language reference (`docs/03-syntax-design.md`) | English | done |
 | Keyword glossary (`tutorial/glossary.md`, Indonesian: `tutorial/id/glosarium.md`) | Kerinci, English, Indonesian | done; checked against the language |
@@ -89,10 +89,11 @@ python3 tests/test_tutorial_dialects.py
 `--bangun koto-payang` reads the baseline lessons, maps words by neutral ID,
 runs every generated block, and rewrites the committed
 `tutorial/{en,id}/koto-payang/` trees. The generated index names any English
-base fallback the dialect still needs; Koto Payang currently uses `contains`
-(`fn.contains`) and `boolean` (`type.bool`). The build warns once per fallback
-on stderr and still exits 0. A `.krc` helper gets a dialect header; raw-data
-helpers such as `nilai.txt` keep their bytes.
+base fallback the dialect still needs. Koto Payang owns every ID, so its build
+reports no fallback and prints no warning. A future dialect that lacks a
+permitted word still gets one warning per ID on stderr and exit 0. A `.krc`
+helper gets a dialect header; raw-data helpers such as `nilai.txt` keep their
+bytes.
 
 ## The Siulak freeze
 
@@ -109,10 +110,10 @@ needs a Siulak speaker review and a new revision.
 
 ## The Koto Payang review
 
-Koto Payang is the worked example of the worksheet cycle, committed at
-`status: review`. `dialects/src/koto-payang.csv` holds 137 rows: 85 `reviewed`
-and 52 `draft`. The JSON still owns the 89 reviewed answers and lets the other
-48 fall back to the base until the drafts are merged.
+Koto Payang is the worked example of the worksheet cycle, now `approved`.
+`dialects/src/koto-payang.csv` holds 137 rows, all `reviewed`; the JSON owns all
+137 answers (69 words, 68 messages) and has no base fallback. The reviewer is
+Rizka Hanifa Khairany, recorded at revision 2.
 
 ```bash
 python3 tools/lembar_kerja.py periksa --kode koto-payang --siap   # review gate
@@ -120,15 +121,11 @@ python3 tools/lembar_kerja.py laporan --kode koto-payang          # tier counts
 python3 tools/cek_dialek.py --kode koto-payang                    # CI gate
 ```
 
-`periksa --siap` passes for `review` and prints that `approved` is not ready
-(51 Tier 2 rows unreviewed). Do not promote the file, fill a `todo` with a
-guess, or borrow a Siulak word to make the counts look complete. The generated
-Koto Payang tutorial is honest about this: it lists `contains` and `boolean`
-as base words in both indexes until speakers supply the dialect's own terms.
-The 42 open messages and 6 open words are now `draft`, composed from
-vocabulary the dialect already owns; the 4 existing drafts are unchanged.
-None is speaker-reviewed, and none is in the runtime JSON. The file stays at
-`review` until a speaker confirms them and a reviewer is named.
+`periksa --siap` reports ready for both `review` and `approved`. The generated
+Koto Payang tutorial now uses the dialect's own words (`meriksu` for `contains`,
+`betiu_salah` for the boolean type) in both indexes, with no “Base words used”
+section. A future dialect may still compose open rows from its own attested
+vocabulary, but only a named speaker review promotes it.
 
 ## Migrating old programs
 

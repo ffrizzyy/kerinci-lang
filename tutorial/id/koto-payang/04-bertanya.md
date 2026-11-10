@@ -125,4 +125,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-4). Lanjut ke [Pelajaran 5](05-keputu
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

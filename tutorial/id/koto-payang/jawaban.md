@@ -442,7 +442,7 @@ tidak dikenal
 # dialek: koto-payang
 netakka_variabel jumlah = {}
 ndik huruf daling "kerinci" {
-    kalu contains(jumlah, huruf) {
+    kalu meriksu(jumlah, huruf) {
         jumlah[huruf] = jumlah[huruf] + 1
     } nga_laen {
         jumlah[huruf] = 1
@@ -637,4 +637,4 @@ Ditolak: nilai harus antara 0 dan 100
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

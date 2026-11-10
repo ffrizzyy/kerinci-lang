@@ -158,4 +158,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-5). Lanjut ke [Pelajaran 6](06-perula
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

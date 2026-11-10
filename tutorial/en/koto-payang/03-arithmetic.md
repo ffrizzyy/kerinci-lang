@@ -161,4 +161,4 @@ Answers: [answers.md](answers.md#lesson-3). Continue to [Lesson 4](04-asking-the
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

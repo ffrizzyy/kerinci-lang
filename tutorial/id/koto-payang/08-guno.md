@@ -206,4 +206,4 @@ Jawaban: [jawaban.md](jawaban.md#pelajaran-8). Lanjut ke [Pelajaran 9](09-peta-d
 
 ---
 *Dibuat dari pelajaran Siulak. Kode dan kode sebaris memakai Koto Payang
-(status: review).*
+(status: approved).*

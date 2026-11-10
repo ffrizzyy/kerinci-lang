@@ -64,7 +64,7 @@ nytak buah
 |---|---|
 | `panja(d)` | number of items |
 | `tambahka(d, x)` | add `x` at the end (changes `d`) |
-| `contains(d, x)` | is `x` in `d`? (`betiu`/`salah`) |
+| `meriksu(d, x)` | is `x` in `d`? (`betiu`/`salah`) |
 | `terurut(d)` | a **sorted** copy (`d` is unchanged) |
 | `tebaluik(d)` | a **reversed** copy (`d` is unchanged) |
 | `d1 + d2` | the two lists joined (a new list) |
@@ -75,8 +75,8 @@ netakka_variabel angka = [5, 2, 9, 1]
 nytak terurut(angka)
 nytak tebaluik(angka)
 nytak angka
-nytak contains(angka, 9)
-nytak contains(angka, 7)
+nytak meriksu(angka, 9)
+nytak meriksu(angka, 7)
 nytak angka + [100, 200]
 ```
 
@@ -171,7 +171,7 @@ nytak c
 ## Summary
 
 - `[a, b, c]` makes a list; `d[0]` gets the first item.
-- `tambahka`, `contains`, `terurut`, `tebaluik`, `panja`.
+- `tambahka`, `meriksu`, `terurut`, `tebaluik`, `panja`.
 - Positions start at 0.
 - `netakka_variabel b = a` shares the same list.
 
@@ -185,4 +185,4 @@ Answers: [answers.md](answers.md#lesson-7). Continue to [Lesson 8](08-guno.md).
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

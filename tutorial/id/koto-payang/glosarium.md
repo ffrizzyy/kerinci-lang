@@ -1,11 +1,11 @@
 # Glosarium
 
-Tutorial ini dibuat untuk Koto Payang (status: review). Glosarium lengkapnya
-masih glosarium Siulak: [glosarium](../../id/glosarium.md). Glosarium Koto Payang
-menyusul setelah dialek ini disetujui.
+Tutorial ini dibuat untuk Koto Payang (status: approved). Glosarium lengkapnya
+masih glosarium Siulak: [glosarium](../../id/glosarium.md). Glosarium Koto Payang belum dibuat; sumbernya adalah lembar kerja
+yang sudah disetujui.
 
 ## Kesalahan
 
 Pesan kesalahan mengikuti glosarium Siulak: [glosarium
-Indonesia](../../id/glosarium.md). Daftar lengkapnya akan ditulis di
-sini setelah dialek ini disetujui.
+Indonesia](../../id/glosarium.md). Daftar lengkapnya belum dibuat di sini; sumbernya adalah
+lembar kerja yang sudah disetujui.

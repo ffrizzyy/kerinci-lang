@@ -402,22 +402,19 @@ def test_normalized_equivalence():
           {"blocks": checked, "problems": problems[:5]})
 
 
-# ---- 8. fallbacks are honest and limited ---------------------------------
+# ---- 8. a complete dialect has no fallbacks -----------------------------
 def test_fallbacks():
     with tempdir() as tmp:
         _repo, result = build_repo(tmp)
         fallbacks = result["fallbacks"]
-        check(set(fallbacks) == {"fn.contains", "type.bool"},
-              "the build reports exactly the two expected fallbacks",
-              sorted(fallbacks))
+        check(fallbacks == {},
+              "the approved build reports no fallbacks", sorted(fallbacks))
 
         for axis in ("en", "id"):
             index = read_text(generated_dir(axis) / "README.md")
-            missing = [name for name in ("fn.contains", "contains",
-                                         "type.bool", "boolean") if name not in index]
-            check(not missing,
-                  "the %s index lists the fallback IDs and words" % axis,
-                  missing)
+            check("Base words used" not in index
+                  and "Kata dasar yang dipakai" not in index,
+                  "the %s index has no fallback section" % axis)
 
         found_code, found_output = set(), set()
         for path in generated_files():
@@ -432,11 +429,11 @@ def test_fallbacks():
                         if re.search(r"(?<![A-Za-z0-9_])" + word
                                      + r"(?![A-Za-z0-9_])", block["code"]):
                             found_output.add(word)
-        check(found_code == {"contains"},
-              "only the allowed base word appears in generated code",
+        check(found_code == set(),
+              "no English base word appears in generated code",
               sorted(found_code))
-        check("boolean" in found_output,
-              "the allowed type fallback appears in generated output",
+        check(found_output == set(),
+              "no English base word appears in generated output",
               sorted(found_output))
 
         out = pathlib.Path(tmp) / "warn"
@@ -444,11 +441,8 @@ def test_fallbacks():
             ["--bangun", "koto-payang", "--keluaran", str(out)])
         warnings = [line for line in stderr.splitlines()
                     if line.startswith("warning:")]
-        check(code == 0 and len(warnings) == 2
-              and any("fn.contains" in line for line in warnings)
-              and any("type.bool" in line for line in warnings),
-              "stderr warns once for each fallback ID",
-              (code, warnings))
+        check(code == 0 and warnings == [],
+              "stderr warns about no fallback", (code, warnings))
 
 
 # ---- 9. every generated code fence is headered ---------------------------

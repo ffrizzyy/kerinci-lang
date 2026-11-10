@@ -11,8 +11,8 @@ nytak kata[0]
 nytak kata[panja(kata) - 1]
 nytak panja(kata)
 nytak tebaluik(kata)
-nytak contains(kata, "rin")
-nytak contains(kata, "xyz")
+nytak meriksu(kata, "rin")
+nytak meriksu(kata, "xyz")
 ```
 
 ```hasil
@@ -110,7 +110,7 @@ Terurut: bahasa, belajar, kerinci, pemrograman
 netakka_variabel vokal = "aiueo"
 netakka_variabel jumlah = 0
 ndik huruf daling "pemrograman kerinci" {
-    kalu contains(vokal, huruf) {
+    kalu meriksu(vokal, huruf) {
         jumlah = jumlah + 1
     }
 }
@@ -159,7 +159,7 @@ nytak nilai
 
 ## Summary
 
-- Text can be indexed (`t[0]`), measured (`panja`), reversed (`tebaluik`) and searched (`contains`).
+- Text can be indexed (`t[0]`), measured (`panja`), reversed (`tebaluik`) and searched (`meriksu`).
 - `pecah` breaks text into a list; `basatau` joins a list into text.
 - Text cannot be changed letter by letter.
 
@@ -173,4 +173,4 @@ Answers: [answers.md](answers.md#lesson-10). Continue to [Lesson 11](11-files.md
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

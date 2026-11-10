@@ -78,7 +78,7 @@ Python change.
 
 ## Learn
 
-The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included. The same course is generated with Koto Payang code in [English](tutorial/en/koto-payang/README.md) and [Indonesian](tutorial/id/koto-payang/README.md); Koto Payang is still under review.
+The **[tutorial](tutorial/README.md)** has 13 lessons, from "Hello, world" to a gradebook project, with exercises, answers and a [glossary](tutorial/glossary.md). The explanations are in English and the code uses Kerinci. Every code example is run automatically by the tests. An [Indonesian version](tutorial/id/README.md) is included. The same course is generated with Koto Payang code in [English](tutorial/en/koto-payang/README.md) and [Indonesian](tutorial/id/koto-payang/README.md); Koto Payang is approved.
 
 More example programs are in [`examples/`](examples/). The full language reference is [`docs/03-syntax-design.md`](docs/03-syntax-design.md).
 
@@ -95,21 +95,20 @@ speaker-gated axis.
 | Dialect | Code | Status | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
 | Siulak | `siulak` | `draft` (frozen v0.5) | 32/32 | 104/104 | 1/1 |
-| Koto Payang | `koto-payang` | `review` | 32/32 | 57/104 | 0/1 |
+| Koto Payang | `koto-payang` | `approved` | 32/32 | 104/104 | 1/1 |
 
 Siulak owns every ID but stays `draft` because 0.6 freezes the approved v0.5
 vocabulary instead of running a new approval pass. Its 271 language tests and
 550 tutorial blocks are the compatibility oracle; no Siulak word or tutorial
 output changed in 0.6.
 
-Koto Payang owns 89 of the 137 neutral IDs and falls back to the English base
-for the other 48. It is included at `status: review`: its Tier 1 vocabulary is
-complete, and its remaining Tier 2 rows are recorded as open rather than
-guessed. The generated tutorial names the two base words its lessons actually
-use (`contains` and `boolean`) instead of inventing replacements. The checklist
-Siulak speakers worked through is in
-[`docs/02-vocabulary-worksheet.md`](docs/02-vocabulary-worksheet.md); the Koto
-Payang record is in [`dialects/koto-payang.md`](dialects/koto-payang.md).
+Koto Payang owns all 137 neutral IDs and names Rizka Hanifa Khairany as its
+reviewer. Every Tier 1, Tier 2, and Tier 3 row is `reviewed`, so the dialect is
+included at `status: approved` with no English fallback. The generated tutorial
+now uses its own words (`meriksu` for `contains`, `betiu_salah` for the boolean
+type) instead of borrowing the base. The checklist Siulak speakers worked
+through is in [`docs/02-vocabulary-worksheet.md`](docs/02-vocabulary-worksheet.md);
+the Koto Payang record is in [`dialects/koto-payang.md`](dialects/koto-payang.md).
 
 Semurup, Sungai Liuk, and Rawang are **not in this release**. No
 speaker-approved file exists for them. The guide for adding one is

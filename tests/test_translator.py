@@ -4,6 +4,7 @@ Run with: python3 tests/test_translator.py
 """
 import contextlib
 import io
+import json
 import os
 import pathlib
 import shutil
@@ -57,13 +58,32 @@ def headered(body, code="siulak"):
     return "# dialek: %s\n%s" % (code, body)
 
 
-def translate(path, target="koto-payang", extra=()):
-    return capture(main, ["terjemah", str(path), "--ke", target] + list(extra))
+def translate(path, target="koto-payang", extra=(), **kwargs):
+    return capture(main, ["terjemah", str(path), "--ke", target] + list(extra),
+                   **kwargs)
 
 
-def translate_out(path, out, target="koto-payang", extra=()):
+def translate_out(path, out, target="koto-payang", extra=(), **kwargs):
     return capture(main, ["terjemah", str(path), "--ke", target,
-                          "--out", str(out)] + list(extra))
+                          "--out", str(out)] + list(extra), **kwargs)
+
+
+def gap_root(tmp):
+    """A copy of the Koto Payang file with four built-ins removed."""
+    root = pathlib.Path(tmp) / "dialects"
+    root.mkdir()
+    for name in ("siulak.json", "koto-payang.json"):
+        shutil.copy2(os.path.join(ROOT, "dialects", name), root / name)
+    data = json.loads((root / "koto-payang.json").read_text(encoding="utf-8"))
+    data["code"] = "koto-gap"
+    data["name"] = "Koto Gap"
+    data["status"] = "draft"
+    for ident in ("fn.wait", "fn.list", "fn.map", "fn.contains"):
+        data["words"].pop(ident, None)
+    (root / "koto-gap.json").write_text(
+        json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8", newline="\n")
+    return root
 
 
 # ---- 1. basic translation -------------------------------------------------
@@ -253,11 +273,13 @@ def test_target_gaps():
         ("nyetak isi([1], 1)\n", "fn.contains"),
     ]
     with tempfile.TemporaryDirectory() as tmp:
+        root = gap_root(tmp)
         for index, (body, token_id) in enumerate(cases):
             path = write_text(os.path.join(tmp, "gap%d.krc" % index),
                               headered(body))
             out_path = os.path.join(tmp, "gap%d.out.krc" % index)
-            code, out, err = translate_out(path, out_path)
+            code, out, err = translate_out(path, out_path, target="koto-gap",
+                                           dialect_root=root)
             check(code == 1, "a missing target ID exits 1", (index, code, err))
             check(token_id in err, "the missing ID is named", (index, err))
             check(not os.path.exists(out_path),
@@ -269,8 +291,9 @@ def test_target_gaps():
             source = os.path.join(EXAMPLES, name)
             before = read_bytes(source)
             out_path = os.path.join(tmp, "example-" + name)
-            code, out, err = translate_out(source, out_path)
-            check(code == 1, "%s is refused by Koto Payang" % name,
+            code, out, err = translate_out(source, out_path, target="koto-gap",
+                                           dialect_root=root)
+            check(code == 1, "%s is refused by the gap dialect" % name,
                   (code, err))
             check(token_id in err, "%s names %s" % (name, token_id), err)
             check(read_bytes(source) == before,

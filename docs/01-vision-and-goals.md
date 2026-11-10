@@ -3,7 +3,7 @@
 Status (2026-11-02): this is the original v1 vision, kept for history. The
 current status is in [`07-roadmap.md`](07-roadmap.md). The language now has a
 multi-dialect engine, Siulak is frozen at its v0.5 vocabulary, and Koto Payang
-is the second dialect at `review`; see [`09-adding-a-dialect.md`](09-adding-a-dialect.md).
+is the second dialect, now `approved`; see [`09-adding-a-dialect.md`](09-adding-a-dialect.md).
 
 ## Purpose
 
@@ -42,7 +42,7 @@ Fill these in as you decide.
 
 - Language name: **KerinciLang** (alternative: KerinciScript)
 - File extension: **.krc**
-- Dialects: **no standard dialect.** Siulak is the first, frozen at its v0.5 vocabulary for compatibility; Koto Payang is the second at `review`. A new dialect is a data file with its own speakers.
+- Dialects: **no standard dialect.** Siulak is the first, frozen at its v0.5 vocabulary for compatibility; Koto Payang is the second, `approved`. A new dialect is a data file with its own speakers.
 - Reference dictionary: the Siulak dictionary (record title, author, year, URL in `02`)
 - Licence: see `06-community-and-preservation.md`
 

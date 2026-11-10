@@ -265,7 +265,9 @@ def test_release_notes():
     check("| Siulak | `siulak` | `draft` (frozen v0.5) | 32/32 | 104/104 | 1/1 |"
           in changelog, "changelog table has Siulak counts")
     check("| Koto Payang | `koto-payang` | `review` | 32/32 | 57/104 | 0/1 |"
-          in changelog, "changelog table has Koto Payang counts")
+          in changelog, "changelog 0.6.0 table keeps the release history")
+    check("| Koto Payang | `koto-payang` | `approved` | 32/32 | 104/104 | 1/1 |"
+          in changelog, "unreleased table has the approved Koto Payang counts")
     check("Not in this release" in changelog,
           "changelog has a 'Not in this release' section")
     for name in ("Semurup", "Sungai Liuk", "Rawang"):
@@ -307,8 +309,10 @@ def test_grammar_freshness_and_coverage():
                 missing.append((ident, word))
         check(not missing, "grammar highlights every kw/op/fn word for %s" % code,
               missing)
-    check("contains" in text and "wait" in text,
-          "grammar includes Koto Payang's base fallback built-ins")
+    check("meriksu" in text and "nunggu" in text,
+          "grammar includes Koto Payang's own built-ins")
+    check("contains" not in text and "wait" not in text,
+          "grammar does not include the retired base built-ins")
     check("nytak" in text and "nyetak" in text,
           "grammar is a union, not a Siulak-only list")
 
@@ -372,8 +376,10 @@ def test_no_collateral_change():
 
     data = json.loads(read(os.path.join(ROOT, "dialects",
                                        "koto-payang.json")))
-    check(data.get("status") == "review", "Koto Payang is still review",
+    check(data.get("status") == "approved", "Koto Payang is approved",
           data.get("status"))
+    check(data.get("reviewer") == "Rizka Hanifa Khairany",
+          "Koto Payang names its reviewer", data.get("reviewer"))
     check(kerincilang.__version__ == "0.6.0" and "0.5.0" not in read(
         os.path.join(ROOT, "README.md")), "no 0.5.0 regression in the README")
 

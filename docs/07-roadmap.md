@@ -86,10 +86,9 @@
 - [x] `krc terjemah` for a lossless rewrite between dialects
 - [x] Worksheet pipeline (`lembar_kerja.py buat/rangka/periksa/laporan/json`) and the canonical CSVs
 - [x] Siulak frozen at its v0.5 vocabulary as `dialects/siulak.json` (`draft`)
-- [x] Koto Payang at `status: review`: 32/32 Tier 1, 57/104 Tier 2, 0/1 Tier 3
+- [x] Koto Payang `approved`: 32/32 Tier 1, 104/104 Tier 2, 1/1 Tier 3
 - [x] Generated English and Indonesian Koto Payang tutorial trees, every block tested
 - [x] One union VS Code grammar, `docs/09-adding-a-dialect.md`, and `RELEASING.md`
-- [ ] Koto Payang Tier 2 vocabulary (optional; the dialect is included at `review`)
 - [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
 - [x] Tag and publish `v0.6.0`
 

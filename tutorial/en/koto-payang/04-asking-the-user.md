@@ -125,4 +125,4 @@ Answers: [answers.md](answers.md#lesson-4). Continue to [Lesson 5](05-decisions.
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*

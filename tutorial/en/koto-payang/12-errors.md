@@ -198,4 +198,4 @@ Answers: [answers.md](answers.md#lesson-12). Continue to [Lesson 13](13-project.
 
 ---
 *Generated from the Siulak lesson. Code and inline code use Koto Payang
-(status: review).*
+(status: approved).*
