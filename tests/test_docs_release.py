@@ -232,28 +232,30 @@ def test_stale_strings():
 
 
 def test_versions():
-    version = "0.6.0"
+    version = "0.6.1"
     check(kerincilang.__version__ == version,
-          "kerincilang.__version__ is 0.6.0", kerincilang.__version__)
+          "kerincilang.__version__ is 0.6.1", kerincilang.__version__)
     pyproject = read(os.path.join(ROOT, "pyproject.toml"))
-    check(re.search(r'^version = "0\.6\.0"$', pyproject, re.M) is not None,
-          "pyproject version is 0.6.0")
+    check(re.search(r'^version = "0\.6\.1"$', pyproject, re.M) is not None,
+          "pyproject version is 0.6.1")
     extension = json.loads(read(os.path.join(ROOT, "vscode-extension",
                                              "package.json")))
     check(extension.get("version") == version,
-          "VS Code extension version is 0.6.0", extension.get("version"))
+          "VS Code extension version is 0.6.1", extension.get("version"))
     readme = read(os.path.join(ROOT, "README.md"))
-    check("Version **0.6.0**" in readme, "README says Version 0.6.0")
+    check("Version **0.6.1**" in readme, "README says Version 0.6.1")
     getting = read(os.path.join(ROOT, "GETTING-STARTED.md"))
-    for text in ("KerinciLang 0.6.0", "kerincilang-0.6.0",
-                 "kerincilang.kerincilang-0.6.0", "v0.6.0"):
+    for text in ("KerinciLang 0.6.1", "kerincilang-0.6.1",
+                 "kerincilang.kerincilang-0.6.1", "v0.6.1"):
         check(text in getting, "GETTING-STARTED mentions %s" % text)
     changelog = read(os.path.join(ROOT, "CHANGELOG.md"))
-    check("## 0.6.0 (2026-11-02)" in changelog, "CHANGELOG has the 0.6.0 heading")
-    check("v0.6.0" in read(os.path.join(ROOT, "RELEASING.md")),
-          "RELEASING names v0.6.0")
-    check("v0.6.0" in read(os.path.join(ROOT, "docs", "07-roadmap.md")),
-          "roadmap names v0.6.0")
+    check("## 0.6.1 (2026-11-19)" in changelog, "CHANGELOG has the 0.6.1 heading")
+    check("## 0.6.0 (2026-11-02)" in changelog,
+          "CHANGELOG keeps the 0.6.0 heading")
+    check("v0.6.1" in read(os.path.join(ROOT, "RELEASING.md")),
+          "RELEASING names v0.6.1")
+    check("v0.6.1" in read(os.path.join(ROOT, "docs", "07-roadmap.md")),
+          "roadmap names v0.6.1")
 
     for name in READER_FILES:
         check("0.5.0" not in read(os.path.join(ROOT, name)),
@@ -327,7 +329,7 @@ def test_extension_metadata():
     check("union" in readme.lower(), "extension README explains the union rule")
     check("picker" in readme.lower(),
           "extension README explains the missing per-dialect picker")
-    check("0.6.0" in readme, "extension README names the 0.6.0 install path")
+    check("0.6.1" in readme, "extension README names the 0.6.1 install path")
 
 
 def test_packaging_configuration():
@@ -351,7 +353,7 @@ def test_packaging_configuration():
 
 def test_releasing_document():
     text = read(os.path.join(ROOT, "RELEASING.md"))
-    for needle in ("0.6.0", "build.py", "cek_dialek.py --semua",
+    for needle in ("0.6.1", "build.py", "cek_dialek.py --semua",
                    "test_release.py", "pip wheel", "git tag"):
         check(needle in text, "RELEASING names %s" % needle)
     check("Semurup" in text and "Sungai Liuk" in text and "Rawang" in text,
@@ -380,7 +382,7 @@ def test_no_collateral_change():
           data.get("status"))
     check(data.get("reviewer") == "Rizka Hanifa Khairany",
           "Koto Payang names its reviewer", data.get("reviewer"))
-    check(kerincilang.__version__ == "0.6.0" and "0.5.0" not in read(
+    check(kerincilang.__version__ == "0.6.1" and "0.5.0" not in read(
         os.path.join(ROOT, "README.md")), "no 0.5.0 regression in the README")
 
 

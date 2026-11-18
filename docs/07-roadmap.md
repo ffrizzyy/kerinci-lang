@@ -77,7 +77,7 @@
 - [ ] Browser playground (transpile to JavaScript), so people can try the language without installing Python
 - [ ] More text tools (uppercase/lowercase, find, replace, trim), random numbers, dates (all need words)
 
-## Milestone 8: v0.6.0, multi-dialect (done; release pending)
+## Milestone 8: v0.6.0, multi-dialect (released 2026-11-02)
 
 - [x] Neutral ID catalogue in `core/ids.json`; the engine compares IDs, never words
 - [x] Dialect loader and validation: `dialects/<code>.json`, parents, fallbacks, status gates
@@ -86,11 +86,18 @@
 - [x] `krc terjemah` for a lossless rewrite between dialects
 - [x] Worksheet pipeline (`lembar_kerja.py buat/rangka/periksa/laporan/json`) and the canonical CSVs
 - [x] Siulak frozen at its v0.5 vocabulary as `dialects/siulak.json` (`draft`)
-- [x] Koto Payang `approved`: 32/32 Tier 1, 104/104 Tier 2, 1/1 Tier 3
 - [x] Generated English and Indonesian Koto Payang tutorial trees, every block tested
 - [x] One union VS Code grammar, `docs/09-adding-a-dialect.md`, and `RELEASING.md`
-- [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
 - [x] Tag and publish `v0.6.0`
+- [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
+
+## Milestone 9: v0.6.1, Koto Payang approved (done; release pending)
+
+- [x] Every open Koto Payang row reviewed; all 137 IDs owned, no base fallback
+- [x] `dialects/koto-payang.json` is `approved`, revision 2, reviewer Rizka Hanifa Khairany
+- [x] Tutorial generator counts a fallback only when the base is actually used
+- [x] Generated English and Indonesian tutorial trees use the dialect's own words
+- [ ] Tag and publish `v0.6.1`
 
 ## Weekly rhythm
 

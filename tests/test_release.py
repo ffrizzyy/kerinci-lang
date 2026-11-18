@@ -141,8 +141,8 @@ def run_installed(target, work):
 
     result = run(outside, "-c",
                  "import kerincilang; print(kerincilang.__version__)", env=env)
-    check(result.returncode == 0 and result.stdout.strip() == "0.6.0",
-          "the installed package reports version 0.6.0",
+    check(result.returncode == 0 and result.stdout.strip() == "0.6.1",
+          "the installed package reports version 0.6.1",
           (result.returncode, result.stdout, result.stderr))
 
 

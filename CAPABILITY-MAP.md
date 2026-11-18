@@ -80,7 +80,7 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
       implemented and green (`dialects/siulak.json`, `tests/test_siulak_legacy.py`).
 - [x] `SPEC-dialect-koto-payang.md` approved; `dialect-koto-payang`
       implemented and green (`dialects/koto-payang.json`,
-      `tests/test_koto_payang.py`), status `review`.
+      `tests/test_koto_payang.py`), status `approved`.
 - [x] `SPEC-cli-migration.md` approved; `cli-migration` implemented and green
       (`krc migrasi`, `tests/test_migration.py`); examples carry headers.
 - [x] `SPEC-translator.md` approved; `translator` implemented and green
@@ -91,4 +91,4 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
 - [x] `SPEC-docs-release.md` approved; `docs-release` implemented and green
       (`docs/09-adding-a-dialect.md`, `RELEASING.md`, the union grammar,
       `tests/test_docs_release.py`, `tests/test_release.py`).
-- [ ] Next: tag and publish `v0.6.0` after human confirmation.
+- [ ] Next: tag and publish `v0.6.1` after human confirmation.

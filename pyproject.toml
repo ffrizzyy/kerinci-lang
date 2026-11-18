@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kerincilang"
-version = "0.6.0"
+version = "0.6.1"
 description = "A multi-dialect programming language with Kerinci vocabulary (Siulak and Koto Payang)"
 readme = "README.md"
 requires-python = ">=3.9"

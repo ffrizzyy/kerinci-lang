@@ -2,7 +2,7 @@
 
 All notable changes to KerinciLang. Versions below 1.0 may still change vocabulary after review by speakers.
 
-## Unreleased
+## 0.6.1 (2026-11-19)
 
 Koto Payang is now `approved`. The speaker reviewed every open row, the JSON
 owns all 137 IDs, and the generated tutorial uses the dialect's own words with
@@ -10,6 +10,7 @@ no English fallback.
 
 | Dialect | Code | Status | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
+| Siulak | `siulak` | `draft` (frozen v0.5) | 32/32 | 104/104 | 1/1 |
 | Koto Payang | `koto-payang` | `approved` | 32/32 | 104/104 | 1/1 |
 
 **Changed**

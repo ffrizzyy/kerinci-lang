@@ -3,10 +3,10 @@
 Syntax highlighting for `.krc` files, generated from the dialect data in
 `dialects/`.
 
-## Install (0.6.0)
+## Install (0.6.1)
 
 Copy this whole `vscode-extension/` folder into VS Code's extensions folder
-under the name `kerincilang.kerincilang-0.6.0`:
+under the name `kerincilang.kerincilang-0.6.1`:
 
 - Windows: `%USERPROFILE%\.vscode\extensions\`
 - macOS and Linux: `~/.vscode/extensions/`

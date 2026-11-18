@@ -8,7 +8,7 @@ KerinciLang exists to help preserve the Kerinci language. Because of that, **Ker
 
 - New words and corrections must come from **the dictionary or from speakers**. They must never be guessed, invented, or machine-translated.
 - Decisions about words are recorded in the worksheet for that dialect and in [`docs/02-vocabulary-worksheet.md`](docs/02-vocabulary-worksheet.md) (the Siulak "Decisions log"), with their source.
-- Each dialect has its own speakers and its own file. There is **no standard dialect**. Siulak is the first dialect and is frozen at its v0.5 vocabulary for compatibility; Koto Payang is the next, at `review`.
+- Each dialect has its own speakers and its own file. There is **no standard dialect**. Siulak is the first dialect and is frozen at its v0.5 vocabulary for compatibility; Koto Payang is the next, `approved` with a named reviewer.
 - If speakers disagree, write the disagreement down in the dialect's notes file; do not hide it.
 - Ask permission before naming anyone as a contributor.
 

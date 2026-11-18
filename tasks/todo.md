@@ -39,11 +39,12 @@ Each item is done only when the listed check passes.
 
 ## Follow-ups (not part of docs-release)
 
-- Koto Payang Tier 2 rows remain open; the dialect is included at `review`.
+- Koto Payang is promoted to `approved` in the 0.6.1 tree: all 137 rows
+  reviewed, no base fallback, Rizka Hanifa Khairany as the named reviewer.
 - Rawang: `dialects/src/rawang.csv` is mapped from the speaker worksheet (29/32
   Tier 1, 58/104 Tier 2, all `draft`). It is not a release; a reviewed
   `dialects/rawang.json` and `rawang.md` come first.
 - Semurup, Sungai Liuk: speaker-approved files, then the guide.
 - A per-dialect VS Code picker, if it ever earns its complexity.
 - A full Koto Payang glossary after `approved`.
-- Tag and publish `v0.6.0` only after the human confirms.
+- Tag and publish `v0.6.1` only after the human confirms.

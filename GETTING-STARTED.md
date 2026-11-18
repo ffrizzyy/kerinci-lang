@@ -4,7 +4,7 @@ A step-by-step guide for a freshly unzipped copy of KerinciLang. Each step says 
 
 ## 1. Unzip
 
-Unzip `kerincilang-0.6.0.zip`. You get one folder, `kerincilang-0.6.0`. Everything below happens inside it.
+Unzip `kerincilang-0.6.1.zip`. You get one folder, `kerincilang-0.6.1`. Everything below happens inside it.
 
 ## 2. Check that Python is installed
 
@@ -21,7 +21,7 @@ You should see something like `Python 3.12.3`.
 
 ## 3. Open a terminal inside the folder
 
-- **Windows:** open the `kerincilang-0.6.0` folder in File Explorer, click the address bar, type `cmd`, and press Enter.
+- **Windows:** open the `kerincilang-0.6.1` folder in File Explorer, click the address bar, type `cmd`, and press Enter.
 - **macOS:** right-click the folder and choose "New Terminal at Folder" (or in Terminal, type `cd ` and drag the folder into the window).
 - **Linux:** right-click inside the folder and choose "Open in Terminal", or `cd` to it.
 
@@ -31,7 +31,7 @@ Check that you are in the right place:
 python3 kerincilang.py --version
 ```
 
-You should see `KerinciLang 0.6.0`.
+You should see `KerinciLang 0.6.1`.
 
 ## 4. Run your first program
 
@@ -81,7 +81,7 @@ Press `Ctrl+D` (on Windows: `Ctrl+Z`, then Enter) to leave.
    nyetak "Halo, dunia"
    ```
 
-2. Save it as `halo.krc` inside the `kerincilang-0.6.0` folder. Use the UTF-8 encoding (most editors do this by default; in Notepad choose it under "Save as").
+2. Save it as `halo.krc` inside the `kerincilang-0.6.1` folder. Use the UTF-8 encoding (most editors do this by default; in Notepad choose it under "Save as").
 3. Run it:
 
    ```bash
@@ -110,7 +110,7 @@ python3 dist/krc.pyz --dialek koto-payang halo.krc
 The header wins over `--dialek`. A dialect that does not own a word uses the
 neutral English base and prints one warning per missing ID on stderr, so the
 program still runs. The dialects included in this release are `siulak` (the
-default, frozen at v0.5) and `koto-payang` (under review).
+default, frozen at v0.5) and `koto-payang` (approved).
 
 ## 8. Learn the language
 
@@ -142,7 +142,7 @@ If `krc` is "not found" afterwards, your Python scripts folder is not on your PA
 
 ## 10. Optional: colours in VS Code
 
-The folder `vscode-extension/` adds syntax highlighting for `.krc` files. Copy that whole folder into VS Code's extensions folder under the name `kerincilang.kerincilang-0.6.0`:
+The folder `vscode-extension/` adds syntax highlighting for `.krc` files. Copy that whole folder into VS Code's extensions folder under the name `kerincilang.kerincilang-0.6.1`:
 
 - Windows: `%USERPROFILE%\.vscode\extensions\`
 - macOS and Linux: `~/.vscode/extensions/`
@@ -194,21 +194,21 @@ Everything works, but a few things need your input first:
    ```bash
    git init
    git add .
-   git commit -m "KerinciLang v0.6.0"
+   git commit -m "KerinciLang v0.6.1"
    git branch -M main
    git remote add origin <the address of your new repository>
    git push -u origin main
    ```
 
    The automated tests in `.github/workflows/tests.yml` then run on Python 3.9 to 3.13 (and on Windows and macOS).
-4. **Publish a release.** On the repository's Releases page, create `v0.6.0` and attach `dist/krc.pyz` so people can download the single file.
+4. **Publish a release.** On the repository's Releases page, create `v0.6.1` and attach `dist/krc.pyz` so people can download the single file.
 
 ## Troubleshooting
 
 | Problem | What to do |
 |---|---|
 | `python3: command not found` | On Windows use `python` or `py`; otherwise install Python (step 2). |
-| `Kesalahan: Berkas tidak ditemukan: ...` | The file name or folder is wrong. Check you are inside `kerincilang-0.6.0` and spelled the name correctly. |
+| `Kesalahan: Berkas tidak ditemukan: ...` | The file name or folder is wrong. Check you are inside `kerincilang-0.6.1` and spelled the name correctly. |
 | `Kesalahan: Baris 1: karakter tidak dikenal ...` | Usually a missing closing quotation mark. |
 | Any other `Kesalahan: ...` message | The messages are in Indonesian; [tutorial/glossary.md](tutorial/glossary.md#error-messages) explains the common ones. |
 | Strange characters in output on Windows | Run `chcp 65001` first, or use Windows Terminal; save your programs as UTF-8. |

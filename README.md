@@ -88,7 +88,7 @@ Variables and constants, numbers, text (with `pisah` / `disatu` to split and joi
 
 ## Status
 
-Version **0.6.0**. The multi-dialect engine is complete and tested (271 language
+Version **0.6.1**. The multi-dialect engine is complete and tested (271 language
 checks and 550 baseline tutorial blocks), but dialect coverage is a separate,
 speaker-gated axis.
 

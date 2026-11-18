@@ -1,7 +1,7 @@
 # Releasing KerinciLang
 
 This is the maintainer checklist for a release. It assumes the repository is
-`kerinci-lang` and the release is `v0.6.0`. Change the numbers, not the order.
+`kerinci-lang` and the release is `v0.6.1`. Change the numbers, not the order.
 
 ## 1. Start clean
 
@@ -16,18 +16,18 @@ dirty tree.
 
 ## 2. Agree on the version
 
-These locations must all say `0.6.0`:
+These locations must all say `0.6.1`:
 
 | Location | Field |
 |---|---|
 | `kerincilang.py` | `__version__` |
 | `pyproject.toml` | `version` |
 | `vscode-extension/package.json` | `version` |
-| `README.md` | `Version **0.6.0**` |
+| `README.md` | `Version **0.6.1**` |
 | `GETTING-STARTED.md` | folder, banner, extension folder, tag, release name |
-| `CHANGELOG.md` | top heading `## 0.6.0 (YYYY-MM-DD)` |
+| `CHANGELOG.md` | top heading `## 0.6.1 (YYYY-MM-DD)` |
 | `RELEASING.md` | the tag in step 7 |
-| `docs/07-roadmap.md` | the `v0.6.0` milestone |
+| `docs/07-roadmap.md` | the `v0.6.1` milestone |
 
 `core/ids.json` stays `"core": "0.6"`. It is a MAJOR.MINOR compatibility tuple,
 not the package version. A patch release does not change it.
@@ -92,13 +92,13 @@ A missing word warning belongs on stderr, never in stdout.
 
 ```bash
 git add -A
-git commit -m "release: v0.6.0"
-git tag -a v0.6.0 -m "KerinciLang 0.6.0"
+git commit -m "release: v0.6.1"
+git tag -a v0.6.1 -m "KerinciLang 0.6.1"
 git push
-git push origin v0.6.0
+git push origin v0.6.1
 ```
 
-On the GitHub Releases page, create `v0.6.0` from the tag and attach
+On the GitHub Releases page, create `v0.6.1` from the tag and attach
 `dist/krc.pyz`. Paste the dialect status table from `CHANGELOG.md` into the
 release notes. Do not attach a dialect file separately; it is inside the
 zipapp.
@@ -132,5 +132,5 @@ Never attach a dialect name to a release before its file exists, and never
 promote `review` to `approved` without the review gate: every Tier 1 and Tier 2
 row reviewed and a named reviewer. The 0.6.0 scope was Siulak (frozen `draft`)
 and Koto Payang (`review`); Semurup, Sungai Liuk, and Rawang were not included.
-The unreleased tree promotes Koto Payang to `approved` with all 137 rows
-reviewed and Rizka Hanifa Khairany as the named reviewer.
+0.6.1 promotes Koto Payang to `approved` with all 137 rows reviewed and Rizka
+Hanifa Khairany as the named reviewer.
