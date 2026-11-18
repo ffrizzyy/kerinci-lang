@@ -1,0 +1,49 @@
+{
+  "name": "KerinciLang (Koto Payang)",
+  "patterns": [
+    {
+      "match": "#.*$",
+      "name": "comment.line.number-sign.krc"
+    },
+    {
+      "begin": "\"",
+      "end": "\"",
+      "name": "string.quoted.double.krc",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.krc"
+        }
+      ]
+    },
+    {
+      "match": "\\b\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric.krc"
+    },
+    {
+      "match": "\\b(baluikka|cocokka|cubea|daling|impor|kalu|kecuali|lanjutka|mulai|ndik|nga_laen|selamu|selesai|slese|timbaoka)\\b",
+      "name": "keyword.control.krc"
+    },
+    {
+      "match": "\\b(jeloehka|netakka_konstanta|netakka_variabel)\\b",
+      "name": "storage.type.krc"
+    },
+    {
+      "match": "\\b(atau|iduak|iduak_samu_dinga|lebih_geduang_atau_samu_dinga|lebih_geduang_dari|lebih_nik_atau_samu_dinga|lebih_nik_dari|nga|samu_dinga)\\b",
+      "name": "keyword.operator.word.krc"
+    },
+    {
+      "match": "\\b(masukka|nytak)\\b",
+      "name": "support.function.krc"
+    },
+    {
+      "match": "\\b(betiu|kusao|salah)\\b",
+      "name": "constant.language.krc"
+    },
+    {
+      "match": "\\b(bacea|bagi|basatau|bilangan_buluak|bukuak|daftar|desimal|kali|kura|meriksu|ngapih_berkas|nunggu|panja|pecah|peta|rentang|tambah|tambahka|tebaluik|terurut|tipe|tulaih|tulisan|tutamp)(?=\\()\\b",
+      "name": "support.function.builtin.krc"
+    }
+  ],
+  "scopeName": "source.krc.koto_payang"
+}

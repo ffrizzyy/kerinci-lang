@@ -10,7 +10,7 @@
 - [x] 271 language checks + 550 baseline tutorial code blocks + the generated Koto Payang trees
 - [x] Conflicts resolved: `salah` = false, `kelihu` = error (reserved); try/catch/raise = `cubo`/`tangkap`/`ngangkat`; `kurang` = subtract, `kurang_daripado` / `lebih_daripado` = less / greater than
 - [x] Comparison words (`samo`, `dak_samo`, `lebih_daripado`, `kurang_daripado`, `lebih_samo`, `kurang_samo`)
-- [x] VS Code syntax highlighting generated as a union of every dialect's words
+- [x] VS Code syntax highlighting: one union grammar plus one per dialect, and a picker that follows the line-1 header
 - [x] Example programs in `examples/`
 - [x] `krc` command (`pip install .`), single-file build `dist/krc.pyz`, multi-line REPL, `-c`, `--version`, clean exit codes
 

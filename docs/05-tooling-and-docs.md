@@ -42,21 +42,29 @@ MESSAGES = {
 
 ### VS Code syntax highlighting
 
-Already included in `vscode-extension/`. The grammar is a **union** generated
-from every dialect's resolved words, so it stays in sync and no dialect is
-presented as the standard:
+Already included in `vscode-extension/`. `make_highlight.py` writes a **union**
+grammar from every dialect's resolved words, one grammar per dialect, and
+`dialects.json`, the catalogue the extension reads at runtime:
 
 ```bash
 python3 make_highlight.py
 ```
 
+A `.krc` file starts in the union grammar. When it opens, and whenever line 1
+changes, `extension.js` reads the same header rule as the interpreter and
+switches to that dialect's grammar, so Siulak code does not color Koto Payang
+words and the other way round. **KerinciLang: Pilih Dialek** in the Command
+Palette (or the language name in the status bar) overrides the choice for the
+current file without editing it; **Otomatis** returns to the header.
+`kerincilang.autoDetectDialect` turns the automatic switch off. A TextMate
+grammar cannot read the file it colors, which is why the declarative grammars
+are generated and the small extension module only chooses one.
+
 To try it locally, copy the `vscode-extension` folder into your VS Code
 extensions directory (`~/.vscode/extensions/kerincilang`) and reload VS Code.
 Files ending in `.krc` get colors for keywords, strings, numbers and comments,
 plus bracket matching and `#` comment toggling. The extension README explains
-the union rule. A per-dialect picker is not part of 0.6: a grammar cannot switch
-on the `# dialek:` line, so every valid word from every dialect is highlighted.
-To publish it, package it with `vsce`.
+the generated files. To publish it, package it with `vsce`.
 
 ## Documentation set
 

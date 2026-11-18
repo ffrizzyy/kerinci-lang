@@ -1,13 +1,20 @@
 {
   "name": "kerincilang",
   "displayName": "KerinciLang",
-  "description": "Syntax highlighting for KerinciLang (.krc), covering Siulak and Koto Payang",
+  "description": "Syntax highlighting and a per-file dialect picker for KerinciLang (.krc): Siulak and Koto Payang",
   "version": "0.6.1",
   "engines": {
     "vscode": "^1.70.0"
   },
   "categories": [
     "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onLanguage:kerincilang",
+    "onLanguage:kerincilang-siulak",
+    "onLanguage:kerincilang-koto-payang",
+    "onCommand:kerincilang.pilihDialek"
   ],
   "contributes": {
     "languages": [
@@ -21,6 +28,22 @@
           ".krc"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "kerincilang-siulak",
+        "aliases": [
+          "KerinciLang (Siulak)",
+          "krc (Siulak)"
+        ],
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "kerincilang-koto-payang",
+        "aliases": [
+          "KerinciLang (Koto Payang)",
+          "krc (Koto Payang)"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -28,8 +51,35 @@
         "language": "kerincilang",
         "scopeName": "source.krc",
         "path": "./syntaxes/krc.tmLanguage.json"
+      },
+      {
+        "language": "kerincilang-siulak",
+        "scopeName": "source.krc.siulak",
+        "path": "./syntaxes/krc-siulak.tmLanguage.json"
+      },
+      {
+        "language": "kerincilang-koto-payang",
+        "scopeName": "source.krc.koto_payang",
+        "path": "./syntaxes/krc-koto-payang.tmLanguage.json"
       }
-    ]
+    ],
+    "commands": [
+      {
+        "command": "kerincilang.pilihDialek",
+        "title": "Pilih Dialek",
+        "category": "KerinciLang"
+      }
+    ],
+    "configuration": {
+      "title": "KerinciLang",
+      "properties": {
+        "kerincilang.autoDetectDialect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Read the line-1 `# dialek:` header and switch to that dialect's grammar. Turn off to keep the language mode you choose."
+        }
+      }
+    }
   },
   "publisher": "kerincilang"
 }

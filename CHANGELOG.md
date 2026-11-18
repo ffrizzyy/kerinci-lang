@@ -6,12 +6,20 @@ All notable changes to KerinciLang. Versions below 1.0 may still change vocabula
 
 Koto Payang is now `approved`. The speaker reviewed every open row, the JSON
 owns all 137 IDs, and the generated tutorial uses the dialect's own words with
-no English fallback.
+no English fallback. The VS Code extension also gains one grammar per dialect
+and a picker that follows the line-1 header.
 
 | Dialect | Code | Status | Tier 1 | Tier 2 | Tier 3 |
 |---|---|---|---|---|---|
 | Siulak | `siulak` | `draft` (frozen v0.5) | 32/32 | 104/104 | 1/1 |
 | Koto Payang | `koto-payang` | `approved` | 32/32 | 104/104 | 1/1 |
+
+**New**
+- The VS Code extension ships one grammar per dialect and a picker. It reads
+  the line-1 `# dialek:` header with the interpreter's own rule, switches the
+  language mode, and adds **KerinciLang: Pilih Dialek** plus
+  `kerincilang.autoDetectDialect`. The union grammar remains the fallback for
+  files without a header.
 
 **Changed**
 - `dialects/koto-payang.json` is `approved`, revision 2, reviewer Rizka Hanifa

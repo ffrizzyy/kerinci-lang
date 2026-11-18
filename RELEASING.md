@@ -133,4 +133,5 @@ promote `review` to `approved` without the review gate: every Tier 1 and Tier 2
 row reviewed and a named reviewer. The 0.6.0 scope was Siulak (frozen `draft`)
 and Koto Payang (`review`); Semurup, Sungai Liuk, and Rawang were not included.
 0.6.1 promotes Koto Payang to `approved` with all 137 rows reviewed and Rizka
-Hanifa Khairany as the named reviewer.
+Hanifa Khairany as the named reviewer. It also adds the per-dialect VS Code
+grammars and picker.

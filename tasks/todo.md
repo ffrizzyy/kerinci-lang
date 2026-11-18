@@ -45,6 +45,5 @@ Each item is done only when the listed check passes.
   Tier 1, 58/104 Tier 2, all `draft`). It is not a release; a reviewed
   `dialects/rawang.json` and `rawang.md` come first.
 - Semurup, Sungai Liuk: speaker-approved files, then the guide.
-- A per-dialect VS Code picker, if it ever earns its complexity.
 - A full Koto Payang glossary after `approved`.
 - Tag and publish `v0.6.1` only after the human confirms.

@@ -319,6 +319,119 @@ def test_grammar_freshness_and_coverage():
           "grammar is a union, not a Siulak-only list")
 
 
+def test_dialect_grammars_and_picker():
+    from dialects.loader import available_dialects, load_dialect
+    codes = list(available_dialects())
+    syntaxes = pathlib.Path(ROOT, "vscode-extension", "syntaxes")
+    expected = set()
+    texts = {}
+    words = {}
+    for code in codes:
+        name = "krc-%s.tmLanguage.json" % code
+        expected.add(name)
+        path = syntaxes / name
+        check(path.is_file(), "per-dialect grammar exists: %s" % name)
+        if not path.is_file():
+            continue
+        check(path.read_bytes() ==
+              make_highlight.render_dialect(code).encode("utf-8"),
+              "committed grammar matches a fresh generation for %s" % code)
+        texts[code] = path.read_text(encoding="utf-8")
+        dialect = load_dialect(code)
+        words[code] = {ident: word for ident, word in dialect.words.items()
+                       if ident.split(".", 1)[0] in ("kw", "op", "fn")}
+    actual = {path.name for path in syntaxes.glob("krc-*.tmLanguage.json")}
+    check(actual == expected, "no stale per-dialect grammar",
+          sorted(actual ^ expected))
+
+    for code in codes:
+        if code not in texts:
+            continue
+        missing = [(ident, word) for ident, word in words[code].items()
+                   if re.search(r"(?<![a-z0-9_])" + re.escape(word) +
+                                r"(?![a-z0-9_])", texts[code]) is None]
+        check(not missing,
+              "grammar highlights every kw/op/fn word for %s" % code,
+              missing[:5])
+
+        other_words = set()
+        for other in codes:
+            if other != code:
+                other_words.update(words[other].values())
+        unique = [(ident, word) for ident, word in words[code].items()
+                  if word not in other_words]
+        check(bool(unique), "dialect %s has a word no other dialect uses" % code)
+
+        leaked = []
+        for ident, word in unique:
+            pattern = r"(?<![a-z0-9_])" + re.escape(word) + r"(?![a-z0-9_])"
+            if re.search(pattern, texts[code]) is None:
+                leaked.append((code, ident, word, "missing"))
+            for other in texts:
+                if other != code and re.search(pattern, texts[other]) is not None:
+                    leaked.append((code, ident, word, "in " + other))
+        check(not leaked,
+              "per-dialect grammar %s excludes other dialects' words" % code,
+              leaked[:5])
+
+    catalogue_path = pathlib.Path(ROOT, "vscode-extension", "dialects.json")
+    check(catalogue_path.is_file(), "the extension catalogue exists")
+    if catalogue_path.is_file():
+        check(catalogue_path.read_text(encoding="utf-8") ==
+              make_highlight.render_catalogue(),
+              "the extension catalogue matches a fresh generation")
+        catalogue = json.loads(catalogue_path.read_text(encoding="utf-8"))
+        check([item["code"] for item in catalogue["dialects"]] == codes,
+              "the catalogue lists every dialect in order")
+
+    extension = json.loads(read(os.path.join(ROOT, "vscode-extension",
+                                             "package.json")))
+    check(extension.get("main") == "./extension.js",
+          "the extension declares its module", extension.get("main"))
+    module = pathlib.Path(ROOT, "vscode-extension", "extension.js")
+    check(module.is_file(), "the extension module exists")
+    if module.is_file():
+        source = module.read_text(encoding="utf-8")
+        check(kerincilang.HEADER_RE.pattern in source,
+              "the extension uses the interpreter's header rule")
+        check("setTextDocumentLanguage" in source,
+              "the extension switches the language mode")
+
+    languages = {item["id"]: item
+                 for item in extension["contributes"].get("languages", [])}
+    grammars = {item["language"]: item
+                for item in extension["contributes"].get("grammars", [])}
+    check("kerincilang" in languages and
+          languages["kerincilang"].get("extensions") == [".krc"],
+          "only the union language claims .krc")
+    for code in codes:
+        language = "kerincilang-%s" % code
+        check(language in languages, "the extension registers %s" % language)
+        check(not languages.get(language, {}).get("extensions"),
+              "%s does not claim a file extension" % language)
+        check(language in grammars,
+              "the extension ships a grammar for %s" % language)
+        check(grammars.get(language, {}).get("path") ==
+              "./syntaxes/krc-%s.tmLanguage.json" % code,
+              "the grammar for %s points at the generated file" % language)
+
+    events = set(extension.get("activationEvents", []))
+    for language in languages:
+        check("onLanguage:" + language in events,
+              "the extension activates for %s" % language)
+    check("onCommand:kerincilang.pilihDialek" in events,
+          "the extension activates for its picker command")
+    commands = {item["command"]
+                for item in extension["contributes"].get("commands", [])}
+    check("kerincilang.pilihDialek" in commands,
+          "the picker command is contributed")
+    properties = extension["contributes"].get(
+        "configuration", {}).get("properties", {})
+    setting = properties.get("kerincilang.autoDetectDialect", {})
+    check(setting.get("type") == "boolean" and setting.get("default") is True,
+          "auto-detection is on by default", setting)
+
+
 def test_extension_metadata():
     extension = json.loads(read(os.path.join(ROOT, "vscode-extension",
                                              "package.json")))
@@ -328,7 +441,7 @@ def test_extension_metadata():
     readme = read(os.path.join(ROOT, "vscode-extension", "README.md"))
     check("union" in readme.lower(), "extension README explains the union rule")
     check("picker" in readme.lower(),
-          "extension README explains the missing per-dialect picker")
+          "extension README explains the picker")
     check("0.6.1" in readme, "extension README names the 0.6.1 install path")
 
 
@@ -395,6 +508,7 @@ def main():
         test_versions,
         test_release_notes,
         test_grammar_freshness_and_coverage,
+        test_dialect_grammars_and_picker,
         test_extension_metadata,
         test_packaging_configuration,
         test_releasing_document,

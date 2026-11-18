@@ -1,0 +1,26 @@
+{
+  "dialects": [
+    {
+      "code": "koto-payang",
+      "grammar": "syntaxes/krc-koto-payang.tmLanguage.json",
+      "language": "kerincilang-koto-payang",
+      "name": "Koto Payang",
+      "scopeName": "source.krc.koto_payang",
+      "status": "approved"
+    },
+    {
+      "code": "siulak",
+      "grammar": "syntaxes/krc-siulak.tmLanguage.json",
+      "language": "kerincilang-siulak",
+      "name": "Siulak (legacy 0.5)",
+      "scopeName": "source.krc.siulak",
+      "status": "draft"
+    }
+  ],
+  "union": {
+    "grammar": "syntaxes/krc.tmLanguage.json",
+    "language": "kerincilang",
+    "name": "KerinciLang",
+    "scopeName": "source.krc"
+  }
+}
