@@ -2,6 +2,14 @@ name: tests
 
 on: [push, pull_request]
 
+# A release pushes the branch and its tag, which point at the same commit.
+# Without this, the whole matrix - including the slow macOS runner - is queued
+# twice for identical code. Keep one run per commit; a later push for a
+# different commit gets its own group.
+concurrency:
+  group: tests-${{ github.sha }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
