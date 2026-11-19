@@ -46,4 +46,4 @@ Each item is done only when the listed check passes.
   `dialects/rawang.json` and `rawang.md` come first.
 - Semurup, Sungai Liuk: speaker-approved files, then the guide.
 - A full Koto Payang glossary after `approved`.
-- Tag and publish `v0.6.1` only after the human confirms.
+- Released `v0.6.1` on 2026-11-19.

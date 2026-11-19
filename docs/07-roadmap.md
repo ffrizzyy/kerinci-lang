@@ -91,13 +91,13 @@
 - [x] Tag and publish `v0.6.0`
 - [ ] Semurup, Sungai Liuk, Rawang: speaker-approved files first, then the new-dialect guide
 
-## Milestone 9: v0.6.1, Koto Payang approved (done; release pending)
+## Milestone 9: v0.6.1, Koto Payang approved (released 2026-11-19)
 
 - [x] Every open Koto Payang row reviewed; all 137 IDs owned, no base fallback
 - [x] `dialects/koto-payang.json` is `approved`, revision 2, reviewer Rizka Hanifa Khairany
 - [x] Tutorial generator counts a fallback only when the base is actually used
 - [x] Generated English and Indonesian tutorial trees use the dialect's own words
-- [ ] Tag and publish `v0.6.1`
+- [x] Tag and publish `v0.6.1`
 
 ## Weekly rhythm
 

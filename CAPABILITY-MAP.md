@@ -91,4 +91,4 @@ For 0.6, a new dialect is **data only**: one CSV answer sheet, one JSON file, on
 - [x] `SPEC-docs-release.md` approved; `docs-release` implemented and green
       (`docs/09-adding-a-dialect.md`, `RELEASING.md`, the union grammar,
       `tests/test_docs_release.py`, `tests/test_release.py`).
-- [ ] Next: tag and publish `v0.6.1` after human confirmation.
+- [x] Released `v0.6.1` with Koto Payang approved.
